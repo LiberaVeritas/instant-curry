@@ -1,0 +1,41 @@
+Goals:
+- Report in the style of a conference paper
+    - Motivation behind the project
+    - Background knowledge regarding proof assistants:
+        - references to tools like Tutch
+    - Theory: possibly some kind of translation into Agda or Lean?
+    - Description of the syntax, similar to what they are already writing (assertion-level proof)
+    - Project progress and development
+- Implementation:
+    - parser for the syntax
+    - translation into Lean (for double-checking only?)
+    - our own typechecker (for better errors?)
+- Presentation in the complogic group?
+    - valuable as a draft of a future conference presentation
+
+# Rubric
+
+- A:
+    - Implementation:
+        - Parser
+        - Beginnings of typechecker (whole typechecker would be best)
+    - Report:
+        - Syntax
+        - Description of typechecking algorithm
+        - Background in proof assistants
+        - Motivation
+- B:
+    - Implementation:
+        - Parser mostly working
+        - No typechecking
+    - Report:
+        - Syntax
+        - Description of typechecking is mostly there
+        - Background and motivation are present
+- C:
+    - Implementation:
+        - Mostly not present
+    - Report:
+        - Syntax mostly described
+        - Typechecking mostly missing
+        - Background and motivation mostly missing / imcomplete
