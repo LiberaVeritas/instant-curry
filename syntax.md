@@ -1,5 +1,4 @@
-THEOREM. (Name.)
-    `equation`
+THEOREM (Name). `equation`.
 
 PROOF. By induction on [a variable from the equation]
 
