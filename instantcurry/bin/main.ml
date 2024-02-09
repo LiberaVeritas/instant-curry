@@ -5,10 +5,17 @@ let example_append_statement : Synint.stmt =
     let open Synint in {
       quantifiers = ["l3"; "l2"; "l1"];
       claim = { (* app (app l1 l2) l3 = app l1 (app l2 l3) *)
-          lhs = Ref "app" ++ (Ref "app" ++ MVar ("l1", 2) ++ MVar ("l2", 1)) ++ MVar ("l3", 0);
-          rhs = Ref "app" ++ MVar ("l1", 2) ++ (Ref "app" ++ MVar ("l2", 1) ++ MVar ("l3", 0));
+          lhs = Ref "app" ++ (Ref "app" ++ MVar ("l1") ++ MVar "l2") ++ MVar ("l3");
+          rhs = Ref "app" ++ MVar "l1" ++ (Ref "app" ++ MVar "l2" ++ MVar "l3");
       };
     }
+
+let apply_tm () =
+    let open Synint in
+    unify
+        (App (Fun ("x", Ty_Nat, BVar "x"), Nat 3))
+        (Nat 3)
+        ByDefinition
 
 
 let _ =
