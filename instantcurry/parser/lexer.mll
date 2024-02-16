@@ -26,7 +26,9 @@ rule read_token = parse
 | newline                   { next_line lexbuf ; read_token lexbuf }
 | eof                       { EOF }
 
-(* instant-curry keywords *)
+(* proof language keywords *)
+| "DEFINITION"              { DEFINITION }
+| "PRINT"                   { PRINT }
 | "THEOREM"                 { THEOREM }
 | "PROOF"                   { PROOF }
 | "BY"                      { BY }
@@ -38,6 +40,22 @@ rule read_token = parse
 | "LHS"                     { LHS }
 | "RHS"                     { RHS }
 | "QED"                     { QED }
+
+(* term language keywords *)
+| "let"                     { LET }
+| "rec"                     { REC }
+| "match"                   { MATCH }
+| "with"                    { WITH }
+| "if0"                     { IF0 }
+| "then"                    { THEN }
+| "else"                    { ELSE }
+| "fun"                     { FUN }
+| "end"                     { END }
+
+(* types *)
+| "nat"                     { TYNAT }
+| "list"                    { TYLST }
+| "->"                      { TYARROW }
 
 (* nats and idents *)
 | nat                       { NATLIT (int_of_string (Lexing.lexeme lexbuf)) }
@@ -52,8 +70,12 @@ rule read_token = parse
 | "::"                      { CONS }
 | "[]"                      { NIL }
 | "+"                       { PLUS }
+| "-"                       { MINUS }
+| "*"                       { TIMES }
 | "."                       { SEP }
-
+| "=>"                      { ARROW }
+| "|"                       { BAR }
+| ":"                       { COLON }
 
 | _                         { raise (SyntaxError ("Lexer Error: Illegal character: " ^ Lexing.lexeme lexbuf)) }
 

@@ -1,0 +1,5 @@
+DEFINITION.
+    let f (x : nat) : nat = x
+
+PRINT.
+    f 5

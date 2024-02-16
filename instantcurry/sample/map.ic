@@ -1,0 +1,15 @@
+DEFINITION.
+let rec fact_tr (n : nat) (acc : nat) : nat =
+    if0 n then acc
+    else fact_tr (n - 1) (n * acc) end
+
+DEFINITION.
+let rec map (f : nat -> nat) (l : nat list) : nat list =
+    match l with
+    | [] => [] nat
+    | x :: xs => f x :: (map f xs)
+    end
+
+PRINT.  
+map (fun (x : nat) => fact_tr x 1 end) (5 :: 4 :: 3 :: [] nat)
+

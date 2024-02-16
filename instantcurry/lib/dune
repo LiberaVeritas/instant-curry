@@ -1,2 +1,3 @@
 (library
- (name instantcurry))
+ (name instantcurry)
+ (libraries icparser))
