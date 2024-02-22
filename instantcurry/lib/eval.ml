@@ -134,7 +134,7 @@ let exec_stmt (env : env) (s : stmt) : env =
   match s with
   | Print tm -> print_endline @@ string_of_tm @@ eval env tm; env
   | Definition d -> 
-    (d.name, (d.args, d.body)) :: env
+    (d.name, (d.args, d.body)) :: env (* TODO: make this CBV *)
   | Thm _ -> raise NotImplemented
 
 let exec_prog (p : program) : env =
