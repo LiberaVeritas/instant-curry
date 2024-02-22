@@ -95,7 +95,7 @@ let rec eval (env : env) (e : tm) : tm =
     end
   | Minus (e, e') -> 
     begin match eval env e, eval env e' with
-    | Nat x, Nat y -> Nat (x - y)
+    | Nat x, Nat y -> Nat (max (x - y) 0)
     | _ -> raise (Stuck ArithNonNats)
     end
   | Times (e, e') -> 
