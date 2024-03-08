@@ -18,7 +18,7 @@ let newline = '\n' | "\r\n"
 let digit = [ '0'-'9' ]
 let nat = digit+
 let alpha = [ 'a'-'z' 'A'-'Z' ]
-let ident = [ 'a'-'z'] ( alpha | digit | '_' | '\'' )*
+let ident = [ 'a'-'z' ] ( alpha | digit | '_' | '\'' )*
 let ih = "IH_" (digit as d)
 
 rule read_token = parse
@@ -34,12 +34,15 @@ rule read_token = parse
 | "BY"                      { BY }
 | "INDUCTION"               { INDUCTION }
 | "ON"                      { ON }
+| "FORALL"                  { FORALL }
 | "CASE"                    { CASE }
 | "WTS"                     { WTS }
-| "IH_" (ident as i)        { IH i }
+| "IH" (nat as n)           { IH (int_of_string n) }
+| "IH"                      { IH 0 }
 | "LHS"                     { LHS }
 | "RHS"                     { RHS }
 | "QED"                     { QED }
+| "AXIOM"                   { AXIOM }
 
 (* term language keywords *)
 | "let"                     { LET }
@@ -64,8 +67,6 @@ rule read_token = parse
 (* symbols *)
 | "("                       { LPAR }
 | ")"                       { RPAR }
-| "["                       { LBRA }
-| "]"                       { RBRA }
 | "="                       { EQ }
 | "::"                      { CONS }
 | "[]"                      { NIL }

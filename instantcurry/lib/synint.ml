@@ -26,12 +26,16 @@ type tm =
   | MVar of name
     (* A meta variable, referring to a quantified variable in the metalanguage. *)
 
+type pattern = 
+  | Pat_nil (* [] *)
+  | Pat_cons of name * name (* x :: xs *)
+
 let (++) a b = App (a, b)
 
 type eqn = { lhs : tm; rhs : tm }
 
 type thm_stmt = {
-  quantifiers : name list; (* variables universally quantified in the statement *)
+  quantifiers : (name * ty) list; (* variables universally quantified in the statement *)
   claim : eqn (* that the LHS = the RHS *)
 }
 (* ^ Morally this is a nested Pi-type of all the quantified names followed by an equation.
@@ -41,20 +45,27 @@ type thm_stmt = {
 
 type justification =
     | ByDefinition (* To think about: how to specify which definition exactly? *)
-    (* TODO add other ones *)
+    | ByTheorem of name
 
-type side = (tm * justification) list
+type step = (tm * justification)
+
+type side = {
+    start : tm;
+    steps : step list
+}
 
 type case = {
     var : name;
-    pattern : tm;
-    ihs : eqn list;
+    pattern : pattern;
+    ihs : (name * eqn) list;
     wts : eqn;
     lhs : side;
     rhs : side;
 }
 
-type proof = name * case list (* Induction variable, cases *)
+type proof = 
+| Proof of name * case list (* Induction variable, cases *)
+| Axiom
 
 type stmt = 
   | Thm of {

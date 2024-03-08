@@ -31,34 +31,83 @@ let rec lift_tm (ctx : scope_ctx) (t : Icparser.Parsed_ast.tm) : tm =
     | Some Meta -> MVar x
     | None -> raise (ScopeError x)
 
-let lift_stmt (ctx : scope_ctx) (stmt : Icparser.Parsed_ast.stmt) : scope_ctx * stmt =
+let lift_eqn (ctx : scope_ctx) (eqn : Icparser.Parsed_ast.eqn) : eqn =
+  let (lhs, rhs) = eqn in
+  { lhs = lift_tm ctx lhs; rhs = lift_tm ctx rhs }
+
+let lift_pat (pat : Icparser.Parsed_ast.pattern) : pattern =
+  match pat with
+  | Pat_nil -> Pat_nil
+  | Pat_cons (x, xs) -> Pat_cons (x, xs)
+
+let lift_just (thms : name list) (just : Icparser.Parsed_ast.name) : justification =
+  if just = "defn" then ByDefinition else
+  if List.mem just thms then ByTheorem just
+  else raise (ScopeError just)
+
+let lift_side (thms : name list) (ctx : scope_ctx) (side : Icparser.Parsed_ast.side) : side =
+  let (start, steps) = side in
+  let start = lift_tm ctx start in
+  let f = fun (tm, just) -> (lift_tm ctx tm, lift_just thms just) in
+  { start = start;
+    steps = List.map f steps }
+
+let lift_case (thms : name list) (ctx : scope_ctx) (case : Icparser.Parsed_ast.case) : case =
+  let (name, pat, ihs, wts, lhs, rhs) = case in
+  let ctx = match pat with
+  | Pat_cons (x, xs) -> (x, Meta) :: (xs, Meta) :: ctx  (* patterns introduce metavars *)
+  | Pat_nil -> ctx in
+  let thms = List.fold_left (fun thms (n, _) -> n :: thms) thms ihs in  (* ihs introduce new thms *)
+  { var = name;
+    pattern = lift_pat pat;
+    ihs = List.map (function (name, ih) -> (name, lift_eqn ctx ih)) ihs; 
+    wts = lift_eqn ctx wts;
+    lhs = lift_side thms ctx lhs;
+    rhs = lift_side thms ctx rhs }
+
+let lift_proof (thms : name list) (ctx : scope_ctx) (prf : Icparser.Parsed_ast.proof) : proof =
+  match prf with 
+  | Proof (var, cases) -> Proof (var, List.map (lift_case thms ctx) cases)
+  | Axiom -> Axiom
+
+let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : Icparser.Parsed_ast.stmt) : name list * scope_ctx * stmt =
   match stmt with
-  | Theorem _ -> raise NotImplemented
+  | Theorem (name, args, claim, prf) -> 
+    let ctx' = List.fold_left
+                (fun ctx (x, _) -> (x, Meta) :: ctx)
+                ctx
+                args in
+    let args = List.map (fun (x, ty) -> (x, lift_ty ctx' ty)) args in
+    let claim = lift_eqn ctx' claim in
+    (name :: thms, ctx, Thm
+                      { name = name;
+                        stmt = { quantifiers = args; claim = claim};
+                        proof = lift_proof thms ctx' prf })
   | Definition (f, isrec, args, ty, t) ->
-    let ctx = List.fold_left 
+    let ctx' = List.fold_left 
               (fun ctx arg -> (fst arg, Term) :: ctx) 
               ((f, Stmt) :: ctx) 
               args in
-    let args' = List.map (fun (n, ty) -> n, lift_ty ctx ty) args in
-    let argtys = List.map (fun x -> lift_ty ctx @@ snd x) args in
-    let rty = lift_ty ctx ty in
-    let t = lift_tm ctx t in
+    let args' = List.map (fun (n, ty) -> n, lift_ty ctx' ty) args in
+    let argtys = List.map (fun x -> lift_ty ctx' @@ snd x) args in
+    let rty = lift_ty ctx' ty in
+    let t = lift_tm ctx' t in
     let fnsig = List.fold_right (fun ty acc -> Ty_Arrow (ty, acc)) argtys rty in
-    (ctx, Definition 
-          { name = f ; 
-            isrec = isrec;
-            args = args' ; 
-            rty = rty ;
-            fnsig = fnsig ; 
-            body = t })
-  | Print t -> (ctx, Print (lift_tm ctx t))
+    (thms, (f, Stmt) :: ctx, 
+    Definition  { name = f ; 
+                  isrec = isrec;
+                  args = args' ; 
+                  rty = rty ;
+                  fnsig = fnsig ; 
+                  body = t })
+  | Print t -> (thms, ctx, Print (lift_tm ctx t))
 
 let lift_program (p : Icparser.Parsed_ast.program) : program =
-  let rec go ctx p =
+  let rec go thms ctx p =
     match p with
     | stmt :: p -> 
-      let ctx, stmt = lift_stmt ctx stmt in
-      stmt :: go ctx p
+      let thms, ctx, stmt = lift_stmt thms ctx stmt in
+      stmt :: go thms ctx p
     | [] -> []
-  in go [] p
+  in go ["defn"] [] p
 

@@ -19,18 +19,27 @@ type tm =
   | Fun of name * ty * tm (* anonymous function *)
   | Var of name (* we'll figure out which particular kind of variable later *)
 
-type side = (tm * name) list (* steps with justification *)
+type eqn = tm * tm
 
-type case = name * tm * 
-            (name * tm) list option * 
-            tm * 
+type pattern = 
+| Pat_nil (* [] *)
+| Pat_cons of name * name (* x :: xs *)
+(* TODO: add patterns for Z and S n *)
+
+type side = tm * (tm * name) list (* steps with justification *)
+
+type case = name * pattern * 
+            (name * eqn) list * 
+            eqn * 
             side * 
-            side (* variable, pattern, induction hypotheses, wts, lhs, rhs *)
+            side (* variable = pattern, optional induction hypotheses, wts, lhs, rhs *)
 
-type proof = name * case list (* Induction variable, cases *)
+type proof = 
+  | Proof of name * case list (* Induction variable, cases *)
+  | Axiom
 
 type stmt = 
-  | Theorem of name * tm * proof (* Name, statement, proof*)
+  | Theorem of name * (name * ty) list * eqn * proof (* Name, quant vars, statement, proof*)
   | Definition of name * bool * (name * ty) list * ty * tm (* function name, typed args, return type, body *)
   | Print of tm (* Print result of evaluating term *)
 

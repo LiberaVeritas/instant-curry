@@ -13,12 +13,14 @@
 %token BY
 %token INDUCTION
 %token ON
+%token FORALL
 %token CASE
 %token WTS
-%token <string> IH
+%token <int> IH
 %token LHS
 %token RHS
 %token QED
+%token AXIOM
 
 (* term language keywords *)
 %token LET
@@ -43,8 +45,6 @@
 (* symbols *)
 %token LPAR
 %token RPAR
-%token LBRA
-%token RBRA
 %token EQ
 %token CONS
 %token NIL
@@ -77,57 +77,46 @@ program:
 | EOF                                   { [] }
 
 stmt:
-| THEOREM 
-  LPAR v = IDENT RPAR SEP 
-  t = tm SEP 
-  p = proof                             { Theorem (v, t, p) }
+| THEOREM LPAR v = IDENT RPAR SEP 
+  FORALL ps = arg+ COLON 
+  c = eqn SEP p = proof                 { Theorem (v, ps, c, p) }
 | DEFINITION SEP LET REC 
-  f = IDENT ps = args ty = ty
+  f = IDENT ps = arg+ COLON ty = ty
   EQ t = tm                             { Definition (f, true, ps, ty, t) }
-| DEFINITION SEP LET 
-  f = IDENT ps = args ty = ty
-  EQ t = tm                             { Definition (f, false, ps, ty, t) }
 | PRINT SEP t = tm                      { Print t }
-
-args:
-| p = arg ps = args                     { p :: ps }
-| COLON                                 { [] } // ugly! hacky! boo!
 
 arg:
 | LPAR i = IDENT COLON t = ty RPAR      { (i, t) }
 
 proof:
 | PROOF BY INDUCTION ON i = IDENT SEP
-  cs = cases QED SEP                    { (i, cs) }
-
-cases:
-| case cases                            { $1 :: $2 }
-| case                                  { [$1] }
+  cs = case* QED SEP                    { Proof (i, cs) }
+| AXIOM SEP                             { Axiom }
 
 case:
 | CASE
-  LBRA i = IDENT EQ t = tm RBRA SEP
-  ihs = ihs?
-  wts = wts
+  i = IDENT EQ p = pattern SEP
+  ihs = ih*
+  WTS COLON wts = eqn SEP
   LHS lhs = side
-  RHS rhs = side                        { (i, t, ihs, wts, lhs, rhs) }
-
-wts:
-| WTS t = tm SEP                        { t }
-
-ihs:
-| ih ihs                                { $1 :: $2 }
-| ih                                    { [$1] }
+  RHS rhs = side                        { (i, p, ihs, wts, lhs, rhs) }
 
 ih:
-| id = IH t = tm SEP                    { (id, t) }
+| id = IH COLON e = eqn SEP             { ("IH" ^ string_of_int id, e) }
 
 side:
-| step side                             { $1 :: $2 }
-| step                                  { [$1] }
+| EQ t = tm SEP 
+  steps = step*                         { (t, steps) }
 
 step:
 | EQ t = tm BY i = IDENT SEP            { (t, i) }
+
+pattern:
+| NIL                                   { Pat_nil }
+| x = IDENT CONS xs = IDENT             { Pat_cons (x, xs) }
+
+eqn:
+| t1 = tm EQ t2 = tm                    { (t1, t2) }
 
 tm:
 | NIL t = ty                            { Nil t }

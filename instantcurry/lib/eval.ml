@@ -75,6 +75,8 @@ and rename (x : name) (e : tm) : (name * tm) =
 
 type clos = ((string * ty) list * tm)
 type env = (string * clos) list
+type thms = (string * thm_stmt) list
+type constrs = (string * tm) list
 
 let rec eval (env : env) (e : tm) : tm =
   (* print_endline @@ Printing.string_of_tm e ; *)
@@ -126,9 +128,55 @@ let rec eval (env : env) (e : tm) : tm =
   | UVar _ -> raise NotImplemented (* not totally sure what to do here *)
   | MVar _ as v -> v (* uninterpreted metavariables left as-is *)
 
-let unify (env : env) (e1 : tm) (e2 : tm) (j : justification) : bool = 
+exception UnifError
+
+let rec unify (env : env) (cs : constrs) (e : tm) (ue : tm) : constrs =
+  let unify = unify env in
+  match e, ue with
+  | e, UVar x -> begin match List.assoc_opt x cs with
+    | Some e' when e = e' -> cs
+    | Some _ -> raise UnifError
+    | None -> (x, e) :: cs
+    end
+  | Nil _, Nil _ -> cs (* todo: check types? *)
+  | Cons (x, xs), Cons (x', xs') -> 
+    let cs = unify cs x x' in
+    let cs = unify cs xs xs' in
+    cs
+  | ListCase (l, n, _, _, c), ListCase (l', n', _, _, c') -> (* todo: deal with a-equivalence *) 
+    let cs = unify cs l l' in
+    let cs = unify cs n n' in
+    let cs = unify cs c c' in
+    cs
+  | Nat _, Nat _ -> cs
+  | Plus (e1, e2), Plus (e1', e2')
+  | Minus (e1, e2), Minus (e1', e2')
+  | Times (e1, e2), Times (e1', e2')
+  | App (e1, e2), App (e1', e2') ->
+    let cs = unify cs e1 e2 in
+    let cs = unify cs e1' e2' in
+    cs
+  | If0 (n, z, s), If0 (n', z', s') ->
+    let cs = unify cs n n' in
+    let cs = unify cs z z' in
+    let cs = unify cs s s' in
+    cs
+  | Fun (_, _, b), Fun (_, _, b') ->
+    unify cs b b'
+  | BVar _, BVar _ -> raise NotImplemented
+  | Ref x, Ref y when x = y -> cs
+  | MVar _, MVar _ -> raise NotImplemented
+  | _, _ -> raise UnifError
+
+let eval_step (thms : thms) (env : env) (e1 : tm) (e2 : tm) (j : justification) : bool = 
   match j with
   | ByDefinition -> eval env e1 = eval env e2
+  | ByTheorem t -> 
+    let stmt = List.assoc t thms in
+    let f = (fun c (x, _) -> subst x (UVar x) c) in
+    let claim_lhs = List.fold_left f stmt.claim.lhs stmt.quantifiers in
+    let claim_rhs = List.fold_left f stmt.claim.rhs stmt.quantifiers in
+    raise NotImplemented
 
 let exec_stmt (env : env) (s : stmt) : env =
   match s with
