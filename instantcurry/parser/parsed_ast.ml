@@ -5,11 +5,15 @@ type ty =
   | Ty_Nat
   | Ty_Arrow of ty * ty
   | Ty_List of ty
+  | Ty_Tree of ty
 
 type tm =
-  | Nil of ty
+  | Nil
   | Cons of tm * tm
+  | Empty
+  | Node of tm * tm * tm
   | ListCase of tm (* scrutinee *) * tm (* nil case *) * name * name * tm (* cons case (and its two bound vars) *)
+  | TreeCase of tm (* scrutinee *) * tm (* empty case *) * name * name * name * tm (* node case (and its three bound vars) *)
   | Nat of int
   | Plus of tm * tm
   | Minus of tm * tm
@@ -24,7 +28,8 @@ type eqn = tm * tm
 type pattern = 
 | Pat_nil (* [] *)
 | Pat_cons of name * name (* x :: xs *)
-(* TODO: add patterns for Z and S n *)
+| Pat_empty (* Empty *)
+| Pat_node of name * name * name (* Node (l, x, r) *)
 
 type side = tm * (tm * name) list (* steps with justification *)
 

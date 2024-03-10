@@ -54,10 +54,13 @@ rule read_token = parse
 | "else"                    { ELSE }
 | "fun"                     { FUN }
 | "end"                     { END }
+| "Empty"                   { EMPTY }
+| "Node"                    { NODE }
 
 (* types *)
 | "nat"                     { TYNAT }
 | "list"                    { TYLST }
+| "tree"                    { TYTREE }
 | "->"                      { TYARROW }
 
 (* nats and idents *)
@@ -77,6 +80,8 @@ rule read_token = parse
 | "=>"                      { ARROW }
 | "|"                       { BAR }
 | ":"                       { COLON }
+| ","                       { COMMA }
+| "--"                      { DASH }
 
 | _                         { raise (SyntaxError ("Lexer Error: Illegal character: " ^ Lexing.lexeme lexbuf)) }
 

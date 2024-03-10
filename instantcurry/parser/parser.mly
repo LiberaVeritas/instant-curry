@@ -32,11 +32,14 @@
 %token ELSE
 %token FUN
 %token END
+%token EMPTY
+%token NODE
 
 (* types *)
 %token TYNAT
 %token TYARROW
 %token TYLST
+%token TYTREE
 
 (* nats and idents *)
 %token <int> NATLIT
@@ -55,12 +58,15 @@
 %token ARROW
 %token BAR
 %token COLON
+%token DASH
+%token COMMA
 
 (* precedence/associativity *)
 %right TYARROW
 %nonassoc TYLST
+%nonassoc TYTREE
 
-%nonassoc NIL NATLIT IDENT LPAR MATCH IF0 FUN
+%nonassoc NIL EMPTY NODE NATLIT IDENT LPAR MATCH IF0 FUN
 %right CONS
 %left PLUS MINUS
 %left TIMES
@@ -89,7 +95,8 @@ arg:
 | LPAR i = IDENT COLON t = ty RPAR      { (i, t) }
 
 proof:
-| PROOF BY INDUCTION ON i = IDENT SEP
+| PROOF SEP 
+  BY INDUCTION ON i = IDENT SEP
   cs = case* QED SEP                    { Proof (i, cs) }
 | AXIOM SEP                             { Axiom }
 
@@ -109,22 +116,36 @@ side:
   steps = step*                         { (t, steps) }
 
 step:
-| EQ t = tm BY i = IDENT SEP            { (t, i) }
+| EQ t = tm DASH BY i = IDENT SEP       { (t, i) }
 
 pattern:
 | NIL                                   { Pat_nil }
 | x = IDENT CONS xs = IDENT             { Pat_cons (x, xs) }
+| EMPTY                                 { Pat_empty }
+| NODE LPAR l = IDENT COMMA
+            x = IDENT COMMA
+            r = IDENT RPAR              { Pat_node (l, x, r) }
 
 eqn:
 | t1 = tm EQ t2 = tm                    { (t1, t2) }
 
 tm:
-| NIL t = ty                            { Nil t }
+| NIL                                   { Nil }
 | t1 = tm CONS t2 = tm                  { Cons (t1, t2) }
+| EMPTY                                 { Empty }
+| NODE LPAR l = tm COMMA
+            x = tm COMMA
+            r = tm RPAR                 { Node (l, x, r) }
 | MATCH l = tm WITH 
   BAR? NIL ARROW t1 = tm
   BAR x = IDENT CONS xs = IDENT ARROW 
   t2 = tm END                           { ListCase (l, t1, x, xs, t2) }
+| MATCH t = tm WITH 
+  BAR? EMPTY ARROW t1 = tm
+  BAR NODE LPAR l = IDENT COMMA 
+                x = IDENT COMMA
+                r = IDENT RPAR
+  ARROW t2 = tm END                     { TreeCase (t, t1, l, x, r, t2) }
 | NATLIT                                { Nat $1 }
 | t1 = tm PLUS t2 = tm                  { Plus (t1, t2) }
 | t1 = tm MINUS t2 = tm                 { Minus (t1, t2) }
@@ -141,5 +162,6 @@ ty:
 | TYNAT                                 { Ty_Nat }
 | t1 = ty TYARROW t2 = ty               { Ty_Arrow (t1, t2) }
 | t = ty TYLST                          { Ty_List t }
+| t = ty TYTREE                         { Ty_Tree t }
 | LPAR t = ty RPAR                      { t }
 
