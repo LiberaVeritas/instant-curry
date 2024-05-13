@@ -1,5 +1,4 @@
 open Icparser
-open Instantcurry
 
 (* let example_append_statement : Synint.stmt =
     let open Synint in {
@@ -28,16 +27,18 @@ let _ =
         (List.length ast)
         (List.length example_append_statement.quantifiers) *)
 
-let usage_message = "Usage: instantcurry <filename>"
+let usage_message = "Usage: instantcurry <infile> <outfile>"
 
 let () =
-    let filename = try Sys.argv.(1) with
+    let infile = try Sys.argv.(1) with
         | Invalid_argument _ -> failwith usage_message
     in
-    let channel = open_in filename in
-    let ptree = try Parser.program (Lexer.read_token) (Lexing.from_channel channel) with
+    let outfile = try Sys.argv.(2) with
+    | Invalid_argument _ -> failwith usage_message
+in
+    let ic = open_in infile in
+    let oc = open_out outfile in
+    let ptree = try Parser.program (Lexer.read_token) (Lexing.from_channel ic) with
         | Parser.Error -> failwith "Does not parse"
     in
-    let prog = Lifting.lift_program ptree in
-    let _ = Typechecking.typecheck_prog prog in
-    let _ = Eval.exec_prog prog in ()
+    Translate.print_prog ptree oc

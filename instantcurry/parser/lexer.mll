@@ -19,7 +19,7 @@ let digit = [ '0'-'9' ]
 let nat = digit+
 let alpha = [ 'a'-'z' 'A'-'Z' ]
 let ident = [ 'a'-'z' ] ( alpha | digit | '_' | '\'' )*
-let ih = "IH_" (digit as d)
+let ih = "IH" (digit as d)
 
 rule read_token = parse
 | ws                        { read_token lexbuf }
@@ -30,6 +30,7 @@ rule read_token = parse
 | "DEFINITION"              { DEFINITION }
 | "PRINT"                   { PRINT }
 | "THEOREM"                 { THEOREM }
+| "GENERALIZE"              { GENERALIZE }
 | "PROOF"                   { PROOF }
 | "BY"                      { BY }
 | "INDUCTION"               { INDUCTION }
@@ -38,7 +39,6 @@ rule read_token = parse
 | "CASE"                    { CASE }
 | "WTS"                     { WTS }
 | "IH" (nat as n)           { IH (int_of_string n) }
-| "IH"                      { IH 0 }
 | "LHS"                     { LHS }
 | "RHS"                     { RHS }
 | "QED"                     { QED }
@@ -62,6 +62,7 @@ rule read_token = parse
 | "list"                    { TYLST }
 | "tree"                    { TYTREE }
 | "->"                      { TYARROW }
+| '\'' ([ 'a'-'z' ]+ as v)  { TYVAR (String.uppercase_ascii v) }
 
 (* nats and idents *)
 | nat                       { NATLIT (int_of_string (Lexing.lexeme lexbuf)) }

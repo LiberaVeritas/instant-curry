@@ -7,6 +7,3 @@ DEFINITION.
 let rec fact_tr (n : nat) (acc : nat) : nat =
     if0 n then acc
     else fact_tr (n - 1) (n * acc) end
-
-PRINT. fact 5
-PRINT. fact_tr 5 1

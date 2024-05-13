@@ -1,0 +1,75 @@
+DEFINITION.
+let rec len (l : 'a list) : nat =
+    match l with
+    | [] => 0
+    | x :: xs => 1 + len xs
+    end
+
+DEFINITION.
+let rec map (f : 'a -> 'b) (l : 'a list) : 'b list =
+    match l with
+    | [] => []
+    | x :: xs => f x :: (map f xs)
+    end
+
+DEFINITION.
+let id (x : 'a) : 'a = x
+
+THEOREM (map_id).
+FORALL (l : 'a list) : map id l = l : 'a list. 
+
+PROOF. 
+BY INDUCTION ON l.
+
+CASE l = [].
+WTS: map id [] = [].
+
+LHS = map id [].
+    = []                            -- BY defn.
+
+RHS = [].
+
+CASE l = y :: ys.
+IH1: map id ys = ys.
+WTS: map id (y :: ys) = y :: ys.
+
+LHS = map id (y :: ys).
+    = id y :: map id ys             -- BY defn.
+    = y :: map id ys                -- BY defn.
+    = y :: ys                       -- BY IH1.
+
+RHS = y :: ys.
+
+QED.
+
+THEOREM (map_fusion). 
+FORALL (f : 'b -> 'c) (g : 'a -> 'b) (l : 'a list) :
+    map (fun (x : 'a) => f (g x) end) l = map f (map g l) : 'c list.
+
+PROOF. BY INDUCTION ON l.
+
+CASE l = [].
+WTS: map (fun (x : 'a) => f (g x) end) [] = map f (map g []).
+
+LHS = map (fun (x : 'a) => f (g x) end) [].
+    = []                        -- BY defn.
+
+RHS = map f (map g []).
+    = map f []                  -- BY defn.
+    = []                        -- BY defn.
+
+CASE l = x :: xs.
+IH1: map (fun (x : 'a) => f (g x) end) xs = map f (map g xs).
+WTS: map (fun (x : 'a) => f (g x) end) (x :: xs) = map f (map g (x :: xs)).
+
+LHS = map (fun (x : 'a) => f (g x) end) (x :: xs).
+    = (fun (x : 'a) => f (g x) end) x :: map (fun (x : 'a) => f (g x) end) xs   -- BY defn.
+    = f (g x) :: map (fun (x : 'a) => f (g x) end) xs                           -- BY defn.
+    = f (g x) :: map f (map g xs)                                               -- BY IH1.
+
+RHS = map f (map g (x :: xs)).
+    = map f (g x :: map g xs)                   -- BY defn.
+    = f (g x) :: map f (map g xs)               -- BY defn.
+
+QED.
+

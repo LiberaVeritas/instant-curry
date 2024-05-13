@@ -1,0 +1,92 @@
+DEFINITION. 
+let rec app (xs : 'a list) (ys : 'a list) : 'a list =
+    match xs with
+    | [] => ys
+    | x :: xs => x :: (app xs ys)
+    end
+
+DEFINITION.
+let rec map (f : 'a -> 'b) (xs : 'a list) : 'b list =
+    match xs with
+    | [] => []
+    | x :: xs => f x :: (map f xs)
+    end
+
+DEFINITION.
+let rec rev (xs : 'a list) : 'a list =
+    match xs with
+    | [] => []
+    | x :: xs => app (rev xs) (x :: [])
+    end
+
+DEFINITION.
+let rec map_rev_tr (f : 'a -> 'b) (xs : 'a list) (acc : 'b list) : 'b list =
+    match xs with
+    | [] => acc
+    | x :: xs => map_rev_tr f xs (f x :: acc)
+    end
+
+THEOREM (map_over_app).
+FORALL (f : 'a -> 'b) (xs : 'a list) (ys : 'a list) :
+        map f (app xs ys) = app (map f xs) (map f ys) : 'b list.
+PROOF. BY INDUCTION ON xs.
+
+CASE xs = [].
+WTS: map f (app [] ys) = app (map f []) (map f ys).
+
+LHS = map f (app [] ys).
+    = map f ys                      -- BY defn.
+RHS = app (map f []) (map f ys).
+    = app [] (map f ys)             -- BY defn.
+    = map f ys                      -- BY defn.
+
+CASE xs = x :: xs.
+IH1: map f (app xs ys) = app (map f xs) (map f ys).
+WTS: map f (app (x :: xs) ys) = app (map f (x :: xs)) (map f ys).
+
+LHS = map f (app (x :: xs) ys).
+    = map f (x :: (app xs ys))              -- BY defn.
+    = f x :: map f (app xs ys)              -- BY defn.
+    = f x :: app (map f xs) (map f ys)      -- BY IH1.
+RHS = app (map f (x :: xs)) (map f ys).
+    = app (f x :: (map f xs)) (map f ys)    -- BY defn.
+    = f x :: app (map f xs) (map f ys)      -- BY defn.
+
+QED.
+
+THEOREM (app_assoc).
+FORALL (xs : 'a list) (ys : 'a list) (zs : 'a list) :
+    app (app xs ys) zs = app xs (app ys zs) : 'a list.
+AXIOM.
+
+THEOREM (map_rev_tr_gen).
+FORALL (f : 'a -> 'b) (xs : 'a list) (acc : 'b list) :
+    map_rev_tr f xs acc = app (map f (rev xs)) acc : 'b list.
+PROOF. BY INDUCTION ON xs, GENERALIZE acc.
+
+CASE xs = [].
+WTS: map_rev_tr f [] acc = app (map f (rev [])) acc.
+
+LHS = map_rev_tr f [] acc.
+    = acc                       -- BY defn.
+RHS = app (map f (rev [])) acc.
+    = app (map f []) acc        -- BY defn.
+    = app [] acc                -- BY defn.
+    = acc                       -- BY defn.
+
+CASE xs = x :: xs.
+IH1: map_rev_tr f xs acc = app (map f (rev xs)) acc.
+WTS: map_rev_tr f (x :: xs) acc = app (map f (rev (x :: xs))) acc.
+
+LHS = map_rev_tr f (x :: xs) acc.
+    = map_rev_tr f xs (f x :: acc)                    -- BY defn.
+    = app (map f (rev xs)) (f x :: acc)             -- BY IH1.
+RHS = app (map f (rev (x :: xs))) acc.
+    = app (map f (app (rev xs) (x :: []))) acc              -- BY defn.
+    = app (app (map f (rev xs)) (map f (x :: []))) acc      -- BY map_over_app.
+    = app (app (map f (rev xs)) (f x :: [])) acc            -- BY defn.
+    = app (map f (rev xs)) (app (f x :: []) acc)            -- BY app_assoc.
+    = app (map f (rev xs)) (f x :: acc)                     -- BY defn.
+
+QED.
+

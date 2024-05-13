@@ -6,6 +6,7 @@ type ty =
   | Ty_Arrow of ty * ty
   | Ty_List of ty
   | Ty_Tree of ty
+  | Ty_var of string
 
 type tm =
   | Nil
@@ -40,11 +41,11 @@ type case = name * pattern *
             side (* variable = pattern, optional induction hypotheses, wts, lhs, rhs *)
 
 type proof = 
-  | Proof of name * case list (* Induction variable, cases *)
+  | Proof of name * name list option * case list (* Induction variable, cases *)
   | Axiom
 
 type stmt = 
-  | Theorem of name * (name * ty) list * eqn * proof (* Name, quant vars, statement, proof*)
+  | Theorem of name * (name * ty) list * (eqn * ty) * proof (* Name, quant vars, statement with type, proof *)
   | Definition of name * bool * (name * ty) list * ty * tm (* function name, typed args, return type, body *)
   | Print of tm (* Print result of evaluating term *)
 

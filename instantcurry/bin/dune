@@ -1,4 +1,4 @@
 (executable
  (public_name instantcurry)
  (name main)
- (libraries instantcurry icparser))
+ (libraries icparser translate))
