@@ -1,0 +1,31 @@
+# dune build -p instantcurry -j 11 @install
+# OCAMLPARAM: unset
+# Shared cache: disabled
+# Shared cache location: /home/gabekarasik/.cache/dune/db
+# Workspace root:
+# /mnt/c/Users/gabri/instant-curry/instantcurry/_opam/.opam-switch/build/instantcurry.~dev
+# Dune context:
+#  { name = "default"
+#  ; kind = "default"
+#  ; profile = Release
+#  ; merlin = true
+#  ; fdo_target_exe = None
+#  ; build_dir = In_build_dir "default"
+#  ; instrument_with = []
+#  }
+$ /usr/bin/ocamlc.opt -config > /opam-tmp/dune_a01f3c_output
+# Promoting "_build/default/instantcurry.opam" to "instantcurry.opam"
+$ (cd _build/default && /usr/bin/ocamldep.opt -modules -impl lib/typechecking.ml) > _build/default/lib/.instantcurry.objs/instantcurry__Typechecking.impl.d
+$ (cd _build/default && /usr/bin/ocamldep.opt -modules -impl parser/parsed_ast.ml) > _build/default/parser/.icparser.objs/icparser__Parsed_ast.impl.d
+$ (cd _build/default && /usr/bin/ocamldep.opt -modules -impl lib/eval.ml) > _build/default/lib/.instantcurry.objs/instantcurry__Eval.impl.d
+$ (cd _build/default && /usr/bin/ocamldep.opt -modules -impl lib/lifting.ml) > _build/default/lib/.instantcurry.objs/instantcurry__Lifting.impl.d
+$ (cd _build/default && /usr/bin/ocamldep.opt -modules -impl lib/printing.ml) > _build/default/lib/.instantcurry.objs/instantcurry__Printing.impl.d
+$ (cd _build/default && /usr/bin/ocamldep.opt -modules -impl lib/synint.ml) > _build/default/lib/.instantcurry.objs/instantcurry__Synint.impl.d
+$ (cd _build/default && /usr/bin/ocamlc.opt -w -40 -w -49 -nopervasives -nostdlib -g -bin-annot -I lib/.instantcurry.objs/byte -no-alias-deps -o lib/.instantcurry.objs/byte/instantcurry.cmo -c -impl lib/instantcurry.ml-gen)
+$ (cd _build/default && /usr/bin/ocamlc.opt -w -40 -w -49 -nopervasives -nostdlib -g -bin-annot -I parser/.icparser.objs/byte -no-alias-deps -o parser/.icparser.objs/byte/icparser.cmo -c -impl parser/icparser.ml-gen)
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w -40 -w -49 -nopervasives -nostdlib -g -I lib/.instantcurry.objs/byte -I lib/.instantcurry.objs/native -intf-suffix .ml-gen -no-alias-deps -o lib/.instantcurry.objs/native/instantcurry.cmx -c -impl lib/instantcurry.ml-gen)
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w -40 -w -49 -nopervasives -nostdlib -g -I parser/.icparser.objs/byte -I parser/.icparser.objs/native -intf-suffix .ml-gen -no-alias-deps -o parser/.icparser.objs/native/icparser.cmx -c -impl parser/icparser.ml-gen)
+$ (cd _build/default && /usr/bin/ocamlc.opt -w -40 -g -bin-annot -I parser/.icparser.objs/byte -no-alias-deps -open Icparser -o parser/.icparser.objs/byte/icparser__Parsed_ast.cmo -c -impl parser/parsed_ast.ml)
+$ (cd _build/default && /usr/bin/ocamllex -q -o parser/lexer.ml parser/lexer.mll)
+$ (cd _build/default && /usr/bin/ocamldep.opt -modules -impl parser/lexer.ml) > _build/default/parser/.icparser.objs/icparser__Lexer.impl.d
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w -40 -g -I parser/.icparser.objs/byte -I parser/.icparser.objs/native -intf-suffix .ml -no-alias-deps -open Icparser -o parser/.icparser.objs/native/icparser__Parsed_ast.cmx -c -impl parser/parsed_ast.ml)
