@@ -16,10 +16,12 @@ open Icparser
         (Nat 3)
         ByDefinition
 
-
+	
 let _ =
-    let ast =
-        try Parser.program (Lexer.read_token) (Lexing.from_string @@ read_line ()) with
+let ast =
+let x = (Lexer.read_token) in
+let y = (Lexing.from_string @@ read_line ()) in
+        try Parser.program (x) (y) with
         | Parser.Error -> failwith "Does not parse"
     in
     (* some stupid stuff to ensure that definitions above are used to avoid errors: *)
@@ -38,7 +40,9 @@ let () =
 in
     let ic = open_in infile in
     let oc = open_out outfile in
-    let ptree = try Parser.program (Lexer.read_token) (Lexing.from_channel ic) with
-        | Parser.Error -> failwith "Does not parse"
+    let x = (Lexer.read_token) in
+    let y = (Lexing.from_channel ic) in
+    let ptree = try Parser.program (x) (y) with
+        | Parser.Error -> failwith (string_of_int y.lex_curr_p.pos_lnum)
     in
     Translate.print_prog ptree oc

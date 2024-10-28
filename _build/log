@@ -1,0 +1,6 @@
+# dune build
+# OCAMLPARAM: unset
+# Workspace root: /mnt/c/Users/gabri/instant-curry
+$ /usr/bin/nproc > /tmp/dune045ccd.output 2> /dev/null
+# Auto-detected concurrency: 12
+# disable binary cache

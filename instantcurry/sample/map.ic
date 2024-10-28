@@ -16,7 +16,7 @@ DEFINITION.
 let id (x : 'a) : 'a = x
 
 THEOREM (map_id).
-FORALL (l : 'a list) : map id l = l. 
+FORALL (l : 'a list) : map id l = l : 'a list. 
 
 PROOF. 
 BY INDUCTION ON l.
@@ -43,7 +43,7 @@ RHS = y :: ys.
 QED.
 
 THEOREM (map_len).
-FORALL (l : 'a list) (f : 'a -> 'b) : len (map f l) = len l.
+FORALL (l : 'a list) (f : 'a -> 'b) : len (map f l) = len l : nat.
 
 PROOF.
 BY INDUCTION ON l.
