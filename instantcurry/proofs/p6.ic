@@ -1,0 +1,33 @@
+THEOREM (rev_map).
+FORALL (f : 'a -> 'b) (l : 'a list) : rev (map f l) = map f (rev l) : 'b list.
+
+PROOF.
+BY INDUCTION ON l.
+
+CASE l = [].
+WTS: rev (map f []) = map f (rev []).
+
+LHS = rev (map f []).
+    = rev [] -- BY defn.
+    = [] -- BY defn.
+
+RHS = map f (rev []).
+    = map f [] -- BY defn.
+    = [] -- BY defn.
+
+CASE l = x :: xs.
+IH1: rev (map f xs) = map f (rev xs).
+WTS: rev (map f (x :: xs)) = map f (rev (x :: xs)).
+
+LHS = rev (map f (x :: xs)).
+    = rev ((f x) :: (map f xs)) -- BY defn.
+    = app (rev (map f xs)) ((f x) :: []) -- BY defn.
+    = app (map f (rev xs)) ((f x) :: []) -- BY IH1.
+
+RHS = map f (rev (x :: xs)).
+    = map f (app (rev xs) (x :: [])) -- BY defn.
+    = app (map f (rev xs)) (map f (x :: [])) -- BY map_app.
+    = app (map f (rev xs)) ((f x) :: (map f [])) -- BY defn.
+    = app (map f (rev xs)) ((f x) :: []) -- BY defn.
+
+QED.

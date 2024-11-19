@@ -71,12 +71,17 @@ let translate_just (tm : tm) (ety : ty) (s : string) (buf : Buffer.t) : unit =
   | "defn" -> add "next_refl ("; translate_tm tm buf; 
               add " : "; translate_ty ety buf;
               add ").\n"
-  | "commonsense" ->  add "next_lia ("; translate_tm tm buf; 
-                      add " : "; translate_ty ety buf;
-                      add ").\n"
-  | _ ->  add "next_hyp ("; translate_tm tm buf; 
-          add " : "; translate_ty ety buf; add ") ";
-          add s; add ".\n"
+  | "commonsense" -> add "next_lia ("; translate_tm tm buf; 
+                     add " : "; translate_ty ety buf;
+                     add ").\n" 
+  | _ -> if (String.starts_with ~prefix:"LEMMA" s) then
+         let ls = String.length s in
+         let lss = ls - 6 in
+         let ss = String.sub s 6 lss in
+         add "rewrite "; add ss; add ".\n"
+         else (add "next_hyp ("; translate_tm tm buf; 
+         add " : "; translate_ty ety buf; add ") ";
+         add s; add ".\n")
   (* if s = "defn" then add "simpl.\n" else begin add "erewrite "; add s; add ".\n" end *)
 
 let translate_case (c : case) (ety : ty) (buf : Buffer.t) : unit =
@@ -106,7 +111,8 @@ let translate_proof (p : proof) (ety : ty) (args: (name * ty) list) (buf : Buffe
   let add = add_string buf in
   match p with
   | Axiom -> add "Admitted.\n"
-  | Proof (ivar, gvs, cs) -> 
+  | Proof (ivar, gvs, cs) ->
+    add "intros.\n";
     let indty = try List.assoc ivar args with
     | Not_found -> raise (TranslationError BadIndVar) in
     let intropat = match indty with
@@ -117,6 +123,8 @@ let translate_proof (p : proof) (ety : ty) (args: (name * ty) list) (buf : Buffe
     | None -> ()
     | Some gvs -> List.iter (fun gv -> add "generalize dependent "; add gv; add ".\n") gvs
     end;
+    List.iter (fun arg -> match arg with
+		   | (var, _) -> if (String.compare var ivar) <> 0 then (add "generalize dependent "; add var; add ".\n")) args;
     add "induction "; add ivar; add " as "; add intropat; add "; intros.\n";
     List.iter (fun c -> add "- "; translate_case c ety buf; add "\n") cs;
     add "Qed.\n"

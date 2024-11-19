@@ -1,0 +1,22 @@
+THEOREM (rev_filter).
+FORALL (l : 'a list) : rev (filter l) = filter (rev l) : 'a list.
+
+PROOF.
+BY INDUCTION ON l.
+
+CASE l = [].
+WTS: rev (filter []) = filter (rev []).
+
+LHS = rev (filter []).
+    = rev [] -- BY defn.
+    = [] -- BY defn.
+
+RHS = filter (rev []).
+    = filter [] -- BY defn.
+    = [] -- BY defn.
+
+CASE l = x :: xs.
+IH1: rev (filter xs) = filter (rev xs).
+WTS: rev (filter (x :: xs)) = filter (rev (x :: xs)).
+
+LHS = rev (filter (x :: xs))

@@ -43,6 +43,7 @@ rule read_token = parse
 | "RHS"                     { RHS }
 | "QED"                     { QED }
 | "AXIOM"                   { AXIOM }
+| "LEMMA"		    { LEMMA }
 
 (* term language keywords *)
 | "let"                     { LET }

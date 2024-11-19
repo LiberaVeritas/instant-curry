@@ -22,6 +22,7 @@
 %token RHS
 %token QED
 %token AXIOM
+%token LEMMA
 
 (* term language keywords *)
 %token LET
@@ -126,6 +127,7 @@ side:
   steps = step*                         { (t, steps) }
 
 step:
+| EQ t = tm DASH BY LEMMA i = IDENT SEP	{ (t, "LEMMA " ^ i) }
 | EQ t = tm DASH BY i = IDENT SEP       { (t, i) }
 | EQ t = tm DASH BY ih = IH SEP         { (t, "IH" ^ string_of_int ih) }
 
