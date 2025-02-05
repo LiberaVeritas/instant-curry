@@ -1,4 +1,5 @@
 open Icparser
+open Instantcurry
 
 (* let example_append_statement : Synint.stmt =
     let open Synint in {
@@ -45,4 +46,6 @@ in
     let ptree = try Parser.program (x) (y) with
         | Parser.Error -> failwith (string_of_int y.lex_curr_p.pos_lnum)
     in
-    Translate.print_prog ptree oc
+    let tcheck = Typechecking.typecheck_prog prog in
+    let ev = Eval.exec_prog prog in ()
+    (* Translate.print_prog ptree oc *)

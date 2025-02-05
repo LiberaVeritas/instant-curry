@@ -1,0 +1,24 @@
+Theorem rev_app {A : Set} (l1 : (list (A))) (l2 : (list (A))) : (((rev) (((app) (l1)) (l2))) = (((app) ((rev) (l2))) ((rev) (l1)))).
+Proof. 
+intros.
+generalize dependent l2.
+induction l1 as [| x xs IH1 ]; intros.
+- apply lhs_is_rhs with (C := ((rev) (l2))).
+-- next_refl (((rev) (l2)) : (list (A))).
+reflexivity. 
+-- next_refl ((((app) ((rev) (l2))) (Nil)) : (list (A))).
+rewrite app_nil.
+reflexivity. 
+
+- rename x into x.
+rename xs into xs.
+apply lhs_is_rhs with (C := (((app) ((rev) (l2))) (((app) ((rev) (xs))) (Cons (x) (Nil))))).
+-- next_refl (((rev) (Cons (x) (((app) (xs)) (l2)))) : (list (A))).
+next_refl ((((app) ((rev) (((app) (xs)) (l2)))) (Cons (x) (Nil))) : (list (A))).
+next_hyp ((((app) (((app) ((rev) (l2))) ((rev) (xs)))) (Cons (x) (Nil))) : (list (A))) IH1.
+rewrite assoc.
+reflexivity. 
+-- next_refl ((((app) ((rev) (l2))) (((app) ((rev) (xs))) (Cons (x) (Nil)))) : (list (A))).
+reflexivity. 
+
+Qed.

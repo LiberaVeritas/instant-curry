@@ -27,4 +27,3 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "https://gitlab.cs.mcgill.ca/comp-302/instant-curry.git"

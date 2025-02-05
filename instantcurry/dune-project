@@ -6,8 +6,6 @@
 
 (generate_opam_files true)
 
-(source
- (uri https://gitlab.cs.mcgill.ca/comp-302/instant-curry.git))
 
 (authors "Maite Kramarz")
 
