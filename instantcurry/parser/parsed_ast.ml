@@ -9,7 +9,7 @@ type ty =
   | Ty_var of string
 
 type tm =
-  | Nil
+  | Nil 
   | Cons of tm * tm
   | Empty
   | Node of tm * tm * tm

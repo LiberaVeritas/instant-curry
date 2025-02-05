@@ -14,7 +14,7 @@ let rec lift_ty (ctx : scope_ctx) (ty : Icparser.Parsed_ast.ty) : ty =
 
 let rec lift_tm (ctx : scope_ctx) (t : Icparser.Parsed_ast.tm) : tm =
   match t with
-  | Icparser.Parsed_ast.Nil ty -> Nil (lift_ty ctx ty)
+  | Icparser.Parsed_ast.Nil -> Nil Ty_Nat
   | Icparser.Parsed_ast.Cons (t, t') -> Cons (lift_tm ctx t, lift_tm ctx t')
   | Icparser.Parsed_ast.ListCase (l, n, x, xs, c) -> 
     ListCase (lift_tm ctx l, lift_tm ctx n, x, xs, lift_tm ((x, Term) :: (xs, Term) :: ctx) c)
@@ -39,6 +39,8 @@ let lift_pat (pat : Icparser.Parsed_ast.pattern) : pattern =
   match pat with
   | Pat_nil -> Pat_nil
   | Pat_cons (x, xs) -> Pat_cons (x, xs)
+  | Pat_empty -> Pat_empty
+  | Pat_node (l, x, r) -> Pat_node (l, x, r)
 
 let lift_just (thms : name list) (just : Icparser.Parsed_ast.name) : justification =
   if just = "defn" then ByDefinition else

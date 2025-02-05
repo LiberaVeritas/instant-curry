@@ -29,6 +29,8 @@ type tm =
 type pattern = 
   | Pat_nil (* [] *)
   | Pat_cons of name * name (* x :: xs *)
+  | Pat_empty
+  | Pat_node of name * name * name
 
 let (++) a b = App (a, b)
 
