@@ -19,7 +19,7 @@ exception Stuck of stuck_reason
 
 let rec fvs (e : tm) : VarSet.t =
   match e with
-  | Nil _ -> empty
+  | Nil -> empty
   | Cons (x, xs) -> union (fvs x) (fvs xs)
   | ListCase (l, n, x, xs, c) ->  (* TODO: remove x and xs only from c *)
     let varlist = List.map fvs [l; n; c] in
@@ -42,7 +42,7 @@ let fresh (x : name) : name =
 (* [x := s] t *)
 let rec subst (x : name) (s :tm) (e : tm) : tm = 
   match e with
-  | Nil ty -> Nil ty
+  | Nil -> Nil
   | Cons (y, ys) -> Cons (subst x s y, subst x s ys)
   | ListCase (l, n, y, ys, c) -> 
     let l' = subst x s l in
@@ -81,11 +81,12 @@ type constrs = (string * tm) list
 let rec eval (env : env) (e : tm) : tm =
   (* print_endline @@ Printing.string_of_tm e ; *)
   match e with
-  | Nil _ as v -> v
+  (* TODO *)
+  | Nil -> Nil
   | Cons (x, xs) -> Cons (eval env x, eval env xs)
   | ListCase (l, n, x, xs, c) -> 
     begin match l with
-    | Nil _ -> eval env n
+    | Nil -> eval env n
     | Cons (y, ys) -> eval env @@ subst x y (subst xs ys c)  
     | _ -> raise (Stuck ListCaseNonList)
     end
@@ -138,7 +139,7 @@ let rec unify (env : env) (cs : constrs) (e : tm) (ue : tm) : constrs =
     | Some _ -> raise UnifError
     | None -> (x, e) :: cs
     end
-  | Nil _, Nil _ -> cs (* todo: check types? *)
+  | Nil, Nil -> cs (* todo: check types? *)
   | Cons (x, xs), Cons (x', xs') -> 
     let cs = unify cs x x' in
     let cs = unify cs xs xs' in
@@ -176,7 +177,8 @@ let eval_step (thms : thms) (env : env) (e1 : tm) (e2 : tm) (j : justification) 
     let f = (fun c (x, _) -> subst x (UVar x) c) in
     let claim_lhs = List.fold_left f stmt.claim.lhs stmt.quantifiers in
     let claim_rhs = List.fold_left f stmt.claim.rhs stmt.quantifiers in
-    raise NotImplemented
+    (* TODO *)
+    claim_lhs = claim_rhs
 
 let exec_stmt (env : env) (s : stmt) : env =
   match s with

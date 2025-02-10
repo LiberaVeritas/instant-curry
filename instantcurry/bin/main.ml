@@ -1,5 +1,10 @@
 open Icparser
+open Icparser.Parsed_ast
+open Core
 open Instantcurry
+
+
+(*open Instantcurry*)
 
 (* let example_append_statement : Synint.stmt =
     let open Synint in {
@@ -30,22 +35,33 @@ let y = (Lexing.from_string @@ read_line ()) in
         (List.length ast)
         (List.length example_append_statement.quantifiers) *)
 
-let usage_message = "Usage: instantcurry <infile> <outfile>"
+
+(*let usage_message = "Usage: instantcurry <infile> <outfile>"*)
 
 let () =
-    let infile = try Sys.argv.(1) with
-        | Invalid_argument _ -> failwith usage_message
+    let args = Sys.get_argv () in 
+    let infile = args.(1) in
+    
+    (*let outfile = args.(1)  in *)
+
+    let ic = In_channel.create infile in
+    (*let oc = Out_channel.create outfile in *)
+    let lextok = (Lexer.read_token) in
+    let lexbuf = (Lexing.from_channel ic) in
+    let ptree = try Parser.program lextok lexbuf with
+        | Parser.Error -> failwith (Int.to_string lexbuf.lex_curr_p.pos_lnum)
     in
-    let outfile = try Sys.argv.(2) with
-    | Invalid_argument _ -> failwith usage_message
-in
-    let ic = open_in infile in
-    let oc = open_out outfile in
-    let x = (Lexer.read_token) in
-    let y = (Lexing.from_channel ic) in
-    let ptree = try Parser.program (x) (y) with
-        | Parser.Error -> failwith (string_of_int y.lex_curr_p.pos_lnum)
-    in
-    let tcheck = Typechecking.typecheck_prog prog in
-    let ev = Eval.exec_prog prog in ()
-    (* Translate.print_prog ptree oc *)
+    let prog = Lifting.lift_program ptree in
+    (*let () = List.iter (Out_channel.printf "%s\n") sexp_of_program ptree in*)
+    (*let buf = Buffer.create 2048 in
+    Buffer.output_buffer oc buf;*)
+    
+    
+
+    (* print_prog p oc *)
+    (*let _ = Eval.exec_prog prog in *)
+    let _ = Typechecking.typecheck_prog prog in
+    
+    Sexp.pp_hum Format.std_formatter (sexp_of_program ptree);
+    (*Translate.print_prog ptree oc *)
+

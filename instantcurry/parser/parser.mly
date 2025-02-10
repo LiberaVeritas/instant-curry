@@ -222,6 +222,6 @@ ty:
 | t1 = ty TYARROW t2 = ty               { Ty_Arrow (t1, t2) }
 | t = ty TYLST                          { Ty_List t }
 | t = ty TYTREE                         { Ty_Tree t }
-| t = TYVAR                             { Ty_var t }
+| t = TYVAR                             { Ty_Var t }
 | LPAR t = ty RPAR                      { t }
 

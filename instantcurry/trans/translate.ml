@@ -16,7 +16,7 @@ let translate_ty (ty : ty) (buf : Buffer.t) : unit =
     | Ty_Arrow (ty, ty') -> go ty; add " -> "; go ty'
     | Ty_List ty -> add "list "; go ty
     | Ty_Tree ty -> add "tree "; go ty
-    | Ty_var x -> add x
+    | Ty_Var x -> add x
     end;
     add ")"
   in go ty
@@ -59,7 +59,7 @@ let rec collect l ty =
   | Ty_Nat -> []
   | Ty_Arrow (ty, ty') -> collect (collect l ty) ty'
   | Ty_List ty | Ty_Tree ty -> collect l ty
-  | Ty_var x -> if List.mem x l then l else x :: l
+  | Ty_Var x -> if List.mem x l then l else x :: l
 
 let translate_eqn ((lhs, rhs) : eqn) (buf : Buffer.t) : unit =
   let add = add_string buf in
