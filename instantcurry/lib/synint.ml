@@ -41,6 +41,24 @@ type tm =
     (* A meta variable, referring to a quantified variable in the metalanguage. *)
   [@@deriving sexp]
 
+let rec tm_equal tm1 tm2 =
+  match (tm1, tm2) with
+  | (Nil, Nil) -> true
+  | (Cons (a1, a2), Cons (b1, b2)) -> tm_equal a1 b1 && tm_equal a2 b2
+  | (Nat a, Nat b) -> a = b
+  | (Plus (a1, a2), Plus (b1, b2)) -> tm_equal a1 b1 && tm_equal a2 b2
+  | (Minus (a1, a2), Minus (b1, b2)) -> tm_equal a1 b1 && tm_equal a2 b2
+  | (Times (a1, a2), Times (b1, b2)) -> tm_equal a1 b1 && tm_equal a2 b2
+  | (App (a1, a2), App (b1, b2)) -> tm_equal a1 b1 && tm_equal a2 b2
+  | (If0 (a1, a2, a3), If0 (b1, b2, b3)) -> tm_equal a1 b1 && tm_equal a2 b2 && tm_equal a3 b3
+  | (Fun (a1, a2, a3), Fun (b1, b2, b3)) -> String.equal a1 b1 && ty_equal a2 b2 && tm_equal a3 b3
+  | (BVar a, BVar b) -> String.equal a b (* A bound variable *)
+  | (Ref a, Ref b) -> String.equal a b (* A free variable, e.g. a self-reference in a recursive function. *)
+  | (UVar a, UVar b) -> String.equal a b (* A unification variable *)
+  | (MVar a, MVar b) -> String.equal a b
+    (* A meta variable, referring to a quantified variable in the metalanguage. *)
+  | _ -> false
+
 type pattern = 
   | Pat_nil (* [] *)
   | Pat_cons of name * name (* x :: xs *)

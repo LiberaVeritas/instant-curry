@@ -1,8 +1,10 @@
 open Core
 
+(* TODO make type annotations optional *)
+
 type name = string [@@deriving sexp]
 type uv_name = string [@@deriving sexp]
-type recursive = bool [@@deriving sexp]
+type isrec = bool [@@deriving sexp]
 
 type ty =
   | Ty_Nat
@@ -11,6 +13,19 @@ type ty =
   | Ty_Tree of ty
   | Ty_Var of string
   [@@deriving sexp]
+  
+let cnt = ref 0
+let fresh () : uv_name =
+  incr cnt;
+  "p_" ^ Int.to_string !cnt
+
+let ty_lower (ty: ty option) : ty = 
+  match ty with
+  | Some ty -> ty
+  | None -> Ty_Var (fresh ())
+
+let arg_map (args: (name * ty option) list) : (name * ty) list =
+  List.map args ~f:(fun (name, ty) -> (name, ty_lower ty))
 
 type tm =
   | Nil
@@ -54,7 +69,7 @@ type proof =
 
 type stmt = 
   | Theorem of name * (name * ty) list * (eqn * ty) * proof (* Name, quant vars, statement with type, proof *)
-  | Definition of name * recursive * (name * ty) list * ty * tm (* function name, typed args, return type, body *)
+  | Definition of name * isrec * (name * ty) list * ty * tm (* function name, typed args, return type, body *)
   | Print of tm (* Print result of evaluating term *)
   [@@deriving sexp]
 

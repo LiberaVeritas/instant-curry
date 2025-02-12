@@ -4,88 +4,265 @@ open Sexp
 open Stdio
 
 let stdout = Out_channel.stdout
+let print _ = () (*output_hum stdout s; printf "\n"*)
+
 
 (* typechecking *)
 
-exception IllTyped of string (* todo: MORE SPECIFIC TYPE ERRORS *) 
-type ctx = (name * ty) list [@@deriving sexp]
-type thm_ctx = (name * thm_stmt) list [@@deriving sexp]
+(* algo w and schemes
+structure + same or not
+ex forall [t1 t2] t1 -> t3
+schm environment, mapping names to schmes replace ctx
+all names map to schemes
+when called, instantiate with fresh vars, then unify
+fresh vars because can have 2 diff instans in same ctx
+unification outputs substitutions
+occurs check in subs, a -> b {a/a->c}
+sub composition S1 . S2 is S1(S2 ty) is S1 applied to vars in S2
 
-(* Delta: metavars, Sigma: Refs, Gamma: bvars *)
-let rec typecheck_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty =
-  (* print_endline @@ Printing.string_of_tm e ; *)
+Schemes contain a type and a list of some of the type variables in that type.
+When variables are declared, their type is generalized.
+Generalization means creating a scheme out of a type.
+The type variables in a scheme are those in the type that aren’t also in the type environment.
+When a variable is used, it is instantiated.
+Instantiating a type scheme produces a type.
+That type is the one from the type scheme, with the type variables listed in the scheme replaced with brand new type variables.
+*)
+
+let cnt = ref 0 
+let fresh () : uv_name =
+  incr cnt;
+  "t_" ^ Int.to_string !cnt;
+
+type ty_scheme = {
+  qvars : uv_name list;
+  typ : ty;
+} [@@deriving sexp]
+
+exception IllTyped of string (* todo: MORE SPECIFIC TYPE ERRORS *) [@@deriving sexp]
+type ctx = (name * ty_scheme) list [@@deriving sexp]
+type thm_ctx = (name * thm_stmt) list [@@deriving sexp]
+type ctx' = (name * ty) list [@@deriving sexp]
+
+
+let generalize (gamma : ctx) (t : ty) : ty_scheme =
+  let rec gen t =
+    match t with
+    | Ty_Nat -> { qvars = []; typ = Ty_Nat }
+    | Ty_Arrow (t1, t2) -> 
+      let s1 = gen t1 in
+      let s2 = gen t2 in
+      { qvars = s1.qvars @ s2.qvars; typ = Ty_Arrow (s1.typ, s2.typ) }
+    | Ty_List typ -> 
+      let s = gen typ in
+      { qvars = s.qvars; typ = Ty_List s.typ }
+    | Ty_Tree typ ->
+      let s = gen typ in
+      { qvars = s.qvars; typ = Ty_Tree s.typ }
+    | Ty_Var var -> 
+      match List.Assoc.find ~equal:String.equal gamma var with
+      | Some _ -> { qvars = []; typ = Ty_Var var }
+      | None -> { qvars = [var]; typ = Ty_Var var }
+  in
+  gen t
+  
+type sub = (uv_name * ty) list [@@deriving sexp]
+    
+let apply_sub (typ: ty) (sub : sub) : ty =
+    let rec apply t =
+    match t with 
+    | Ty_Var var -> 
+      begin match List.Assoc.find ~equal:String.equal sub var with
+      | Some t' -> t'
+      | None -> Ty_Var var
+      end
+    | Ty_Nat -> Ty_Nat
+    | Ty_Arrow (t1, t2) -> Ty_Arrow (apply t1, apply t2)
+    | Ty_List t' -> Ty_List (apply t')
+    | Ty_Tree t' -> Ty_Tree (apply t')
+    in
+    apply typ
+  
+let apply_sub_sch (sch: ty_scheme) (sub: sub) : ty_scheme =
+  let f (name, _) = not (List.mem sch.qvars name ~equal:String.equal) in
+  let typ = apply_sub sch.typ (List.filter sub ~f:f) in
+  { qvars = sch.qvars; typ = typ }
+  
+let apply_sub_ctx (ctx: ctx) (sub: sub) : ctx =
+  let f (var, sch) = (var, apply_sub_sch sch sub) in 
+  List.map ctx ~f:f
+
+let compose_sub (sub1: sub) (sub2: sub) : sub =
+  let f (name2, ty2) = (name2, apply_sub ty2 sub1) in
+  let sub2 = List.map sub2 ~f:f in
+  let g (name1, _) = 
+    match List.Assoc.find ~equal:String.equal sub2 name1 with
+    | Some _ -> false
+    | None -> true
+  in
+  (List.filter sub1 ~f:g) @ sub2
+
+let instantiate (sch: ty_scheme) : ty =
+  let f qv = (qv, Ty_Var (fresh ()) ) in
+  apply_sub sch.typ (List.map sch.qvars ~f:f)
+
+let get_vars (ty: ty) : name list =
+  let rec get ty =
+    match ty with
+    | Ty_Var var -> [var]
+    | Ty_Nat -> []
+    | Ty_Arrow (t1, t2) -> get t1 @ get t2
+    | Ty_List t' -> get t'
+    | Ty_Tree t' -> get t'
+    in 
+    get ty
+
+let unify_var (var: name) (ty: ty) : sub = 
+  match ty with
+  | Ty_Var v when String.equal v var -> []
+  | ty -> if List.mem ~equal:String.equal (get_vars ty) var 
+    then raise (IllTyped ("occurs check fail " ^ var ^ " " ^ (to_string (sexp_of_ty ty))))
+    else [(var, ty)]
+  
+let rec unify (t1: ty) (t2: ty) : sub =
+  match (t1, t2) with
+  | (Ty_Nat, Ty_Nat) -> []
+  | (Ty_Arrow (x1, y1), Ty_Arrow (x2, y2)) ->
+    let sub1 = unify x1 x2 in
+    let sub2 = unify (apply_sub y1 sub1) (apply_sub y2 sub1) in
+    compose_sub sub1 sub2
+  | (Ty_List t1, Ty_List t2) -> unify t1 t2
+  | (Ty_Tree t1, Ty_Tree t2) -> unify t1 t2
+  | (Ty_Var var, ty) -> unify_var var ty 
+  | (ty, Ty_Var var) -> unify_var var ty
+  | _ -> raise (IllTyped ("unification error " ^ (to_string (sexp_of_ty t1)) ^ " " ^(to_string (sexp_of_ty t2))))
+  
+  
+(* delta is metavars, sigma is refs, gamma is bound vars *)
+let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
+  let inf = infer_tm delta sigma gamma in
   match e with
   (* | Nil ty -> Ty_List ty *)
   | Nil ->
   (*let () = output_hum stdout (sexp_of_tm e) in*)
-  Ty_List Ty_Nat
-  | Cons (x, xs) -> 
-    let t = typecheck_tm delta sigma gamma x in
-    begin match typecheck_tm delta sigma gamma xs with
-    | Ty_List t' -> if ty_equal t t' then Ty_List t else raise (IllTyped "cons")
-    | _ -> raise (IllTyped "cons")
-    end
-  | Nat _ -> Ty_Nat
-  | Plus (e, e') | Minus (e, e') | Times (e, e') -> 
-    begin match (typecheck_tm delta sigma gamma e, typecheck_tm delta sigma gamma e') with
-    | (Ty_Nat, Ty_Nat) -> Ty_Nat
-    | _ -> raise (IllTyped "arith non-nats")
-    end
-  | If0 (e, z, nz) ->
-    let ty = typecheck_tm delta sigma gamma z in
-    if phys_equal (typecheck_tm delta sigma gamma e) Ty_Nat &&
-       phys_equal (typecheck_tm delta sigma gamma nz) ty then ty
-    else raise (IllTyped "if0")
-  | App (e, e') ->
-    begin match typecheck_tm delta sigma gamma e with
-    | Ty_Arrow (t, t') -> 
-            let () = printf "\n" in
-            let () = output_hum stdout (sexp_of_ty t) in
-            let () = printf " -> " in
-            let () = output_hum stdout (sexp_of_ty t') in
-            let () = printf "\n" in
-            let () = output_hum stdout (sexp_of_ty (typecheck_tm delta sigma gamma e')) in
-            let () = printf "\n" in
-      if ty_equal (typecheck_tm delta sigma gamma e') t
-        then t' else raise (IllTyped ("apply other " ^ Sexp.to_string (sexp_of_ty (typecheck_tm delta sigma gamma e'))))
-    | _ -> raise (IllTyped "apply non-fn")
-    end
-  | Fun (x, ty, e) ->
-    let rty = typecheck_tm delta sigma ((x, ty) :: gamma) e in
-    Ty_Arrow (ty, rty)
+    (Ty_List Ty_Nat, [])
   | BVar x ->
+    let () = print (sexp_of_string x) in
     begin match List.Assoc.find ~equal:String.equal gamma x with
-    | Some t -> t
+    | Some sch -> let () = print (sexp_of_ty (instantiate sch)) in (instantiate sch, [])
     | None -> raise (IllTyped "no bvar") 
     end
   | MVar x -> 
+    let () = print (sexp_of_string x) in
     begin match List.Assoc.find ~equal:String.equal delta x with
-    | Some t -> t
+    | Some sch -> let () = print (sexp_of_ty (instantiate sch)) in (instantiate sch, [])
     | None -> raise (IllTyped "no mvar") 
     end
   | Ref x -> 
+    let () = print (sexp_of_string x) in
     begin match List.Assoc.find ~equal:String.equal sigma x with
-    | Some t -> t
-    | None -> raise (IllTyped "no ref") 
+    | Some sch -> let () = print (sexp_of_ty (instantiate sch)) in (instantiate sch, [])
+    | None -> raise (IllTyped ("no ref " ^ x)) 
     end
   | UVar _ -> raise NotImplemented
+  | Nat _ -> (Ty_Nat, [])
+  | Plus (e, e') | Minus (e, e') | Times (e, e') -> 
+      let () = print (sexp_of_tm e) in
+      let () = print (sexp_of_tm e') in
+      let () = print (sexp_of_ty (fst (inf e))) in
+      let () = print (sexp_of_ty (fst (inf e'))) in
+    let sub1 = unify (fst (inf e)) Ty_Nat in
+    let sub2 = unify (apply_sub (fst (inf e')) sub1) Ty_Nat in
+    (Ty_Nat, compose_sub sub1 sub2)
+  | If0 (e, z, nz) ->
+    let (zty, _) = inf z in
+    let (ety, _) = inf e in
+    let (nzty, _) = inf nz in
+    let sub1 = unify ety Ty_Nat in
+    let sub2 = unify (apply_sub zty sub1) (apply_sub nzty sub1) in
+    ((apply_sub zty sub1), compose_sub sub2 sub1)
+  | Cons (x, xs) -> 
+    let (xty, _) = inf x in
+    let (xsty, _) = inf xs in
+    let sub = unify (Ty_List xty) xsty in
+      let () = print (sexp_of_tm x) in
+      let () = print (sexp_of_tm xs) in
+      let () = print (sexp_of_ty xty) in
+      let () = print (sexp_of_ty xsty) in
+    (Ty_List xty, sub)
+    (*begin match inf xs with
+    | (Ty_List ty, _) -> 
+      let sub = unify xty ty in
+      let () = print (sexp_of_tm x) in
+      let () = print (sexp_of_tm xs) in
+      let () = print (sexp_of_ty xty) in
+      let () = print (sexp_of_ty ty) in
+      (Ty_List xty, compose_sub xsub sub) *)
+        (*raise (IllTyped ("cons " ^ (to_string (sexp_of_tm x)) ^ " " ^ (to_string (sexp_of_tm xs)) ^ "  " ^ (to_string (sexp_of_ty xty)) ^ " " ^ (to_string (sexp_of_ty ty))))*)
+  (*  | _ -> 
+      let () = print (sexp_of_tm x) in
+      let () = print (sexp_of_tm xs) in
+      let () = print (sexp_of_ty xty) in
+      raise (IllTyped "cons") 
+    end *)
+  | App (f, arg) ->
+    let rty = Ty_Var (fresh ()) in
+    let (fty, sub1) = infer_tm delta sigma gamma f in
+    let (argty, sub2) = infer_tm (apply_sub_ctx delta sub1)
+                                (apply_sub_ctx sigma sub1)
+                                (apply_sub_ctx gamma sub1)
+                                arg
+    in
+      let () = print (sexp_of_tm f) in
+      let () = print (sexp_of_tm arg) in
+      let () = print (sexp_of_ty fty) in
+      let () = print (sexp_of_ty argty) in
+      let () = print (sexp_of_sub sub1) in
+      let () = print (sexp_of_sub sub2) in
+    let sub3 = unify (apply_sub fty sub2) (Ty_Arrow (argty, rty)) in
+    let sub = compose_sub sub3 (compose_sub sub2 sub1) in
+    (apply_sub rty sub, sub)
+  | Fun (x, ty, e) ->
+    let new_var = Ty_Var (fresh ()) in
+    let (rty, sub1) = infer_tm delta sigma ((x, { qvars = []; typ = new_var }) :: gamma) e in
+    let sub2 = unify ty (apply_sub new_var sub1) in
+    let sub = compose_sub sub2 sub1 in
+    (apply_sub rty sub, sub)
   | ListCase (l,nil,x,xs,e) -> 
-    begin match typecheck_tm delta sigma gamma l with
-    | Ty_List t ->
-      let _ = typecheck_tm delta sigma gamma nil in
-      let gamma = (x, t) :: (xs, Ty_List t)  :: gamma in
-      typecheck_tm delta sigma gamma e
-    | _ -> raise (IllTyped ("scrutinee not list " ^ (Sexp.to_string (sexp_of_tm e))))
-    end
+    let new_var = Ty_Var (fresh ()) in
+    let (lty, sub1) = inf l in
+    let ty = apply_sub new_var sub1 in
+    let sub2 = unify lty (Ty_List ty) in
+    let (nilty, _) = inf nil in
+    let gamma = apply_sub_ctx (
+      (xs, {qvars = []; typ = Ty_List ty }) :: 
+      (x, {qvars = []; typ = ty }) :: 
+      gamma 
+      ) sub2
+    in
+      let () = print (sexp_of_tm l) in
+      let () = print (sexp_of_tm nil) in
+      let () = print (sexp_of_string x) in
+      let () = print (sexp_of_string xs) in
+      let () = print (sexp_of_tm e) in
+    let (ety, _) = infer_tm delta sigma gamma e in
+    let sub3 = unify nilty ety in
+    let sub = compose_sub sub3 (compose_sub sub2 sub1) in
+    (apply_sub ety sub, sub)
+
 
 let typecheck_eqn (delta : ctx) (sigma : ctx) (e : eqn) : unit =
-  let tc = typecheck_tm delta sigma [] in
-  if not (phys_equal (tc e.lhs) (tc e.rhs)) then raise (IllTyped "eqn types disagree")
+  let inf tm = fst (infer_tm delta sigma [] tm) in
+  let _ = unify (inf e.lhs) (inf e.rhs) in
+  ()
+  (*if not (ty_equal (inf e.lhs) (inf e.rhs)) then raise (IllTyped "eqn types disagree")*)
 
 let typecheck_step (delta : ctx) (sigma : ctx) 
                    (prev : tm) (next : tm) (_ : justification) : unit =
-  let tc = typecheck_tm delta sigma [] in
-  if not (phys_equal (tc prev) (tc next)) then raise (IllTyped "step types disagree")
+  let inf tm = fst (infer_tm delta sigma [] tm) in
+  let _ = unify (inf prev) (inf next) in
+  ()
+  (*if not (ty_equal (inf prev) (inf next)) then raise (IllTyped "step types disagree")*)
 
 let typecheck_steps (delta : ctx) (sigma : ctx) (s : side) : unit =
   let _ = List.fold_left s.steps ~init:s.start ~f:(fun prev (next, j) -> 
@@ -96,25 +273,27 @@ let typecheck_case (delta : ctx) (sigma : ctx) (c : case) : unit =
   let delta = match c.pattern with (* todo: what if they induct on l but case is k = [] *)
   | Pat_cons (x, xs) -> 
     begin match List.Assoc.find ~equal:String.equal delta c.var with
-    | Some (Ty_List ty as tyl) -> (x, ty) :: (xs, tyl) :: delta
-    | Some _ -> raise (IllTyped "pattern disagrees with case var")
+    | Some { qvars = qvs; typ = (Ty_List ty as tyl) } -> 
+      (x, { qvars = qvs; typ = ty }) :: (xs, { qvars = qvs; typ = tyl }) :: delta
+    | Some { qvars = _; typ = _ } -> raise (IllTyped "pattern disagrees with case var")
     | None -> raise (IllTyped "case on nonexistent var") end
   | Pat_nil -> 
     begin match List.Assoc.find ~equal:String.equal delta c.var with
-    | Some (Ty_List _) -> delta
-    | Some _ -> raise (IllTyped "pattern disagrees with case var")
+    | Some { qvars = _; typ = (Ty_List _) } -> delta
+    | Some { qvars = _; typ = _ } -> raise (IllTyped "pattern disagrees with case var")
     | None -> raise (IllTyped "case on nonexistent var") end
   | Pat_empty -> raise (IllTyped "empty pattern") 
   | Pat_node (_, _, _) -> 
     begin match List.Assoc.find ~equal:String.equal delta c.var with
-    | Some _ -> raise (IllTyped "pattern disagrees with case var")
+    | Some { qvars = _; typ = _ } -> raise (IllTyped "pattern disagrees with case var")
     | None -> raise (IllTyped "case on nonexistent var") end 
   in 
   (* todo: check wts is valid *)
   (* todo: check ihs are valid *)
-  if not (phys_equal (c.wts.lhs) (c.lhs.start)) then raise (IllTyped "invalid lhs start");
+
+  if not (tm_equal (c.wts.lhs) (c.lhs.start)) then raise (IllTyped "invalid lhs start");
   typecheck_steps delta sigma c.lhs;
-  if not (phys_equal (c.wts.rhs) (c.rhs.start)) then raise (IllTyped "invalid rhs start");
+  if not (tm_equal (c.wts.rhs) (c.rhs.start)) then raise (IllTyped "invalid rhs start");
   typecheck_steps delta sigma c.rhs
   
 
@@ -124,29 +303,37 @@ let typecheck_proof (delta : ctx) (sigma : ctx) (p : proof) : unit =
   | Axiom -> []
   in ()
 
-let typecheck_stmt (delta : ctx) (sigma : ctx) (s : stmt) : ctx =
+let infer_stmt (delta : ctx) (sigma : ctx) (s : stmt) : ctx =
+  let f = (fun (name, ty) -> (name, { qvars = []; typ = ty })) in
   match s with
   | Definition d -> 
     (*let gamma = List.fold d.args ~init:[] ~f:(fun xs x -> x :: xs) in*)
-    let gamma = d.args in(*
-        let () = printf "asd\n" in
-        let () = output_hum stdout (sexp_of_list (sexp_of_pair sexp_of_string sexp_of_ty) gamma) in
-        let () = printf "\n" in*) 
-    let sigma = (d.name, d.fnsig) :: sigma in
-            
-    let ty = typecheck_tm delta sigma gamma d.body in
-    if ty_equal ty d.rty then sigma else raise (IllTyped "letrec disagree")
+
+    let gamma = List.map d.args ~f:f in
+        let () = print (sexp_of_string d.name) in
+    (*let sigma = if d.isrec then (d.name, d.fnsig) :: sigma else sigma in*)
+    let sigma = (d.name, { qvars = []; typ = d.fnsig} ) :: sigma in
+    let (ty, sub1) = infer_tm delta sigma gamma d.body in
+        let () = print (sexp_of_ty ty) in
+        let () = print (sexp_of_ty d.rty) in
+        let () = print (sexp_of_stmt s) in
+    let rty= (apply_sub d.rty sub1) in
+    let sub2 = unify ty rty in 
+    let _ = compose_sub sub2 sub1 in
+    
+    (*let () = output_hum stdout (sexp_of_ty (apply_sub d.fnsig sub)) in*)
+    sigma
   | Print t -> 
-    let _ = typecheck_tm delta sigma [] t in 
+    let _ = infer_tm delta sigma [] t in 
     sigma
   | Thm t ->  (* todo: add to context of theorems *)
-    let delta = t.stmt.quantifiers @ delta in
+    let delta = (List.map t.stmt.quantifiers ~f:f) @ delta in
     typecheck_eqn delta sigma t.stmt.claim;
     typecheck_proof delta sigma t.proof;
     sigma
 
 let typecheck_prog (p : program) =
-  List.fold ~f:(fun sigma stmt -> typecheck_stmt [] sigma stmt) ~init:[] p
+  List.fold ~f:(fun sigma stmt -> infer_stmt [] sigma stmt) ~init:[] p
 
 (* TODO LIST
    

@@ -3,6 +3,8 @@
     open Parsed_ast
 %}
 
+(* TODO make type annotations optional *)
+
 %token EOF
 
 (* proof language keywords *)
@@ -91,15 +93,25 @@ stmt:
   c = eqn COLON t = ty SEP 
   p = proof                             { Theorem (v, ps, (c, t), p) }
 | DEFINITION SEP LET REC 
-  f = IDENT ps = arg+ COLON ty = ty
-  EQ t = tm                             { Definition (f, true, ps, ty, t) }
+  f = IDENT ps = arg2+ COLON ty = ty
+  EQ t = tm                             { Definition (f, true, arg_map ps, ty, t) }
+| DEFINITION SEP LET REC 
+  f = IDENT ps = arg2+ 
+  EQ t = tm                             { Definition (f, true, arg_map ps, ty_lower None, t) }
 | DEFINITION SEP LET 
-  f = IDENT ps = arg+ COLON ty = ty
-  EQ t = tm                             { Definition (f, false, ps, ty, t) }
+  f = IDENT ps = arg2+ COLON ty = ty
+  EQ t = tm                             { Definition (f, false, arg_map ps, ty, t) }
+| DEFINITION SEP LET 
+  f = IDENT ps = arg2+ 
+  EQ t = tm                             { Definition (f, false, arg_map ps, ty_lower None, t) }
 | PRINT SEP t = tm                      { Print t }
 
 arg:
 | LPAR i = IDENT COLON t = ty RPAR      { (i, t) }
+
+arg2:
+| LPAR i = IDENT COLON t = ty RPAR      { ( i, Some t) }
+| i = IDENT                             { ( i, None) }
 
 proof:
 | PROOF SEP 
@@ -171,8 +183,8 @@ key_tm:
   ARROW t2 = tm END                     { TreeCase (t, t1, l, x, r, t2) }
 | IF0 t = tm THEN t1 = tm 
   ELSE t2 = tm END                      { If0 (t, t1, t2) }
-| FUN LPAR x = IDENT COLON ty = ty RPAR
-  ARROW t = tm END                      { Fun (x, ty, t) }
+| FUN LPAR x = IDENT COLON ty = ty? RPAR
+  ARROW t = tm END                      { Fun (x, ty_lower ty, t) }
 | t = app_tm                            { t }
 
 app_tm:

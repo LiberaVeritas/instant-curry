@@ -1,8 +1,12 @@
 open Icparser
-open Icparser.Parsed_ast
+
 open Core
 open Instantcurry
+open Sexp
+open Stdio
 
+let stdout = Out_channel.stdout
+let print s = output_hum stdout s; printf "\n"
 
 (*open Instantcurry*)
 
@@ -37,6 +41,8 @@ let y = (Lexing.from_string @@ read_line ()) in
 
 
 (*let usage_message = "Usage: instantcurry <infile> <outfile>"*)
+type p = (string * Typechecking.ty_scheme) list [@@deriving sexp]
+type prog = Synint.stmt list [@@deriving sexp]
 
 let () =
     let args = Sys.get_argv () in 
@@ -57,11 +63,12 @@ let () =
     Buffer.output_buffer oc buf;*)
     
     
-
+    print (sexp_of_string "p\n");
     (* print_prog p oc *)
     (*let _ = Eval.exec_prog prog in *)
     let _ = Typechecking.typecheck_prog prog in
-    
-    Sexp.pp_hum Format.std_formatter (sexp_of_program ptree);
+    ()
+    (*print (sexp_of_p p);*)
+    (*Sexp.pp_hum Format.std_formatter (sexp_of_program ptree);*)
     (*Translate.print_prog ptree oc *)
 

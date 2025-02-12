@@ -4,31 +4,34 @@ open Core
 
 (* lifting from parse trees to ASTs *)
 
-exception ScopeError of name
+exception ScopeError of name 
 type scope = Term | Stmt | Meta [@@deriving sexp]
 type scope_ctx = (name * scope) list [@@deriving sexp]
 
+
 let rec lift_ty (ctx : scope_ctx) (ty : Icparser.Parsed_ast.ty) : ty =
+  let lft = lift_ty ctx in
   match ty with
   | Icparser.Parsed_ast.Ty_Nat -> Ty_Nat
-  | Icparser.Parsed_ast.Ty_List ty -> Ty_List (lift_ty ctx ty)
-  | Icparser.Parsed_ast.Ty_Arrow (ty, ty') -> Ty_Arrow (lift_ty ctx ty, lift_ty ctx ty')
-  | Icparser.Parsed_ast.Ty_Tree ty -> Ty_Tree (lift_ty ctx ty)
+  | Icparser.Parsed_ast.Ty_List ty -> Ty_List (lft ty)
+  | Icparser.Parsed_ast.Ty_Arrow (ty, ty') -> Ty_Arrow (lft ty, lft ty')
+  | Icparser.Parsed_ast.Ty_Tree ty -> Ty_Tree (lft ty)
   | Icparser.Parsed_ast.Ty_Var v -> Ty_Var v
 
 let rec lift_tm (ctx : scope_ctx) (t : Icparser.Parsed_ast.tm) : tm =
+  let lft = lift_tm ctx in
   match t with
   | Icparser.Parsed_ast.Nil -> Nil
-  | Icparser.Parsed_ast.Cons (t, t') -> Cons (lift_tm ctx t, lift_tm ctx t')
+  | Icparser.Parsed_ast.Cons (t, t') -> Cons (lft t, lft t')
   | Icparser.Parsed_ast.ListCase (l, n, x, xs, c) -> 
-    ListCase (lift_tm ctx l, lift_tm ctx n, x, xs, lift_tm ((x, Term) :: (xs, Term) :: ctx) c)
+    ListCase (lft l, lft n, x, xs, lift_tm ((x, Term) :: (xs, Term) :: ctx) c)
   | Icparser.Parsed_ast.Nat n -> Nat n
-  | Icparser.Parsed_ast.Plus (t, t') -> Plus (lift_tm ctx t, lift_tm ctx t')
-  | Icparser.Parsed_ast.Minus (t, t') -> Minus (lift_tm ctx t, lift_tm ctx t')
-  | Icparser.Parsed_ast.Times (t, t') -> Times (lift_tm ctx t, lift_tm ctx t')
-  | Icparser.Parsed_ast.If0 (t, z, s) -> If0 (lift_tm ctx t, lift_tm ctx z, lift_tm ctx s)
-  | Icparser.Parsed_ast.App (t, t') -> App (lift_tm ctx t, lift_tm ctx t')
-  | Icparser.Parsed_ast.Fun (x, ty, t) -> Fun (x, lift_ty ctx ty, lift_tm ((x, Term) :: ctx) t)
+  | Icparser.Parsed_ast.Plus (t, t') -> Plus (lft t, lft t')
+  | Icparser.Parsed_ast.Minus (t, t') -> Minus (lft t, lft t')
+  | Icparser.Parsed_ast.Times (t, t') -> Times (lft t, lft t')
+  | Icparser.Parsed_ast.If0 (t, z, s) -> If0 (lft t, lft z, lft s)
+  | Icparser.Parsed_ast.App (t, t') -> App (lft t, lft t')
+  | Icparser.Parsed_ast.Fun (x, ty, t) -> Fun (x, (lift_ty ctx ty), lift_tm ((x, Term) :: ctx) t)
   (*| Icparser.Parsed_ast.Empty -> Nil*)
   | Icparser.Parsed_ast.Node (_, _, _) -> raise NotImplemented 
   | Icparser.Parsed_ast.TreeCase _ -> raise NotImplemented
@@ -99,7 +102,7 @@ let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : Icparser.Parsed_ast.s
                       { name = name;
                         stmt = { quantifiers = args; claim = claim};
                         proof = lift_proof thms ctx' prf })
-  | Definition (f, isrec, args, ty, t) -> (* TODO is rec *)
+  | Definition (f, isrec, args, ty, t) -> 
     let ctx' = List.fold 
               ~f:(fun ctx arg -> (fst arg, Term) :: ctx) 
               ~init:((f, Stmt) :: ctx) 
