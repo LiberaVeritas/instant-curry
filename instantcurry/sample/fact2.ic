@@ -1,9 +1,9 @@
 DEFINITION.
-let rec fact (n: nat) : nat =
+let rec fact n =
     if0 n then 1
     else n * (fact (n - 1)) end
 
 DEFINITION.
-let rec fact_tr (n: nat) (acc: nat) : nat =
+let rec fact_tr n acc =
     if0 n then acc
     else fact_tr (n - 1) (n * acc) end
