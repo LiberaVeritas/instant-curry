@@ -45,47 +45,40 @@ let lookup_ty ctx x =
 let member lst x =
   List.mem ~equal:String.equal lst x
 
+  
+let rec get_vars (ty: ty) : name list =
+  match ty with
+  | Ty_Var var -> [var]
+  | Ty_Nat -> []
+  | Ty_Arrow (t1, t2) -> get_vars t1 @ get_vars t2
+  | Ty_List t' -> get_vars t'
+  | Ty_Tree t' -> get_vars t'
 
 (* type -> type scheme. Free vars get universally quantified *)
-let generalize (gamma : ctx) (t : ty) : ty_scheme =
-  let rec gen t =
-    match t with
-    | Ty_Nat -> { qvars = []; typ = Ty_Nat }
-    | Ty_Arrow (t1, t2) -> 
-      let s1 = gen t1 in
-      let s2 = gen t2 in
-      { qvars = s1.qvars @ s2.qvars; typ = Ty_Arrow (s1.typ, s2.typ) }
-    | Ty_List typ -> 
-      let s = gen typ in
-      { qvars = s.qvars; typ = Ty_List s.typ }
-    | Ty_Tree typ ->
-      let s = gen typ in
-      { qvars = s.qvars; typ = Ty_Tree s.typ }
-    | Ty_Var var -> 
-      match lookup gamma var with
-      | Some _ -> { qvars = []; typ = Ty_Var var }
-      | None -> { qvars = [var]; typ = Ty_Var var }
-  in
-  gen t
+let generalize (gamma : ctx) (ty : ty) : ty_scheme =
+  let vars = get_vars ty in
+  let ctx_vars = List.map ~f:fst gamma in
+  let qvars = vars |> List.filter ~f:(fun v -> not (member ctx_vars v)) in
+  { qvars = qvars; typ = ty }
   
 (* var -> type *)
 type sub = (uv_name * ty) list [@@deriving sexp]
     
 (* substitute variables withiin a given type with the matching type in the sub *)
-let apply_sub (typ: ty) (sub : sub) : ty =
-    let rec apply t =
-    match t with 
+let apply_sub (ty: ty) (sub : sub) : ty =
+  let rec apply ty =
+    match ty with 
     | Ty_Var var -> 
       begin match lookup sub var with
-      | Some t' -> t'
+      | Some ty' -> ty'
       | None -> Ty_Var var
       end
     | Ty_Nat -> Ty_Nat
     | Ty_Arrow (t1, t2) -> Ty_Arrow (apply t1, apply t2)
-    | Ty_List t' -> Ty_List (apply t')
-    | Ty_Tree t' -> Ty_Tree (apply t')
-    in
-    apply typ
+    | Ty_List ty' -> Ty_List (apply ty')
+    | Ty_Tree ty' -> Ty_Tree (apply ty')
+  in
+  apply ty
   
 let apply_sub_sch (sch: ty_scheme) (sub: sub) : ty_scheme =
   let f (name, _) = not (member sch.qvars name) in
@@ -100,30 +93,15 @@ let apply_sub_ctx (ctx: ctx) (sub: sub) : ctx =
 ie. a -> b {a:c -> bool} {c:int} = a -> b {a:int -> bool}
 TODO type error on same var to different types *)
 let compose_sub (sub1: sub) (sub2: sub) : sub =
-  let f (name2, ty2) = (name2, apply_sub ty2 sub1) in
-  let sub2 = List.map sub2 ~f:f in
-  let g (name1, _) = 
-    match lookup sub2 name1 with
-    | Some _ -> false
-    | None -> true
-  in
-  (List.filter sub1 ~f:g) @ sub2
+  let sub2' = List.map sub2 ~f:(fun (var, ty) -> (var, apply_sub ty sub1)) in
+  let sub1' = List.filter sub1 ~f:(fun (var, _) -> 
+    not (List.Assoc.mem sub2 var ~equal:String.equal)) in
+  sub1' @ sub2'
 
 (* type scheme -> type, replace all quantified vars with fresh vars *)
 let instantiate (sch: ty_scheme) : ty =
   let f qv = (qv, Ty_Var (fresh ()) ) in
   apply_sub sch.typ (List.map sch.qvars ~f:f)
-
-let get_vars (ty: ty) : name list =
-  let rec get ty =
-    match ty with
-    | Ty_Var var -> [var]
-    | Ty_Nat -> []
-    | Ty_Arrow (t1, t2) -> get t1 @ get t2
-    | Ty_List t' -> get t'
-    | Ty_Tree t' -> get t'
-    in 
-    get ty
 
 let unify_var (var: name) (ty: ty) : sub = 
   match ty with
@@ -135,15 +113,14 @@ let unify_var (var: name) (ty: ty) : sub =
 (* enforce equality constraint between types, unify to one type with same vars *)
 let rec unify (t1: ty) (t2: ty) : sub =
   match (t1, t2) with
-  | (Ty_Nat, Ty_Nat) -> []
-  | (Ty_Arrow (x1, y1), Ty_Arrow (x2, y2)) ->
+  | Ty_Nat, Ty_Nat -> []
+  | Ty_Arrow (x1, y1), Ty_Arrow (x2, y2) ->
     let sub1 = unify x1 x2 in
     let sub2 = unify (apply_sub y1 sub1) (apply_sub y2 sub1) in
     compose_sub sub1 sub2
-  | (Ty_List t1, Ty_List t2) -> unify t1 t2
-  | (Ty_Tree t1, Ty_Tree t2) -> unify t1 t2
-  | (Ty_Var var, ty) -> unify_var var ty 
-  | (ty, Ty_Var var) -> unify_var var ty
+  | Ty_List t1, Ty_List t2 -> unify t1 t2
+  | Ty_Tree t1, Ty_Tree t2 -> unify t1 t2
+  | Ty_Var var, ty | ty, Ty_Var var -> unify_var var ty
   | _ -> raise (IllTyped ("unification error " ^ (to_string (sexp_of_ty t1)) ^ " " ^(to_string (sexp_of_ty t2))))
   
   
@@ -151,11 +128,9 @@ let rec unify (t1: ty) (t2: ty) : sub =
 let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
   let inf = infer_tm delta sigma gamma in
   match e with
-  | Nil -> 
-    let var = Ty_Var (fresh ()) in
-    (Ty_List var, [])
+  | Nil -> let var = Ty_Var (fresh ()) in (Ty_List var, [])
   | BVar x ->
-    begin match lookup gamma x with
+    begin match lookup gamma x with 
     | Some sch -> (instantiate sch, [])
     | None -> raise (IllTyped "no bvar") 
     end
@@ -191,9 +166,9 @@ let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
     let rty = Ty_Var (fresh ()) in
     let (fty, sub1) = infer_tm delta sigma gamma f in
     let (argty, sub2) = infer_tm (apply_sub_ctx delta sub1)
-                                (apply_sub_ctx sigma sub1)
-                                (apply_sub_ctx gamma sub1)
-                                arg
+                                 (apply_sub_ctx sigma sub1)
+                                 (apply_sub_ctx gamma sub1)
+                                 arg
     in
     let sub3 = unify (apply_sub fty sub2) (Ty_Arrow (argty, rty)) in
     let sub = compose_sub sub3 (compose_sub sub2 sub1) in
