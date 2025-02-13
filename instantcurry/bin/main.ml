@@ -2,11 +2,10 @@ open Icparser
 
 open Core
 open Instantcurry
-open Sexp
 open Stdio
 
-let stdout = Out_channel.stdout
-let print s = output_hum stdout s; printf "\n"
+(*let stdout = Out_channel.stdout*)
+(*let print s = output_hum stdout s; printf "\n"*)
 
 (*open Instantcurry*)
 
@@ -57,17 +56,17 @@ let () =
     let ptree = try Parser.program lextok lexbuf with
         | Parser.Error -> failwith (Int.to_string lexbuf.lex_curr_p.pos_lnum)
     in
+    let () = printf "parsing succeeded\n" in
     let prog = Lifting.lift_program ptree in
+    let () = printf "lifting succeeded\n" in
     (*let () = List.iter (Out_channel.printf "%s\n") sexp_of_program ptree in*)
     (*let buf = Buffer.create 2048 in
     Buffer.output_buffer oc buf;*)
     
-    
-    print (sexp_of_string "p\n");
     (* print_prog p oc *)
     (*let _ = Eval.exec_prog prog in *)
     let _ = Typechecking.typecheck_prog prog in
-    ()
+    let () = printf "typecheck succeeded\n" in ()
     (*print (sexp_of_p p);*)
     (*Sexp.pp_hum Format.std_formatter (sexp_of_program ptree);*)
     (*Translate.print_prog ptree oc *)

@@ -143,9 +143,10 @@ let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
   let inf = infer_tm delta sigma gamma in
   match e with
   (* | Nil ty -> Ty_List ty *)
-  | Nil ->
+  | Nil -> 
   (*let () = output_hum stdout (sexp_of_tm e) in*)
-    (Ty_List Ty_Nat, [])
+    let var = Ty_Var (fresh ()) in
+    (Ty_List var, [])
   | BVar x ->
     let () = print (sexp_of_string x) in
     begin match List.Assoc.find ~equal:String.equal gamma x with
