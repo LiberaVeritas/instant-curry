@@ -19,10 +19,11 @@ when substituting, occurs check (don't sub var with type containing same var)
 sub composition S1 . S2 is S1(S2 ty) is S1 applied to vars in S2
 *)
 
-let cnt = ref 0 
-let fresh () : uv_name =
-  incr cnt;
-  "t_" ^ Int.to_string !cnt;
+let fresh : unit -> uv_name =
+  let cnt = ref 0 in
+  fun () -> 
+    incr cnt;
+    "t_" ^ Int.to_string !cnt;
 
 type ty_scheme = {
   qvars : uv_name list;

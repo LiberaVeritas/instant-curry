@@ -12,7 +12,7 @@ open Stdio
 (* let example_append_statement : Synint.stmt =
     let open Synint in {
       quantifiers = ["l3"; "l2"; "l1"];
-      claim = { (* app (app l1 l2) l3 = app l1 (app l2 l3) *)
+      claim = {  app (app l1 l2) l3 = app l1 (app l2 l3) 
           lhs = Ref "app" ++ (Ref "app" ++ MVar ("l1") ++ MVar "l2") ++ MVar ("l3");
           rhs = Ref "app" ++ MVar "l1" ++ (Ref "app" ++ MVar "l2" ++ MVar "l3");
       };
@@ -23,18 +23,18 @@ open Stdio
     unify
         (App (Fun ("x", Ty_Nat, BVar "x"), Nat 3))
         (Nat 3)
-        ByDefinition
+        ByDefinition*)
 
 	
-let _ =
+(*let _ =
 let ast =
 let x = (Lexer.read_token) in
 let y = (Lexing.from_string @@ read_line ()) in
         try Parser.program (x) (y) with
         | Parser.Error -> failwith "Does not parse"
-    in
+    in*)
     (* some stupid stuff to ensure that definitions above are used to avoid errors: *)
-    Format.fprintf Format.std_formatter "Parsed %d theorems and here is a number: %d"
+    (*Format.fprintf Format.std_formatter "Parsed %d theorems and here is a number: %d"
         (List.length ast)
         (List.length example_append_statement.quantifiers) *)
 
@@ -66,7 +66,8 @@ let () =
     (* print_prog p oc *)
     (*let _ = Eval.exec_prog prog in *)
     let _ = Typechecking.typecheck_prog prog in
-    let () = printf "typecheck succeeded\n" in ()
+    let () = printf "typecheck succeeded\n" in 
+    In_channel.close ic
     (*print (sexp_of_p p);*)
     (*Sexp.pp_hum Format.std_formatter (sexp_of_program ptree);*)
     (*Translate.print_prog ptree oc *)

@@ -1,6 +1,5 @@
 open Core
 
-(* TODO make type annotations optional *)
 
 type name = string [@@deriving sexp]
 type uv_name = string [@@deriving sexp]
@@ -13,19 +12,12 @@ type ty =
   | Ty_Tree of ty
   | Ty_Var of string
   [@@deriving sexp]
-  
-let cnt = ref 0
-let fresh () : uv_name =
-  incr cnt;
-  "p_" ^ Int.to_string !cnt
 
-let ty_lower (ty: ty option) : ty = 
-  match ty with
-  | Some ty -> ty
-  | None -> Ty_Var (fresh ())
-
-let arg_map (args: (name * ty option) list) : (name * ty) list =
-  List.map args ~f:(fun (name, ty) -> (name, ty_lower ty))
+let fresh : unit -> ty =
+  let cnt = ref 0 in
+  fun () ->
+    incr cnt;
+    Ty_Var ("p_" ^ Int.to_string !cnt)
 
 type tm =
   | Nil

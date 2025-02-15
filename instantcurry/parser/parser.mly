@@ -93,25 +93,24 @@ stmt:
   c = eqn COLON t = ty SEP 
   p = proof                             { Theorem (v, ps, (c, t), p) }
 | DEFINITION SEP LET REC 
-  f = IDENT ps = arg2+ COLON ty = ty
-  EQ t = tm                             { Definition (f, true, arg_map ps, ty, t) }
+  f = IDENT ps = arg+ COLON ty = ty
+  EQ tm = tm                            { Definition (f, true, ps, ty, tm) }
 | DEFINITION SEP LET REC 
-  f = IDENT ps = arg2+ 
-  EQ t = tm                             { Definition (f, true, arg_map ps, ty_lower None, t) }
+  f = IDENT ps = arg+
+  EQ tm = tm                            { Definition (f, true, ps, fresh (), tm) }
 | DEFINITION SEP LET 
-  f = IDENT ps = arg2+ COLON ty = ty
-  EQ t = tm                             { Definition (f, false, arg_map ps, ty, t) }
+  f = IDENT ps = arg+ COLON ty = ty
+  EQ tm = tm                            { Definition (f, false, ps, ty, tm) }
 | DEFINITION SEP LET 
-  f = IDENT ps = arg2+ 
-  EQ t = tm                             { Definition (f, false, arg_map ps, ty_lower None, t) }
-| PRINT SEP t = tm                      { Print t }
+  f = IDENT ps = arg+ 
+  EQ tm = tm                            { Definition (f, false, ps, fresh (), tm) }
+| PRINT SEP tm = tm                     { Print tm }
 
 arg:
-| LPAR i = IDENT COLON t = ty RPAR      { (i, t) }
+| LPAR i = IDENT COLON ty = ty RPAR     { (i, ty) }
+| i = IDENT                             { (i, fresh ()) }
+| LPAR i = IDENT RPAR                   { (i, fresh ()) }
 
-arg2:
-| LPAR i = IDENT COLON t = ty RPAR      { ( i, Some t) }
-| i = IDENT                             { ( i, None) }
 
 proof:
 | PROOF SEP 
@@ -183,8 +182,8 @@ key_tm:
   ARROW t2 = tm END                     { TreeCase (t, t1, l, x, r, t2) }
 | IF0 t = tm THEN t1 = tm 
   ELSE t2 = tm END                      { If0 (t, t1, t2) }
-| FUN LPAR x = IDENT COLON ty = ty? RPAR
-  ARROW t = tm END                      { Fun (x, ty_lower ty, t) }
+| FUN LPAR x = IDENT COLON ty = ty RPAR
+  ARROW t = tm END                      { Fun (x, ty, t) }
 | t = app_tm                            { t }
 
 app_tm:
@@ -229,6 +228,7 @@ tm:
 | t1 = tm t2 = tm     %prec APP         { App (t1, t2) }
 *)
 
+
 ty:
 | TYNAT                                 { Ty_Nat }
 | t1 = ty TYARROW t2 = ty               { Ty_Arrow (t1, t2) }
@@ -236,4 +236,5 @@ ty:
 | t = ty TYTREE                         { Ty_Tree t }
 | t = TYVAR                             { Ty_Var t }
 | LPAR t = ty RPAR                      { t }
+
 
