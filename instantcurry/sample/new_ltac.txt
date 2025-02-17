@@ -1,0 +1,26 @@
+- Intro:
+	- Motivation and contrubitions
+		- automatic generalization and lemma translation
+		- test suite and automatic running and testing of IC
+
+- Example lemmas and generalization
+	- worked example
+	- lemma required
+	- high level IC proof
+
+- Translation of lemmas
+	- challenges, i.e. rewrite and how it works
+		- Symmetry
+	- what the ideas are
+
+- Automatic Generalization
+	- Problem with lemmas before
+	- Why generalization is needed and how it was done
+
+- Evaluation:
+	- table of theorems
+		- how complicated? Generalization? Lemmas?
+
+- Conclusion
+	- Recap main points and contribution
+	- What should be done next

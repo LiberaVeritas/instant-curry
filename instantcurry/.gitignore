@@ -1,3 +1,6 @@
 /_opam
 /_build
 *.v
+.DS_Store
+/test*
+/out

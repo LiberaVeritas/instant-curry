@@ -10,7 +10,7 @@ tags: ["topics" "to describe" "your" "project"]
 doc: "https://url/to/documentation"
 depends: [
   "ocaml"
-  "dune" {>= "3.12"}
+  "dune" {>= "3.17"}
   "odoc" {with-doc}
 ]
 build: [
@@ -27,4 +27,3 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "https://gitlab.cs.mcgill.ca/comp-302/instant-curry.git"

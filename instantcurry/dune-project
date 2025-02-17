@@ -1,13 +1,11 @@
-(lang dune 3.12)
+(lang dune 3.17)
 
-(using menhir 2.1)
+(using menhir 3.0)
 
 (name instantcurry)
 
 (generate_opam_files true)
 
-(source
- (uri https://gitlab.cs.mcgill.ca/comp-302/instant-curry.git))
 
 (authors "Maite Kramarz")
 

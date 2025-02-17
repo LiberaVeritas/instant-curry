@@ -1,0 +1,46 @@
+DEFINITION.
+let rec sum (l : nat list) : nat =
+    match l with
+    | [] => 0
+    | x :: xs => x + sum xs
+    end
+
+DEFINITION.
+let rec sum_tr (l : nat list) (acc : nat) : nat =
+    match l with
+    | [] => acc
+    | x :: xs => sum_tr xs (x + acc)
+    end
+
+
+THEOREM (sum_is_sum_tr_gen).
+FORALL (l : nat list) (acc : nat) :
+    sum l + acc = sum_tr l acc : nat.
+
+PROOF. BY INDUCTION ON l, GENERALIZE acc.
+
+CASE l = [].
+WTS: sum [] + acc = sum_tr [] acc.
+
+LHS = sum [] + acc.
+    = 0 + acc           -- BY defn.
+    = acc               -- BY commonsense.
+
+RHS = sum_tr l acc.
+    = acc               -- BY defn.
+
+CASE l = x :: xs.
+IH1: sum xs + acc = sum_tr xs acc.
+WTS: sum (x :: xs) + acc = sum_tr (x :: xs) acc.
+
+LHS = sum (x :: xs) + acc.
+    = x + sum xs + acc      -- BY defn.
+    = sum xs + x + acc      -- BY commonsense.
+    = sum xs + (x + acc)    -- BY commonsense.
+
+RHS = sum_tr (x :: xs) acc.
+    = sum_tr xs (x + acc)   -- BY defn.
+    = sum xs + (x + acc)    -- BY IH1.
+
+QED.
+

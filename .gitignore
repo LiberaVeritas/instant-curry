@@ -1,2 +1,5 @@
 _opam/**
 instantcurry/_build/**
+proofs/**
+**/*.v
+.DS_Store

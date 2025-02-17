@@ -1,0 +1,31 @@
+THEOREM (rev_rev).
+FORALL (l : 'a list) : rev (rev l) = l : 'a list.
+
+PROOF.
+BY INDUCTION ON l.
+
+CASE l = [].
+WTS: rev (rev []) = [].
+
+LHS = rev (rev []).
+    = rev [] -- BY defn.
+    = [] -- BY defn.
+
+RHS = [].
+
+CASE l = x :: xs.
+IH1: rev (rev xs) = xs.
+WTS: rev (rev (x :: xs)) = x :: xs.
+
+LHS = rev (rev (x :: xs)).
+    = rev (app (rev xs) (x :: [])) -- BY defn.
+    = app (rev (x :: [])) (rev (rev xs)) -- BY app_rev.
+    = app (rev (x :: [])) xs -- BY IH1.
+    = app (app (rev []) (x :: [])) xs -- BY defn.
+    = app (app [] (x :: [])) xs -- BY defn.
+    = app (x :: []) xs -- BY defn.
+    = x :: xs -- BY app_x.
+
+RHS = x :: xs.
+
+QED.

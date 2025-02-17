@@ -1,0 +1,28 @@
+THEOREM (assoc).
+FORALL (l1 : 'a list) (l2 : 'a list) (l3 : 'a list) : app (app l1 l2) l3 = app l1 (app l2 l3) : 'a list.
+
+PROOF.
+BY INDUCTION ON l1.
+
+CASE l1 = [].
+WTS: app (app [] l2) l3 = app [] (app l2 l3).
+
+LHS = app (app [] l2) l3.
+    = app l2 l3 -- BY defn.
+
+RHS = app [] (app l2 l3).
+    = app l2 l3 -- BY defn.
+
+CASE l1 = x :: xs.
+IH1: app (app xs l2) l3 = app xs (app l2 l3).
+WTS: app (app (x :: xs) l2) l3 = app (x :: xs) (app l2 l3).
+
+LHS = app (app (x :: xs) l2) l3.
+    = app (x :: (app xs l2)) l3 -- BY defn.
+    = x :: (app (app xs l2) l3) -- BY defn.
+    = x :: (app xs (app l2 l3)) -- BY IH1.
+
+RHS = app (x :: xs) (app l2 l3).
+    = x :: (app xs (app l2 l3)) -- BY defn.
+
+QED.

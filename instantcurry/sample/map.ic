@@ -1,30 +1,72 @@
 DEFINITION.
-let rec fact_tr (n : nat) (acc : nat) : nat =
-    if0 n then acc
-    else fact_tr (n - 1) (n * acc) end
-
-DEFINITION.
-let rec map (f : nat -> nat) (l : nat list) : nat list =
+let rec map (f : 'a -> 'b) (l : 'a list) : 'b list =
     match l with
-    | [] => [] nat
+    | [] => []
     | x :: xs => f x :: (map f xs)
     end
 
-PRINT.  
-map (fun (x : nat) => fact_tr x 1 end) (5 :: 4 :: 3 :: [] nat)
+DEFINITION.
+let rec len (l : 'a list) : nat =
+    match l with
+    | [] => 0
+    | x :: xs => 1 + len xs
+    end
+
+DEFINITION.
+let id (x : 'a) : 'a = x
 
 THEOREM (map_id).
-FORALL (l : nat list) : map (fun (x : nat) => x end) l = l. 
+FORALL (l : 'a list) : map id l = l : 'a list. 
 
-PROOF BY INDUCTION ON l.
+PROOF. 
+BY INDUCTION ON l.
 
 CASE l = [].
-WTS: map (fun (x : nat) => x end) [] nat = [] nat.
+WTS: map id [] = [].
 
-LHS = map (fun (x : nat) => x end) [] nat.
-    = [] nat                                    BY defn.
+LHS = map id [].
+    = []                            -- BY defn.
 
-RHS = [] nat.
+RHS = [].
+
+CASE l = y :: ys.
+IH1: map id ys = ys.
+WTS: map id (y :: ys) = y :: ys.
+
+LHS = map id (y :: ys).
+    = id y :: map id ys             -- BY defn.
+    = y :: map id ys                -- BY defn.
+    = y :: ys                       -- BY IH1.
+
+RHS = y :: ys.
+
+QED.
+
+THEOREM (map_len).
+FORALL (l : 'a list) (f : 'a -> 'b) : len (map f l) = len l : nat.
+
+PROOF.
+BY INDUCTION ON l.
+
+CASE l = [].
+WTS: len (map f []) = len [].
+
+LHS = len (map f []).
+    = len []                        -- BY defn.
+
+RHS = len [].
+
+CASE l = x :: xs.
+IH1: len (map f xs) = len xs.
+WTS: len (map f (x :: xs)) = len (x :: xs).
+
+LHS = len (map f (x :: xs)).
+    = len (f x :: map f xs)         -- BY defn.
+    = len (map f xs) + 1            -- BY defn.
+    = len xs + 1                    -- BY IH1.
+
+RHS = len (x :: xs).
+    = len xs + 1                    -- BY defn.
 
 QED.
 

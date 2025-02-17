@@ -1,0 +1,3 @@
+(library
+ (name translate)
+ (libraries icparser))

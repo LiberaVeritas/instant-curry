@@ -1,3 +1,5 @@
 (library
  (name instantcurry)
- (libraries icparser))
+ (libraries icparser core stdio)
+ (preprocess (pps ppx_sexp_conv))
+ (modules typechecking lifting synint))
