@@ -58,6 +58,8 @@ let () =
     printf "parsing succeeded\n";
     let prog = Lifting.lift_program ptree in
     printf "lifting succeeded\n";
+    printf "lifting succeeded\n";
+
     (*let () = List.iter (Out_channel.printf "%s\n") sexp_of_program ptree in*)
     (*let buf = Buffer.create 2048 in
     Buffer.output_buffer oc buf;*)

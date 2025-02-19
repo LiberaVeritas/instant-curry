@@ -69,6 +69,7 @@ type pattern =
 let (++) a b = App (a, b)
 
 type eqn = { lhs : tm; rhs : tm } [@@deriving sexp]
+
 type claim = {
   eqn : eqn;
   ty : ty
@@ -77,11 +78,8 @@ type claim = {
 type thm_stmt = {
   quantifiers : (name * ty) list; (* variables universally quantified in the statement *)
   claim : claim (* that the LHS = the RHS *)
-
-type thm_stmt = {
-  quantifiers : (name * ty) list; (* variables universally quantified in the statement *)
-  claim : eqn (* that the LHS = the RHS *)
 }
+
 [@@deriving sexp]
 (* ^ Morally this is a nested Pi-type of all the quantified names followed by an equation.
    This is essentially the syntax of types of the metalanguage. *)

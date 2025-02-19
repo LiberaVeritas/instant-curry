@@ -1,10 +1,6 @@
 open Synint
 open Core
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
 (* lifting from parse trees to ASTs *)
 
 exception ScopeError of name 
@@ -73,7 +69,6 @@ let lift_side (thms : name list) (ctx : scope_ctx) (side : Icparser.Parsed_ast.s
 
 let lift_case (thms : name list) (ctx : scope_ctx) (case : Icparser.Parsed_ast.case) : case =
   let (name, pat, ihs, wts, lhs, rhs) = case in
-<<<<<<< HEAD
     if not (match List.Assoc.find ~equal:String.equal ctx name with
       | Some Meta -> true
       | _ -> false
@@ -84,13 +79,6 @@ let lift_case (thms : name list) (ctx : scope_ctx) (case : Icparser.Parsed_ast.c
    | Pat_empty -> ctx
    | Pat_node (l, x, r) -> (l, Meta) :: (x, Meta) :: (r, Meta) :: ctx
    | Pat_nil -> ctx 
-=======
-  let ctx = match pat with
-  | Pat_cons (x, xs) -> (x, Meta) :: (xs, Meta) :: ctx  (* patterns introduce metavars *)
-  | Pat_empty -> ctx
-  | Pat_node (l, x, r) -> (l, Meta) :: (x, Meta) :: (r, Meta) :: ctx
-  | Pat_nil -> ctx 
->>>>>>> origin/main
   in
   let thms = List.fold ~f:(fun thms (n, _) -> n :: thms) ~init:thms ihs in  (* ihs introduce new thms *)
   { var = name;
@@ -102,15 +90,11 @@ let lift_case (thms : name list) (ctx : scope_ctx) (case : Icparser.Parsed_ast.c
 
 let lift_proof (thms : name list) (ctx : scope_ctx) (prf : Icparser.Parsed_ast.proof) : proof =
   match prf with 
-<<<<<<< HEAD
   | Proof (var,_,cases) -> 
     begin match List.Assoc.find ~equal:String.equal ctx var with
     | Some Meta -> Proof (var, List.map ~f:(lift_case thms ctx) cases)
     | _ -> raise (ScopeError var)
     end
-=======
-  | Proof (var,_,cases) -> Proof (var, List.map ~f:(lift_case thms ctx) cases)
->>>>>>> origin/main
   | Axiom -> Axiom
 
 let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : Icparser.Parsed_ast.stmt) : name list * scope_ctx * stmt =
@@ -121,18 +105,11 @@ let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : Icparser.Parsed_ast.s
                 ~init:ctx
                 args in
     let args = List.map ~f:(fun (x, ty) -> (x, lift_ty ctx' ty)) args in
-<<<<<<< HEAD
     let t = lift_ty ctx' (snd claim) in
     let eqn = lift_eqn ctx' (fst claim) in
     (name :: thms, ctx, Thm
                       { name = name;
                         stmt = { quantifiers = args; claim = {eqn=eqn; ty=t}};
-=======
-    let claim = lift_eqn ctx' (fst claim) in
-    (name :: thms, ctx, Thm
-                      { name = name;
-                        stmt = { quantifiers = args; claim = claim};
->>>>>>> origin/main
                         proof = lift_proof thms ctx' prf })
   | Definition (f, isrec, args, ty, t) -> 
     let ctx' = List.fold 
