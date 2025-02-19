@@ -210,7 +210,7 @@ let typecheck_eqn (delta : ctx) (sigma : ctx) (eqn : eqn) : unit =
   let inf tm = fst (infer_tm delta sigma [] tm) in
   let _ = unify (inf eqn.lhs) (inf eqn.rhs) in
   ()
-  
+
 let typecheck_step (delta : ctx) (sigma : ctx) 
                    (prev : tm) (next : tm) (_ : justification) : unit =
   let inf tm = fst (infer_tm delta sigma [] tm) in
@@ -245,6 +245,7 @@ let typecheck_case (delta : ctx) (sigma : ctx) (c : case) : unit =
   (* todo: check ihs are valid *)
   
   typecheck_eqn delta sigma c.wts;
+  
   if not (tm_equal (c.wts.lhs) (c.lhs.start)) then raise (IllTyped "invalid lhs start");
   typecheck_steps delta sigma c.lhs;
   if not (tm_equal (c.wts.rhs) (c.rhs.start)) then raise (IllTyped "invalid rhs start");

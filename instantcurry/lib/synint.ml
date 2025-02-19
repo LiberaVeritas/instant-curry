@@ -77,6 +77,10 @@ type claim = {
 type thm_stmt = {
   quantifiers : (name * ty) list; (* variables universally quantified in the statement *)
   claim : claim (* that the LHS = the RHS *)
+
+type thm_stmt = {
+  quantifiers : (name * ty) list; (* variables universally quantified in the statement *)
+  claim : eqn (* that the LHS = the RHS *)
 }
 [@@deriving sexp]
 (* ^ Morally this is a nested Pi-type of all the quantified names followed by an equation.
@@ -99,7 +103,7 @@ type side = {
 
 type case = {
     var : name;
-    pattern : pattern; 
+    pattern : pattern;
     ihs : (name * eqn) list;
     wts : eqn;
     lhs : side;

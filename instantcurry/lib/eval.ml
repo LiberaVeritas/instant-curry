@@ -1,7 +1,6 @@
 open Synint
 open Printing
 
-
 (* evaluation & associated machinery *)
 
 module VarSet = Set.Make(String)
@@ -81,7 +80,9 @@ type constrs = (string * tm) list
 
 let rec eval (env : env) (e : tm) : tm =
   (* print_endline @@ Printing.string_of_tm e ; *)
+
   let () = Stdio.printf "%s\n" (string_of_tm e) in
+
   match e with
   (* TODO *)
   | Nil -> Nil
@@ -179,7 +180,6 @@ let eval_step (thms : thms) (env : env) (e1 : tm) (e2 : tm) (j : justification) 
     let f = (fun c (x, _) -> subst x (UVar x) c) in
     let claim_lhs = List.fold_left f stmt.claim.eqn.lhs stmt.quantifiers in
     let claim_rhs = List.fold_left f stmt.claim.eqn.rhs stmt.quantifiers in
-    (* TODO *)
     claim_lhs = claim_rhs
 
 let exec_stmt (env : env) (s : stmt) : env =
@@ -192,7 +192,6 @@ let exec_stmt (env : env) (s : stmt) : env =
     (*Theorem.eval_thm env' stmt proof;*)
     env'
     
-
 let exec_prog (p : program) : env =
   List.fold_left (fun env stmt  -> exec_stmt env stmt ) [] p
 

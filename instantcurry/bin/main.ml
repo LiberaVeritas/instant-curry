@@ -46,7 +46,7 @@ let () =
     let args = Sys.get_argv () in 
     let infile = args.(1) in
     
-    (*let outfile = args.(1)  in *) 
+    (*let outfile = args.(1)  in *)
 
     let ic = In_channel.create infile in
     (*let oc = Out_channel.create outfile in *)
