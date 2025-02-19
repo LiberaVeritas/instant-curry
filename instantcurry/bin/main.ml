@@ -45,7 +45,6 @@ type prog = Synint.stmt list [@@deriving sexp]
 let () =
     let args = Sys.get_argv () in 
     let infile = args.(1) in
-    
     (*let outfile = args.(1)  in *)
 
     let ic = In_channel.create infile in
@@ -58,8 +57,6 @@ let () =
     printf "parsing succeeded\n";
     let prog = Lifting.lift_program ptree in
     printf "lifting succeeded\n";
-    printf "lifting succeeded\n";
-
     (*let () = List.iter (Out_channel.printf "%s\n") sexp_of_program ptree in*)
     (*let buf = Buffer.create 2048 in
     Buffer.output_buffer oc buf;*)

@@ -199,16 +199,15 @@ let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
     let sub = compose_sub sub3 (compose_sub sub2 sub1) in
     (apply_sub ety sub, sub)
 
-
 let typecheck_claim (delta : ctx) (sigma : ctx) (c : claim) : unit =
   let inf tm = fst (infer_tm delta sigma [] tm) in
   let _ = unify (inf c.eqn.lhs) c.ty in
   let _ = unify (inf c.eqn.rhs) c.ty in
   ()
 
-let typecheck_eqn (delta : ctx) (sigma : ctx) (eqn : eqn) : unit =
+let typecheck_eqn (delta : ctx) (sigma : ctx) (e : eqn) : unit =
   let inf tm = fst (infer_tm delta sigma [] tm) in
-  let _ = unify (inf eqn.lhs) (inf eqn.rhs) in
+  let _ = unify (inf e.lhs) (inf e.rhs) in
   ()
 
 let typecheck_step (delta : ctx) (sigma : ctx) 
@@ -242,10 +241,9 @@ let typecheck_case (delta : ctx) (sigma : ctx) (c : case) : unit =
     | None -> raise (IllTyped "case on nonexistent var") end 
   in 
   (* todo: check wts is valid *)
-  (* todo: check ihs are valid *)
   
   typecheck_eqn delta sigma c.wts;
-  
+
   if not (tm_equal (c.wts.lhs) (c.lhs.start)) then raise (IllTyped "invalid lhs start");
   typecheck_steps delta sigma c.lhs;
   if not (tm_equal (c.wts.rhs) (c.rhs.start)) then raise (IllTyped "invalid rhs start");

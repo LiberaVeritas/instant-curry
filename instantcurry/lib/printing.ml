@@ -33,6 +33,8 @@ let rec string_of_tm (t : tm) : string =
   | Ref x -> "R_" ^ x
   | MVar x -> "M_" ^ x
   | UVar x -> "U_" ^ x
+
+
   
 let string_of_args _ = "(args)"
 let string_of_thm_stmt _ = "(thm stmt)"
@@ -49,8 +51,4 @@ let string_of_stmt (s: stmt) : string =
 
 let string_of_prog (p: program) : string =
   List.fold ~f:(fun s s' -> s ^ "\n" ^ (string_of_stmt s')) ~init:"" p
-  | BVar x -> "B" ^ x
-  | Ref x -> "R" ^ x
-  | MVar x -> "M" ^ x
-  | UVar x -> "U" ^ x
 
