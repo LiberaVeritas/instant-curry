@@ -3,9 +3,14 @@ open Core
 open Sexp
 open Stdio
 
+<<<<<<< HEAD
 
 let stdout = Out_channel.stdout
 let print s = output_hum stdout s; printf "\n"
+=======
+let stdout = Out_channel.stdout
+let print _ = () (*output_hum stdout s; printf "\n"*)
+>>>>>>> origin/main
 
 
 (* typechecking *)
@@ -129,18 +134,29 @@ let rec unify (t1: ty) (t2: ty) : sub =
 (* delta is metavars, sigma is refs, gamma is bound vars *)
 let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
   let inf = infer_tm delta sigma gamma in
+<<<<<<< HEAD
   (*let () = print (sexp_of_tm e) in*)
+=======
+>>>>>>> origin/main
   match e with
   | Nil -> let var = Ty_Var (fresh ()) in (Ty_List var, [])
   | BVar x ->
     begin match lookup gamma x with 
     | Some sch -> (instantiate sch, [])
+<<<<<<< HEAD
     | None -> raise (IllTyped ("no bvar " ^ x)) 
+=======
+    | None -> raise (IllTyped "no bvar") 
+>>>>>>> origin/main
     end
   | MVar x -> 
     begin match lookup delta x with
     | Some sch -> (instantiate sch, [])
+<<<<<<< HEAD
     | None -> raise (IllTyped ("no mvar " ^ x)) 
+=======
+    | None -> raise (IllTyped "no mvar") 
+>>>>>>> origin/main
     end
   | Ref x -> 
     begin match lookup sigma x with
@@ -200,6 +216,7 @@ let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
     (apply_sub ety sub, sub)
 
 
+<<<<<<< HEAD
 let typecheck_claim (delta : ctx) (sigma : ctx) (c : claim) : unit =
   let inf tm = fst (infer_tm delta sigma [] tm) in
   let _ = unify (inf c.eqn.lhs) c.ty in
@@ -211,6 +228,13 @@ let typecheck_eqn (delta : ctx) (sigma : ctx) (eqn : eqn) : unit =
   let _ = unify (inf eqn.lhs) (inf eqn.rhs) in
   ()
   
+=======
+let typecheck_eqn (delta : ctx) (sigma : ctx) (e : eqn) : unit =
+  let inf tm = fst (infer_tm delta sigma [] tm) in
+  let _ = unify (inf e.lhs) (inf e.rhs) in
+  ()
+
+>>>>>>> origin/main
 let typecheck_step (delta : ctx) (sigma : ctx) 
                    (prev : tm) (next : tm) (_ : justification) : unit =
   let inf tm = fst (infer_tm delta sigma [] tm) in
@@ -243,8 +267,12 @@ let typecheck_case (delta : ctx) (sigma : ctx) (c : case) : unit =
   in 
   (* todo: check wts is valid *)
   (* todo: check ihs are valid *)
+<<<<<<< HEAD
   
   typecheck_eqn delta sigma c.wts;
+=======
+
+>>>>>>> origin/main
   if not (tm_equal (c.wts.lhs) (c.lhs.start)) then raise (IllTyped "invalid lhs start");
   typecheck_steps delta sigma c.lhs;
   if not (tm_equal (c.wts.rhs) (c.rhs.start)) then raise (IllTyped "invalid rhs start");
@@ -273,7 +301,11 @@ let infer_stmt (delta : ctx) (sigma : ctx) (s : stmt) : ctx =
     sigma
   | Thm t ->  (* todo: add to context of theorems *)
     let delta = List.map t.stmt.quantifiers ~f:schemify in
+<<<<<<< HEAD
     typecheck_claim delta sigma t.stmt.claim;
+=======
+    typecheck_eqn delta sigma t.stmt.claim;
+>>>>>>> origin/main
     typecheck_proof delta sigma t.proof;
     sigma
 

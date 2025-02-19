@@ -1,7 +1,10 @@
 open Synint
 open Printing
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 (* evaluation & associated machinery *)
 
 module VarSet = Set.Make(String)
@@ -81,7 +84,10 @@ type constrs = (string * tm) list
 
 let rec eval (env : env) (e : tm) : tm =
   (* print_endline @@ Printing.string_of_tm e ; *)
+<<<<<<< HEAD
   let () = Stdio.printf "%s\n" (string_of_tm e) in
+=======
+>>>>>>> origin/main
   match e with
   (* TODO *)
   | Nil -> Nil
@@ -177,8 +183,13 @@ let eval_step (thms : thms) (env : env) (e1 : tm) (e2 : tm) (j : justification) 
   | ByTheorem t -> 
     let stmt = List.assoc t thms in
     let f = (fun c (x, _) -> subst x (UVar x) c) in
+<<<<<<< HEAD
     let claim_lhs = List.fold_left f stmt.claim.eqn.lhs stmt.quantifiers in
     let claim_rhs = List.fold_left f stmt.claim.eqn.rhs stmt.quantifiers in
+=======
+    let claim_lhs = List.fold_left f stmt.claim.lhs stmt.quantifiers in
+    let claim_rhs = List.fold_left f stmt.claim.rhs stmt.quantifiers in
+>>>>>>> origin/main
     (* TODO *)
     claim_lhs = claim_rhs
 
@@ -187,11 +198,15 @@ let exec_stmt (env : env) (s : stmt) : env =
   | Print tm -> print_endline @@ string_of_tm @@ eval env tm; env
   | Definition d -> 
     (d.name, (d.args, d.body)) :: env (* TODO: make this CBV *)
+<<<<<<< HEAD
   | Thm {name; stmt; proof=_;} -> 
     let env' = (name, (stmt.quantifiers, Nil)) :: env in
     (*Theorem.eval_thm env' stmt proof;*)
     env'
     
+=======
+  | Thm _ -> raise NotImplemented
+>>>>>>> origin/main
 
 let exec_prog (p : program) : env =
   List.fold_left (fun env stmt  -> exec_stmt env stmt ) [] p
