@@ -1,7 +1,30 @@
 open Synint
+
+
 open Printing
 
 
+
+
+
+exception ASDF 
+
+(*
+equations
+list -> cons
+eval steps
+*)(*
+let check (prog : program) =
+  let defs = List.filter ~f:(fun x -> match x with | Definition _ -> true | _ -> false) prog in
+  let def = match List.hd defs with | Some d -> d | _ -> raise ASDF in
+  let _ = match def with | Definition d -> d.body | _ -> raise ASDF in
+  let _ = match def with | Definition d -> d.args | _ -> raise ASDF in
+  ()
+  (*print (sexp_of_ty (Typechecking.infer_tm [] [] [("l", Ty_List Ty_Nat)] body |> fst)) *)
+  
+  (* bound vars, can change name *)
+  *)
+  
 (* evaluation & associated machinery *)
 
 module VarSet = Set.Make(String)
@@ -182,17 +205,37 @@ let eval_step (thms : thms) (env : env) (e1 : tm) (e2 : tm) (j : justification) 
     (* TODO *)
     claim_lhs = claim_rhs
 
+
+
+let subst_eqn name s (eqn : eqn) = {
+    lhs = subst name s eqn.lhs;
+    rhs = subst name s eqn.rhs
+  }
+
+let infer_wts (name : name) (case : case) (thm_stmt : thm_stmt) : eqn =
+  match case.pattern with
+  | Pat_nil -> subst_eqn name Nil thm_stmt.claim.eqn
+  | Pat_cons (x, xs) -> subst_eqn name (Cons (MVar x, MVar xs)) thm_stmt.claim.eqn
+  | Pat_empty -> raise NotImplemented
+  | Pat_node _ -> raise NotImplemented
+  
 let exec_stmt (env : env) (s : stmt) : env =
   match s with
   | Print tm -> print_endline @@ string_of_tm @@ eval env tm; env
   | Definition d -> 
     (d.name, (d.args, d.body)) :: env (* TODO: make this CBV *)
-  | Thm {name; stmt; proof=_;} -> 
-    let env' = (name, (stmt.quantifiers, Nil)) :: env in
-    (*Theorem.eval_thm env' stmt proof;*)
-    env'
-    
+  | Thm {name; stmt; proof} -> 
+    let cases = match proof with
+    | Proof (n, c::s) -> (n, c::s)
+    | Axiom -> raise NotImplemented
+    | _ -> raise NotImplemented
+    in (*TODO check generated wts against provided *)
+    let _ = List.map (fun c -> infer_wts (fst cases) c stmt) (snd cases) in
+    let args = stmt.quantifiers in
+    let _ = stmt.claim.eqn in
+    (name, (args, Nil)) :: env
 
-let exec_prog (p : program) : env =
+
+let check_prog (p : program) : env =
   List.fold_left (fun env stmt  -> exec_stmt env stmt ) [] p
 

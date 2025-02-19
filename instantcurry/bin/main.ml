@@ -1,5 +1,4 @@
 open Icparser
-
 open Core
 open Instantcurry
 open Stdio
@@ -47,7 +46,7 @@ let () =
     let args = Sys.get_argv () in 
     let infile = args.(1) in
     
-    (*let outfile = args.(1)  in *)
+    (*let outfile = args.(1)  in *) 
 
     let ic = In_channel.create infile in
     (*let oc = Out_channel.create outfile in *)
@@ -56,9 +55,9 @@ let () =
     let ptree = try Parser.program lextok lexbuf with
         | Parser.Error -> failwith (Int.to_string lexbuf.lex_curr_p.pos_lnum)
     in
-    let () = printf "parsing succeeded\n" in
+    printf "parsing succeeded\n";
     let prog = Lifting.lift_program ptree in
-    let () = printf "lifting succeeded\n" in
+    printf "lifting succeeded\n";
     (*let () = List.iter (Out_channel.printf "%s\n") sexp_of_program ptree in*)
     (*let buf = Buffer.create 2048 in
     Buffer.output_buffer oc buf;*)
@@ -66,7 +65,9 @@ let () =
     (* print_prog p oc *)
     (*let _ = Eval.exec_prog prog in *)
     let _ = Typechecking.typecheck_prog prog in
-    let () = printf "typecheck succeeded\n" in 
+    printf "typecheck succeeded\n";
+    (*let () = Theorem.check prog in*)
+    let _ = Proof.check_prog prog in
     In_channel.close ic
     (*print (sexp_of_p p);*)
     (*Sexp.pp_hum Format.std_formatter (sexp_of_program ptree);*)

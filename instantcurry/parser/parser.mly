@@ -104,7 +104,7 @@ stmt:
 | DEFINITION SEP LET 
   f = IDENT ps = arg+ 
   EQ tm = tm                            { Definition (f, false, ps, fresh (), tm) }
-| PRINT SEP tm = tm                     { Print tm }
+| PRINT tm = tm SEP                     { Print tm }
 
 arg:
 | LPAR i = IDENT COLON ty = ty RPAR     { (i, ty) }

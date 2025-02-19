@@ -69,10 +69,14 @@ type pattern =
 let (++) a b = App (a, b)
 
 type eqn = { lhs : tm; rhs : tm } [@@deriving sexp]
+type claim = {
+  eqn : eqn;
+  ty : ty
+} [@@deriving sexp]
 
 type thm_stmt = {
   quantifiers : (name * ty) list; (* variables universally quantified in the statement *)
-  claim : eqn (* that the LHS = the RHS *)
+  claim : claim (* that the LHS = the RHS *)
 }
 [@@deriving sexp]
 (* ^ Morally this is a nested Pi-type of all the quantified names followed by an equation.
@@ -95,7 +99,7 @@ type side = {
 
 type case = {
     var : name;
-    pattern : pattern;
+    pattern : pattern; 
     ihs : (name * eqn) list;
     wts : eqn;
     lhs : side;
