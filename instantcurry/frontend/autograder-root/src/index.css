@@ -1,3 +1,5 @@
+/* need to redo entire css */ 
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -105,7 +107,7 @@ button {
 }
 
 .error-glyph {
-  background: red !important; /* Visible in minimap */
+  background: red !important; 
 }
 
 @keyframes fadeIn {
@@ -119,7 +121,11 @@ button {
 
 .error-highlight {
   animation: fadeIn 0.5s ease-in-out;
-  background: rgba(255, 165, 0, 0.5); 
+  background: rgba(255, 165, 0, 0.5) !important; 
+}
+
+.error-inline {
+  border-bottom: 2px solid red !important; 
 }
 
 .header {

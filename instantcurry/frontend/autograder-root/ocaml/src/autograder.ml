@@ -1,14 +1,11 @@
 open Js_of_ocaml
 
 exception Error of string
-
-
-(* Evaluator not implemented *)
-let evaluate = function
-  | _ -> raise (Error "TO DO")
-
 exception SyntaxError of int * string
 exception LexerError of int * string
+
+let evaluate = function
+  | _ -> raise (Error "TO DO")
 
 let grade (expression: string): string =
   try
@@ -28,12 +25,12 @@ let grade (expression: string): string =
       List.map evaluate ast
       |> String.concat "\n"
     in
-    Printf.sprintf {|{ "result": "%s" }|} results  (* JSON output *)
+    Printf.sprintf {|{ "result": "%s" }|} results  
   with
   | LexerError (line, msg) ->
       Printf.sprintf {|{ "error": "Lexer error at line %d: %s", "line": %d }|} line msg line
   | SyntaxError (line, token) ->
       Printf.sprintf {|{ "error": "Syntax error at line %d near: %s", "line": %d }|} line token line
-  | Failure msg -> Printf.sprintf {|{ "error": "%s" }|} msg  (* failures return JSON *)
+  | Failure msg -> Printf.sprintf {|{ "error": "%s" }|} msg  
 
 let () = Js.export "grade" grade

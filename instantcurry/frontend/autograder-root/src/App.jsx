@@ -1,0 +1,361 @@
+import React, { useRef, useState, useEffect } from 'react';
+import Header from "./components/Header";
+import WebEditor, { 
+  initializeEditor,
+  handleClearEditor,
+  handleGrade,
+  handleSelectProof,
+  handleDownload,
+  handleFileUpload
+ } from "./components/WebEditor";
+
+import { saveProof } from "./components/WebEditor";
+
+import supabase from './components/supabase';
+
+import {
+  getSession,
+  handleLogin,
+  handleLogout,
+  fetchProofs,
+  listen,
+  initSession,
+  deleteProof
+} from "./components/supabase";
+
+// Buttons 
+import download from "../media/DOWNLOAD.png";
+import upload from "../media/UPLOAD.png";
+
+// Sample proofs
+import factProof from "../proofs/fact.ic?raw"; 
+import mapProof from "../proofs/map.ic?raw";
+import testProof from "../proofs/test.ic?raw";
+
+function App() {
+
+  // ------------------------------------------------
+  // VARS 
+  // ------------------------------------------------
+  
+  // State management
+  const editorRef = useRef(null);
+  const [feedback, setFeedback] = useState({ message: "", type: "" });
+  const [errorLine, setErrorLine] = useState(null);
+  const [errorToken, setErrorToken] = useState("");
+  const [decorations, setDecorations] = useState([]);
+  
+  const proofFiles = [ 
+    // to do -> change, put them in 'proofs' under all users if that's possible? 
+      // or another table, so can change the examples easier
+    { name: "Fact Proof", content: factProof },
+    { name: "Map Proof", content: mapProof },
+    { name: "Test Proof", content: testProof },
+  ];
+
+  // Supabase
+  const [session, setSession] = useState(null);
+  const [proofs, setProofs] = useState([]);
+  const [saveStatus, setSaveStatus] = useState(null); // rem this! don't actually need it now, only display/debug  
+    // same goes for feedback? re-structure & clean all the feedback / error msgs
+
+
+  // init editor
+  initializeEditor(editorRef);
+  
+  // init sessions & listener 
+  useEffect(() => {
+    initSession(setSession, setProofs);
+    listen(setSession); 
+  }, []);
+
+  // save helper function
+  const handleSave = async () => {
+    await saveProof(editorRef, setSaveStatus, setProofs);
+  };
+  
+  // line deco 
+  useEffect(() => {
+      // set up Editor 
+      if (!editorRef.current) return;
+      const editor = editorRef.current;
+      const model = editor.getModel();
+      if (!model) return;
+
+      // clear prev decorations
+      setDecorations((prevDecorations) => {
+        return editor.deltaDecorations(prevDecorations, []);
+      });
+    
+      if (!errorLine) return;  // If no error, return early
+      
+      editor.revealLineInCenter(errorLine, monaco.editor.ScrollType.Smooth);    // scrolls to the error line smoothly
+    
+      let decorations = [
+        {
+          range: new monaco.Range(errorLine, 1, errorLine, 1),
+          options: {
+            isWholeLine: true,
+            className: "error-highlight fade-in",
+            glyphMarginClassName: "error-glyph", 
+          }
+        }
+      ];
+    
+      // to do -> fix error token. rn it's not actually doing anything (decorations is never used?)
+      if (errorToken) {
+        const lines = model.getLinesContent();
+        const lineContent = lines[errorLine - 1];
+    
+        if (lineContent) {
+          const startIndex = lineContent.indexOf(errorToken);
+          if (startIndex !== -1) {
+            decorations.push({
+              range: new monaco.Range(errorLine, startIndex + 1, errorLine, startIndex + errorToken.length + 1),
+              options: {
+                inlineClassName: "error-token"
+              }
+            });
+          }}}
+
+      setDecorations(editor.deltaDecorations([], decorations));
+  }, [errorLine, errorToken]); 
+    
+
+  // ------------------------------------------------
+  // Proof Writing, grading, retrieving 
+  // ------------------------------------------------
+  
+
+  // debug function, see if needed for loading 
+  //useEffect(() => {
+  //  console.log("Current session state:", session);
+  //}, [session]);
+
+  // login, logout and load helper functions 
+  const handleLogIn = async () => {
+    await handleLogin(setSession);
+  }
+
+  const handleLogOut = async () => { 
+    await handleLogout(setSession, setProofs); 
+  }
+
+  const handleLoad = async (editorRef, proof) => {
+    handleSelectProof(editorRef, proof.content, proof.filename);
+  }
+
+  // ------------------------------------------------
+  // RETURN 
+  // ------------------------------------------------
+
+  return (
+    <div>
+
+      <Header/> 
+
+      {session ? (
+        <div>
+          <span>Welcome, {session.user.email}</span>
+          <button onClick={handleLogOut}>Logout</button> 
+        </div>
+      ) : (
+        <button onClick={handleLogIn}>Login with GitHub</button>
+      )}
+
+      <div style={{ 
+        display: "flex", 
+        maxWidth: "100vw",
+        alignItems: "center"}}>
+
+        
+        <div className="editor-container">
+
+        <WebEditor 
+          editorRef={editorRef}
+          feedback={feedback} 
+          setFeedback={setFeedback} 
+          setErrorLine={setErrorLine} 
+          setErrorToken={setErrorToken} 
+          setDecorations={setDecorations} 
+          errorLine={errorLine} 
+          errorToken={errorToken} 
+        />
+       
+        </div>
+
+        <div style={{padding: "5px"}}> 
+
+          <div style={{ position: "relative", 
+            display: "inline-block", 
+            marginLeft: "3px",
+            padding: "5px"}}>
+           
+            <button id="download-button" 
+              onClick={() => handleDownload(editorRef)}
+              style={{ display: "none"}}>
+                Download .ic
+            </button>
+
+            <label htmlFor="download-button" style={{ cursor: "pointer" }}>
+              <img src={download} alt="Download" style={{ width: "175px", height: "auto" }} />
+            </label>
+            
+          </div>
+          
+          <div style={{ position: "relative", 
+            marginBottom: "10px",
+            marginLeft: "3px",
+            marginRight: "10px",
+            display: "inline-block", 
+            padding: "5px"}}>
+            
+            <input
+              type="file"
+              id="upload-file"
+              accept=".ic"
+              style={{ display: "none" }}
+              onChange={(event) => handleFileUpload(editorRef, event)}
+            />
+            
+            <label htmlFor="upload-file" style={{ cursor: "pointer" }}>
+              <img src={upload} alt="Upload" style={{ width: "175px", height: "auto" }} />
+            </label>
+
+          </div>
+          
+          <h3 style={{
+              color: 'brown',
+              width: "180px",
+              textAlign: "center",
+              marginBottom: "10px",
+              lineHeight: "20px"
+              }}> 
+
+              Browse Sample Proofs
+          
+          </h3>
+          <div style={{ 
+            textAlign: "center", 
+            width: "180px", 
+            padding: "10px",
+            background: "rgb(131, 41, 41)", 
+            borderRadius: "20px", 
+            }}>
+            
+            <div className='proofs-box'>
+
+              {proofFiles.map((file, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleSelectProof(editorRef, file.content, file.name)}
+                  className='proof'>
+                    {file.name}
+                </div>
+              ))}
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div style={{ display: "flex", 
+        alignItems: "center", 
+        flexDirection: "column",
+        }}>
+
+      <button className="clear-orange-button" 
+        onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)}  
+        style={{ marginBottom: "10px" , fontSize: "30px" }}>
+          Get Result
+      </button>
+
+      <button className="clear-orange-button" 
+        onClick={() => handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)}  
+        style={{ margin: "10px" }}>
+          Clear Code
+      </button>
+
+      {session && (
+        <button onClick={handleSave} className="clear-orange-button">
+        Save Proof
+        </button>
+      )}
+      
+
+      {/* rem? 
+      {saveStatus && (
+        <div className={`status-message ${saveStatus.success ? "success" : "error"}`}>
+          {saveStatus.message}
+        </div>
+      )}*/}
+       
+      </div>
+
+      {session && (
+        <div style={{ marginTop: "20px", textAlign: "center" }}>
+          <h2>Saved Proofs</h2>
+          <ul>
+            {proofs.map((proof) => (
+              <li key={proof.id}>
+
+                <strong>{proof.filename}</strong>
+
+                <button onClick={() => handleLoad(editorRef, proof)}> 
+                  {/*() => handleSelectProof(editorRef, proof.content, proof.filename)}>*/}
+                  Load
+                </button>
+
+                <button onClick={() => deleteProof(proof.id, setProofs, setFeedback)}>
+                  X
+                </button>
+
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      
+        
+      {feedback.message && ( // probably a better way to do this? 
+        <div
+          style={{
+            marginTop: "20px",
+            padding: "10px",
+            border: `1px solid ${
+              feedback.type === "success"
+                ? "green"
+                : feedback.type === "error"
+                ? "red"
+                : "grey"
+            }`,
+            backgroundColor:
+            feedback.type === "success"
+              ? "#d4edda"
+              : feedback.type === "error"
+              ? "#f8d7da"
+              : "#e9ecef", 
+            color:
+              feedback.type === "success"
+                ? "green"
+                : feedback.type === "error"
+                ? "red"
+                : "grey", 
+            borderRadius: "5px",
+            width: "80%",
+            margin: "20px auto",
+            textAlign: "center",
+          }}
+        >
+          {feedback.message}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
