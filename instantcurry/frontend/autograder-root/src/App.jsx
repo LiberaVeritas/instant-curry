@@ -37,6 +37,7 @@ import factProof from "../proofs/fact.ic?raw";
 import mapProof from "../proofs/map.ic?raw";
 import testProof from "../proofs/test.ic?raw";
 
+
 function App() {
 
   // ------------------------------------------------
@@ -64,6 +65,7 @@ function App() {
   const [saveStatus, setSaveStatus] = useState(null); // rem this! don't actually need it now, only display/debug  
     // same goes for feedback? re-structure & clean all the feedback / error msgs
 
+  const [showLoginMenu, setShowLoginMenu] = useState(false);
 
   // init editor
   initializeEditor(editorRef);
@@ -138,8 +140,9 @@ function App() {
   //}, [session]);
 
   // login, logout and load helper functions 
-  const handleLogIn = async () => {
-    await handleLogin(setSession);
+  const handleLogIn = async (provider) => {
+    await handleLogin(provider, setSession);
+    setShowLoginMenu(false); // Close menu after clicking
   }
 
   const handleLogOut = async () => { 
@@ -159,25 +162,53 @@ function App() {
   return (
     <div>
 
-<header className="header" style={{ alignItems: "center", justifyContent: "space-between", padding: "10px" }}>
-    
-    <div style={{ padding: "20px", textAlign: "center" }}>
+    <header className="header" style={{ alignItems: "center", justifyContent: "space-between", padding: "10px" }}>
+
+      <div style={{ padding: "20px", textAlign: "center" }}>
         <img src={logo} alt="Logo" className="h-12" style={{ height: "80px" }} />
-    </div>
-    
-    <div style={{ justifyContent: "flex-end", alignItems: "center", padding: "20px"}}>
+      </div>
+
+      <div style={{ position: "relative", justifyContent: "flex-end", alignItems: "center", padding: "20px" }}>
         {session ? (
-            <button className="white-orange-button" onClick={handleLogOut}>Logout</button>
-        ) : (
-            <div>
-                <button id="login-button" onClick={handleLogIn} style={{ display: "none" }}></button>
-                <label htmlFor="login-button" style={{ cursor: "pointer" }}>
-                    <img src={login} alt="Login" style={{ width: "65px", height: "auto" }} />
-                </label>
-            </div>
+          <button className="white-orange-button" onClick={handleLogOut}>Logout</button>
+          ) : (
+          <div style={{ position: "relative" }}>
+
+          <img 
+            src={login} 
+            alt="Login" 
+            style={{ width: "65px", height: "auto", cursor: "pointer" }} 
+            onClick={() => setShowLoginMenu(!showLoginMenu)}
+          />
+
+          {showLoginMenu && (
+            <div style={{
+              position: "absolute",
+              top: "60%",
+              left: "-120px",  
+              transform: "translateY(-50%)",
+              padding: "5px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              zIndex: "1000",
+              justifyContent: "center"
+            }}>
+          
+          <button onClick={() => handleLogIn("github")} style={{ background: "none", border: "none", cursor: "pointer" }}>
+            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" style={{ width: "40px", filter: "invert(100%)" }} />
+          </button>
+          
+          <button onClick={() => handleLogIn("gitlab")} style={{ background: "none", border: "none", cursor: "pointer" }}>
+            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968853.png" alt="GitLab" style={{ width: "40px", filter: "invert(100%)" }} />
+          </button>
+          
+        </div>
         )}
-    </div>
-</header>
+        </div>
+        )}
+        </div>
+      </header>
 
       <div style={{ 
         width: "100vw",
