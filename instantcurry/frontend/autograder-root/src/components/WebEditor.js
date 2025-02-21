@@ -52,12 +52,6 @@ export const WebEditor = ({ editorRef, setErrorLine, setErrorToken, setFeedback,
     }
   };
 
-// to do -> fix loading, doesn't work right now. 
-//    should just be a fetch + the logic from upload function 
-//    (but that also doesn't work anymore)
-export const loadSavedProof = (editorRef, proofContent, fileName) => {
-    handleSelectProof(editorRef, proofContent, fileName); 
-}
   
 
 // Export proof as .ic file
@@ -72,7 +66,6 @@ export const handleDownload = (editorRef) => {
 };
 
 // Import .ic file and load into editor
-// Fix this? It doesn't work anymore 
 export const handleFileUpload = (editorRef, event) => {
     const file = event.target.files[0];
   
@@ -187,11 +180,6 @@ export const handleEditorChange = (editorRef, setErrorLine, setErrorToken, setFe
 export const handleClearEditor = (editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations) => {
   editorRef.current.setValue(""); 
   localStorage.removeItem("userCode");      // remove saved content from localStorage
-  // clear error cache (rem) 
-  /*setErrorLine(null);
-  setErrorToken("");
-  setFeedback({ message: "", type: "" });
-  setDecorations([]);*/
 };
 
 // This is where the code actually gets sent to ocaml  

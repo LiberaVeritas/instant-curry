@@ -18,10 +18,11 @@ import { saveProof } from "./components/WebEditor";
 import supabase from './components/supabase';
 
 import {
-  getSession,
+  //getSession,
   handleLogin,
   handleLogout,
-  fetchProofs,
+  loadSavedProof,
+  //fetchProofs,
   listen,
   initSession,
   deleteProof
@@ -145,8 +146,10 @@ function App() {
     await handleLogout(setSession, setProofs); 
   }
 
-  const handleLoad = async (editorRef, proof) => {
-    handleSelectProof(editorRef, proof.content, proof.filename);
+  const handleLoad = async (editorRef, ID) => {
+    console.log(ID);
+    loadSavedProof(editorRef, ID); 
+    //await handleSelectProof(editorRef, proof.content, proof.filename);
   }
 
   // ------------------------------------------------
@@ -167,7 +170,7 @@ function App() {
             <button className="white-orange-button" onClick={handleLogOut}>Logout</button>
         ) : (
             <div>
-                <button id="login-button" onClick={handleLogin} style={{ display: "none" }}></button>
+                <button id="login-button" onClick={handleLogIn} style={{ display: "none" }}></button>
                 <label htmlFor="login-button" style={{ cursor: "pointer" }}>
                     <img src={login} alt="Login" style={{ width: "65px", height: "auto" }} />
                 </label>
@@ -300,7 +303,7 @@ function App() {
               {proofs.map((proof) => (
                   <div
                     key={proof.id}
-                    onClick={() => handleLoad(editorRef, proof)}
+                    onClick={() => handleLoad(editorRef, proof.id)}
                     className='proof'>
                       {proof.filename}
 

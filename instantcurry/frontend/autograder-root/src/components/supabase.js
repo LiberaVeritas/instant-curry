@@ -23,15 +23,27 @@ export const handleLogin = async (setSession) => {
 // getter function for ID (eventually remove, figure out this with session)
 export const getUserID = async () => {
   const { data: { user }, error } = await supabase.auth.getUser();
-    
-  if (error) {
-      console.error("X Error fetching user:", error.message);
-      return;
-  }
-  
-  console.log("Y Authenticated User ID:", user?.id);
   return user?.id
 }
+
+// load a saved proof
+export const loadSavedProof = async (editorRef, ID) => { 
+
+  try {
+    const { data, error } = await supabase
+      .schema('api')
+      .from('proofs')
+      .select('content').eq('id', ID) 
+      .single();
+
+    if (error) throw error;
+    
+    editorRef.current.setValue(data.content);
+
+  } catch (error) {
+    console.error("Error fetching proofs:", error.message);
+  }
+} 
 
 // Listen for auth state changes
 export const listen = async (setSession) => {
@@ -135,7 +147,7 @@ export const saveToProofs = async (editorRef, proofContent, setProofs) => { // r
       .insert([
         { 
           user_id: user.id, 
-          content: "proof-content",  
+          content: editorRef.current.getValue(), // "proof-content",  
           filename: "test"      
         }
       ])
