@@ -80,7 +80,7 @@ button {
   background-color: white;
   border: 2px solid rgb(255, 123, 0); 
   color: rgb(255, 123, 0);           
-  border-radius: 10px;      
+  border-radius: 20px;      
   padding: 10px 20px; 
   margin: 10px;    
   cursor: pointer;
@@ -92,14 +92,40 @@ button {
   color: white;             
 }
 
+.orange-fill {
+  background-color: rgb(255, 123, 0);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title { 
+  color: rgb(255, 123, 0);
+  width: 180px;
+  text-align: center;
+  margin-bottom: 10px;
+  line-height: 20px;
+}
+
+.section {
+  text-align: center;
+  width: 180px;
+  padding: 10px;
+  background-color: rgb(255, 123, 0);
+  border-radius: 20px;
+}
 
 .editor-container {
   border: 2px solid rgb(255, 123, 0); 
   border-radius: 20px;       
-  height: 370px;
-  width: 100%;
-  margin: 30px;
-  overflow: hidden; 
+  background-color: white;
+  margin: 20px;
+  width: 90%;
+  overflow: hidden;
 }
 
 .error-token {
@@ -134,7 +160,6 @@ button {
   justify-content: center;
   padding: 1rem; 
   background-color: #f97316; 
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
 }
 
 .proofs-box {

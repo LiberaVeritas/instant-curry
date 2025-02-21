@@ -1,5 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Header from "./components/Header";
+import logo from "../media/name.png";
+import login from "../media/login.png";
+
+
 import WebEditor, { 
   initializeEditor,
   handleClearEditor,
@@ -152,44 +156,77 @@ function App() {
   return (
     <div>
 
-      <Header/> 
-
-      {session ? (
-        <div>
-          <span>Welcome, {session.user.email}</span>
-          <button onClick={handleLogOut}>Logout</button> 
-        </div>
-      ) : (
-        <button onClick={handleLogIn}>Login with GitHub</button>
-      )}
+<header className="header" style={{ alignItems: "center", justifyContent: "space-between", padding: "10px" }}>
+    
+    <div style={{ padding: "20px", textAlign: "center" }}>
+        <img src={logo} alt="Logo" className="h-12" style={{ height: "80px" }} />
+    </div>
+    
+    <div style={{ justifyContent: "flex-end", alignItems: "center", padding: "20px"}}>
+        {session ? (
+            <button className="white-orange-button" onClick={handleLogOut}>Logout</button>
+        ) : (
+            <div>
+                <button id="login-button" onClick={handleLogin} style={{ display: "none" }}></button>
+                <label htmlFor="login-button" style={{ cursor: "pointer" }}>
+                    <img src={login} alt="Login" style={{ width: "65px", height: "auto" }} />
+                </label>
+            </div>
+        )}
+    </div>
+</header>
 
       <div style={{ 
+        width: "100vw",
         display: "flex", 
-        maxWidth: "100vw",
+        flexDirection: "row",
         alignItems: "center"}}>
 
         
-        <div className="editor-container">
+        <div style={{ width: "70vw", display: "flex", flexDirection: "column", alignItems: "center" }}>
 
-        <WebEditor 
-          editorRef={editorRef}
-          feedback={feedback} 
-          setFeedback={setFeedback} 
-          setErrorLine={setErrorLine} 
-          setErrorToken={setErrorToken} 
-          setDecorations={setDecorations} 
-          errorLine={errorLine} 
-          errorToken={errorToken} 
-        />
-       
+          <div className='editor-container'>
+              
+              <div style={{
+                  width: "100%", 
+                  height: "300px", 
+                  overflow: "auto"
+              }}>
+
+                <WebEditor 
+                  editorRef={editorRef}
+                  feedback={feedback} 
+                  setFeedback={setFeedback} 
+                  setErrorLine={setErrorLine} 
+                  setErrorToken={setErrorToken} 
+                  setDecorations={setDecorations} 
+                  errorLine={errorLine} 
+                  errorToken={errorToken} 
+                />
+              </div>
+
+              <div className='orange-fill'>
+
+              <button className="white-orange-button" 
+                onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)}  
+                style={{ marginBottom: "10px" , fontSize: "30px" }}>
+                  Get Result
+              </button>
+                 
+
+                  <button className="white-orange-button" 
+                    onClick={() => handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)}  
+                    style={{marginRight: "5%"}}>
+                      Clear Code
+                  </button>
+              </div>
+          </div> 
         </div>
 
-        <div style={{padding: "5px"}}> 
+        <div style={{padding: "15px", display: "flex", flexDirection: "column"}}> 
 
-          <div style={{ position: "relative", 
-            display: "inline-block", 
-            marginLeft: "3px",
-            padding: "5px"}}>
+          <div style={{ 
+            padding: "10px"}}>
            
             <button id="download-button" 
               onClick={() => handleDownload(editorRef)}
@@ -203,12 +240,8 @@ function App() {
             
           </div>
           
-          <div style={{ position: "relative", 
-            marginBottom: "10px",
-            marginLeft: "3px",
-            marginRight: "10px",
-            display: "inline-block", 
-            padding: "5px"}}>
+          <div style={{ 
+            padding: "10px"}}>
             
             <input
               type="file"
@@ -224,24 +257,13 @@ function App() {
 
           </div>
           
-          <h3 style={{
-              color: 'brown',
-              width: "180px",
-              textAlign: "center",
-              marginBottom: "10px",
-              lineHeight: "20px"
-              }}> 
-
+          <h3 className="section-title"> 
+            
               Browse Sample Proofs
           
           </h3>
-          <div style={{ 
-            textAlign: "center", 
-            width: "180px", 
-            padding: "10px",
-            background: "rgb(131, 41, 41)", 
-            borderRadius: "20px", 
-            }}>
+          
+          <div className="section" >
             
             <div className='proofs-box'>
 
@@ -267,17 +289,9 @@ function App() {
         flexDirection: "column",
         }}>
 
-      <button className="clear-orange-button" 
-        onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)}  
-        style={{ marginBottom: "10px" , fontSize: "30px" }}>
-          Get Result
-      </button>
+      
 
-      <button className="clear-orange-button" 
-        onClick={() => handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)}  
-        style={{ margin: "10px" }}>
-          Clear Code
-      </button>
+      
 
       {session && (
         <button onClick={handleSave} className="clear-orange-button">
