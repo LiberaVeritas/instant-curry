@@ -212,6 +212,13 @@ function App() {
                 style={{ marginBottom: "10px" , fontSize: "30px" }}>
                   Get Result
               </button>
+
+              {session && (
+                <button className="white-orange-button" 
+                 onClick={handleSave} >
+                  Save Proof
+                </button>
+              )}
                  
 
                   <button className="white-orange-button" 
@@ -279,60 +286,35 @@ function App() {
 
           </div>
 
-        </div>
+          {session && 
+          (
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
+              <h3 className="section-title"> 
+                Saved proofs
+              </h3>
 
+              <div className="section" >
+            
+              <div className='proofs-box'>
+
+              {proofs.map((proof) => (
+                  <div
+                    key={proof.id}
+                    onClick={() => handleLoad(editorRef, proof)}
+                    className='proof'>
+                      {proof.filename}
+
+                      <button onClick={() => deleteProof(proof.id, setProofs, setFeedback)}>
+                        X
+                      </button>
+                  </div>
+                  
+                ))}
+              </div>
+            </div>
+            </div> )}
+          </div>
       </div>
-
-
-      <div style={{ display: "flex", 
-        alignItems: "center", 
-        flexDirection: "column",
-        }}>
-
-      
-
-      
-
-      {session && (
-        <button onClick={handleSave} className="clear-orange-button">
-        Save Proof
-        </button>
-      )}
-      
-
-      {/* rem? 
-      {saveStatus && (
-        <div className={`status-message ${saveStatus.success ? "success" : "error"}`}>
-          {saveStatus.message}
-        </div>
-      )}*/}
-       
-      </div>
-
-      {session && (
-        <div style={{ marginTop: "20px", textAlign: "center" }}>
-          <h2>Saved Proofs</h2>
-          <ul>
-            {proofs.map((proof) => (
-              <li key={proof.id}>
-
-                <strong>{proof.filename}</strong>
-
-                <button onClick={() => handleLoad(editorRef, proof)}> 
-                  {/*() => handleSelectProof(editorRef, proof.content, proof.filename)}>*/}
-                  Load
-                </button>
-
-                <button onClick={() => deleteProof(proof.id, setProofs, setFeedback)}>
-                  X
-                </button>
-
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       
         
       {feedback.message && ( // probably a better way to do this? 
