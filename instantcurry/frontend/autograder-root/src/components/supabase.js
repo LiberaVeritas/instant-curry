@@ -12,7 +12,7 @@ export const getSession = async () => {
   return session;
 };
 
-// login logic - currently just github. 
+// login logic - currently gitlab & github. 
 export const handleLogin = async (provider, setSession) => {
   await supabase.auth.signInWithOAuth({ provider: provider });
   

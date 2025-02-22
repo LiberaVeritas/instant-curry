@@ -7,6 +7,7 @@ import login from "../media/login.png";
 import WebEditor, { 
   initializeEditor,
   handleClearEditor,
+  newProof,
   handleGrade,
   handleSelectProof,
   handleDownload,
@@ -195,11 +196,11 @@ function App() {
               justifyContent: "center"
             }}>
           
-          <button onClick={() => handleLogIn("github")} style={{ background: "none", border: "none", cursor: "pointer" }}>
+          <button onClick={() => handleLogIn("github")} style={{ background: "none", border: "none", cursor: "pointer", marginTop: "-10px" }}>
             <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" style={{ width: "40px", filter: "invert(100%)" }} />
           </button>
           
-          <button onClick={() => handleLogIn("gitlab")} style={{ background: "none", border: "none", cursor: "pointer" }}>
+          <button onClick={() => handleLogIn("gitlab")} style={{ background: "none", border: "none", cursor: "pointer", marginTop: "-10px"}}>
             <img src="https://cdn-icons-png.flaticon.com/512/5968/5968853.png" alt="GitLab" style={{ width: "40px", filter: "invert(100%)" }} />
           </button>
           
@@ -253,6 +254,12 @@ function App() {
                   Save Proof
                 </button>
               )}
+
+              <button className="white-orange-button" 
+                onClick={() => newProof(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)}  
+                style={{marginRight: "5%"}}>
+                  New proof
+              </button>
                  
 
                   <button className="white-orange-button" 
