@@ -27,20 +27,14 @@ export const WebEditor = ({ editorRef, setErrorLine, setErrorToken, setFeedback,
     }
   };
 
-  export const newProof = (editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations) => {
-    // { session ? 
-    // if logged in : 
-    //    saves proof 
-    //    clearsCode 
-    // if not: 
-    //    displays warning message "will clear code...," 'delete & start new proof' and 'cancel' 
-    //    buttons, if continues
-        //  clearEditor
-    //    if not 
-        //  just go back 
-    // }
-    editorRef.current.setValue(""); 
-    localStorage.removeItem("userCode");      // remove saved content from localStorage
+  export const newProof = async (session, editorRef, setErrorLine, 
+    setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus) => {
+    { session ? (
+      await saveProof(editorRef, setSaveStatus, setProofs), 
+      handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)
+    ) : (
+      handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)
+    )}
   };
 
 

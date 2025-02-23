@@ -256,7 +256,7 @@ function App() {
               )}
 
               <button className="white-orange-button" 
-                onClick={() => newProof(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)}  
+                onClick={() => newProof(session, editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus)}  
                 style={{marginRight: "5%"}}>
                   New proof
               </button>
