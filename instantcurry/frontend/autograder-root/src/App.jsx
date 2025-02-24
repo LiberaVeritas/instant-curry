@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Header from "./components/Header"; // redo header
 import logo from "../media/name.png";
+import write from "../media/write.png";
+import clear from "../media/clear.png";
 import login from "../media/login.png";
 
 
@@ -88,17 +90,13 @@ function App() {
   };
 
   const handleTitleChange = (event) => { 
-    console.log("title change");
     setProofTitle(event.target.value);
-    console.log("done"); 
   }; 
 
   const handleTitleBlur = (event) => { 
-    console.log("blur");
     //setIsEditingTitle(false); 
     setProofTitle(event.target.value); 
     setIsEditingTitle(false)
-    console.log("title blur done");
   }
   
   // line deco 
@@ -152,12 +150,6 @@ function App() {
   // ------------------------------------------------
   // Proof Writing, grading, retrieving 
   // ------------------------------------------------
-  
-
-  // debug function, see if needed for loading 
-  //useEffect(() => {
-  //  console.log("Current session state:", session);
-  //}, [session]);
 
   // login, logout and load helper functions 
   const handleLogIn = async (provider) => {
@@ -181,45 +173,53 @@ function App() {
   return (
     <div>
 
-    <header className="header" style={{ alignItems: "center", justifyContent: "space-between", padding: "10px" }}>
-
-      <div style={{ padding: "20px", textAlign: "center" }}>
-        <img src={logo} alt="Logo" className="h-12" style={{ height: "80px" }} />
-      </div>
-
-      <div style={{ position: "relative", justifyContent: "flex-end", alignItems: "center", padding: "20px" }}>
+    <header className="header">
+      
+      <img 
+        src={logo} 
+        alt="logo" 
+        className="small-image"
+      /> 
+      
+      <div className="padding-20"> 
         {session ? (
-          <button className="white-orange-button" onClick={handleLogOut}>Logout</button>
+          <button 
+            className="white-orange-button" 
+            onClick={handleLogOut}>
+              Logout
+          </button>
           ) : (
           <div style={{ position: "relative" }}>
+            <img 
+              src={login} 
+              alt="Login" 
+              className='icon-65'
+              onClick={() => setShowLoginMenu(!showLoginMenu)}
+            />
 
-          <img 
-            src={login} 
-            alt="Login" 
-            style={{ width: "65px", height: "auto", cursor: "pointer" }} 
-            onClick={() => setShowLoginMenu(!showLoginMenu)}
-          />
-
-          {showLoginMenu && (
-            <div style={{
-              position: "absolute",
-              top: "60%",
-              left: "-120px",  
-              transform: "translateY(-50%)",
-              padding: "5px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              zIndex: "1000",
-              justifyContent: "center"
-            }}>
+            {showLoginMenu && (
+              <div 
+                className='login-menu'
+              >
           
-          <button onClick={() => handleLogIn("github")} style={{ background: "none", border: "none", cursor: "pointer", marginTop: "-10px" }}>
-            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" style={{ width: "40px", filter: "invert(100%)" }} />
+          <button 
+            onClick={() => handleLogIn("github")} 
+            className='login-button'>
+            
+            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" 
+              alt="GitHub" 
+              className="login-icon" />
+          
           </button>
           
-          <button onClick={() => handleLogIn("gitlab")} style={{ background: "none", border: "none", cursor: "pointer", marginTop: "-10px"}}>
-            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968853.png" alt="GitLab" style={{ width: "40px", filter: "invert(100%)" }} />
+          <button 
+            onClick={() => handleLogIn("gitlab")} 
+            className='login-button'>
+            
+            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968853.png" 
+              alt="GitLab" 
+              className="login-icon" />
+          
           </button>
           
         </div>
@@ -229,21 +229,12 @@ function App() {
         </div>
       </header>
 
-      <div style={{ 
-        width: "100vw",
-        display: "flex", 
-        flexDirection: "row",
-        alignItems: "center"}}>
-
-        
-        <div style={{ width: "70vw", display: "flex", flexDirection: "column", alignItems: "center" }}>
-
+      <div className='general-container'> 
+        <div className='left-container'>
           <div className='editor-container'>
               
               <div style={{
-                  width: "100%", 
                   height: "300px", 
-                  overflow: "auto"
               }}>
 
                 <WebEditor 
@@ -259,28 +250,6 @@ function App() {
               </div>
 
               <div className='orange-fill'>
-                <div className='white-orange-button'>
-                { isEditingTitle ? ( 
-                  <input 
-                    type="text"
-                    defaultValue={proofTitle}
-                    //value={proofTitle}
-                    onChange={(event) => handleTitleChange(event)}
-                    /*onBlur={(event) => {
-                      setProofTitle(event.target.value); 
-                      setIsEditingTitle(false);
-                    }}*/
-                    onBlur={(event) => handleTitleBlur(event)} 
-                    autoFocus
-                    style={{ fontSize: "20px", textAlign: "center"}}
-                    />
-                ) : (
-                  <h2 onClick={handleTitleClick} 
-                  style={{cursor: "pointer", fontSize: "20px"}}>
-                    {proofTitle}
-                  </h2>
-                )}
-                </div>
                 
               <button className="white-orange-button" 
                 onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)}  
@@ -295,41 +264,85 @@ function App() {
                 </button>
               )}
 
-              <button className="white-orange-button" 
-                onClick={() => newProof(session, editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus)}  
-                style={{marginRight: "5%"}}>
-                  New proof
-              </button>
-                 
+              <div className='name-button'>
+                { isEditingTitle ? ( 
+                  <input 
+                    type="text"
+                    defaultValue={proofTitle}
+                    onChange={(event) => handleTitleChange(event)}
+                    onBlur={(event) => handleTitleBlur(event)} 
+                    autoFocus
+                    style={{ fontSize: "30px"}}
+                    />
+                ) : (
+                  <h2 onClick={handleTitleClick} 
+                  style={{fontSize: "30px"}}>
+                    {proofTitle}
+                  </h2>
+                )}
+                </div>
 
-                  <button className="white-orange-button" 
-                    onClick={() => handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)}  
-                    style={{marginRight: "5%"}}>
-                      Clear Code
+
+              <div className="column-flex"> 
+                  
+                <div className='small-button'>
+                
+                  <button id="new-proof" 
+                      onClick={() => newProof(session, editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus)}  
+                      style={{ display: "none"}}>
+                      New proof 
                   </button>
+
+                  <label htmlFor="new-proof" >
+                    <img 
+                      src={write} 
+                      alt="new-proof" 
+                      className="small-icon"/>
+                  </label>
+                  
+                </div>
+
+                <div className='small-button'>
+                
+                  <button id="clear-proof" 
+                    onClick={() => handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)}  
+                    style={{ display: "none"}}>
+                      Clear proof 
+                  </button>
+
+                  <label htmlFor="clear-proof" >
+                    <img 
+                      src={clear} 
+                      alt="clear-proof" 
+                      className="small-icon"/>
+                  </label>
+                  
+                </div>
               </div>
+            </div>
           </div> 
         </div>
 
-        <div style={{padding: "15px", display: "flex", flexDirection: "column"}}> 
+        <div className='right-container'> 
 
-          <div style={{ 
-            padding: "10px"}}>
-           
-            <button id="download-button" 
+          <div> 
+            <button 
+              id="download-button" 
               onClick={() => handleDownload(editorRef)}
               style={{ display: "none"}}>
                 Download .ic
             </button>
 
-            <label htmlFor="download-button" style={{ cursor: "pointer" }}>
-              <img src={download} alt="Download" style={{ width: "175px", height: "auto" }} />
+            <label htmlFor="download-button">
+              <img 
+                src={download} 
+                alt="Download" 
+                className="wide-icon"/> 
             </label>
             
           </div>
           
-          <div style={{ 
-            padding: "10px"}}>
+          <div>
             
             <input
               type="file"
@@ -339,22 +352,21 @@ function App() {
               onChange={(event) => handleFileUpload(editorRef, event)}
             />
             
-            <label htmlFor="upload-file" style={{ cursor: "pointer" }}>
-              <img src={upload} alt="Upload" style={{ width: "175px", height: "auto" }} />
+            <label htmlFor="upload-file">
+              <img 
+                src={upload} 
+                alt="Upload" 
+                className="wide-icon"/> 
             </label>
 
           </div>
           
           <h3 className="section-title"> 
-            
               Browse Sample Proofs
-          
           </h3>
           
           <div className="section" >
-            
             <div className='proofs-box'>
-
               {proofFiles.map((file, index) => (
                 <div
                   key={index}
@@ -364,7 +376,6 @@ function App() {
                 </div>
               ))}
             </div>
-
           </div>
 
           {session && 
