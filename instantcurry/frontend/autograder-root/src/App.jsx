@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import Header from "./components/Header";
+import Header from "./components/Header"; // redo header
 import logo from "../media/name.png";
 import login from "../media/login.png";
 
@@ -51,6 +51,8 @@ function App() {
   const [errorLine, setErrorLine] = useState(null);
   const [errorToken, setErrorToken] = useState("");
   const [decorations, setDecorations] = useState([]);
+  const [proofTitle, setProofTitle] = useState("Proof");
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
   
   const proofFiles = [ 
     // to do -> change, put them in 'proofs' under all users if that's possible? 
@@ -65,7 +67,6 @@ function App() {
   const [proofs, setProofs] = useState([]);
   const [saveStatus, setSaveStatus] = useState(null); // rem this! don't actually need it now, only display/debug  
     // same goes for feedback? re-structure & clean all the feedback / error msgs
-
   const [showLoginMenu, setShowLoginMenu] = useState(false);
 
   // init editor
@@ -81,6 +82,24 @@ function App() {
   const handleSave = async () => {
     await saveProof(editorRef, setSaveStatus, setProofs);
   };
+
+  const handleTitleClick = () => {
+    setIsEditingTitle(true); 
+  };
+
+  const handleTitleChange = (event) => { 
+    console.log("title change");
+    setProofTitle(event.target.value);
+    console.log("done"); 
+  }; 
+
+  const handleTitleBlur = (event) => { 
+    console.log("blur");
+    //setIsEditingTitle(false); 
+    setProofTitle(event.target.value); 
+    setIsEditingTitle(false)
+    console.log("title blur done");
+  }
   
   // line deco 
   useEffect(() => {
@@ -151,7 +170,6 @@ function App() {
   }
 
   const handleLoad = async (editorRef, ID) => {
-    console.log(ID);
     loadSavedProof(editorRef, ID); 
     //await handleSelectProof(editorRef, proof.content, proof.filename);
   }
@@ -241,7 +259,29 @@ function App() {
               </div>
 
               <div className='orange-fill'>
-
+                <div className='white-orange-button'>
+                { isEditingTitle ? ( 
+                  <input 
+                    type="text"
+                    defaultValue={proofTitle}
+                    //value={proofTitle}
+                    onChange={(event) => handleTitleChange(event)}
+                    /*onBlur={(event) => {
+                      setProofTitle(event.target.value); 
+                      setIsEditingTitle(false);
+                    }}*/
+                    onBlur={(event) => handleTitleBlur(event)} 
+                    autoFocus
+                    style={{ fontSize: "20px", textAlign: "center"}}
+                    />
+                ) : (
+                  <h2 onClick={handleTitleClick} 
+                  style={{cursor: "pointer", fontSize: "20px"}}>
+                    {proofTitle}
+                  </h2>
+                )}
+                </div>
+                
               <button className="white-orange-button" 
                 onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)}  
                 style={{ marginBottom: "10px" , fontSize: "30px" }}>
