@@ -67,8 +67,7 @@ function App() {
   // Supabase
   const [session, setSession] = useState(null);
   const [proofs, setProofs] = useState([]);
-  const [saveStatus, setSaveStatus] = useState(null); // rem this! don't actually need it now, only display/debug  
-    // same goes for feedback? re-structure & clean all the feedback / error msgs
+  const [saveStatus, setSaveStatus] = useState(null); 
   const [showLoginMenu, setShowLoginMenu] = useState(false);
 
   // init editor
@@ -252,9 +251,8 @@ function App() {
               <div className='orange-fill'>
                 
               <button className="white-orange-button" 
-                onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)}  
-                style={{ marginBottom: "10px" , fontSize: "30px" }}>
-                  Get Result
+                onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)} >
+                  Run
               </button>
 
               {session && (
@@ -272,7 +270,7 @@ function App() {
                     onChange={(event) => handleTitleChange(event)}
                     onBlur={(event) => handleTitleBlur(event)} 
                     autoFocus
-                    style={{ fontSize: "30px"}}
+                    
                     />
                 ) : (
                   <h2 onClick={handleTitleClick} 
