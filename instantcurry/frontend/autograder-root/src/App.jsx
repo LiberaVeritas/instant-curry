@@ -53,7 +53,9 @@ function App() {
   const [errorLine, setErrorLine] = useState(null);
   const [errorToken, setErrorToken] = useState("");
   const [decorations, setDecorations] = useState([]);
-  const [proofTitle, setProofTitle] = useState("Proof");
+  const [proofTitle, setProofTitle] = useState(() => {
+    return localStorage.getItem("proofTitle") || "Proof";
+  });
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   
   const proofFiles = [ 
@@ -81,21 +83,21 @@ function App() {
 
   // save helper function
   const handleSave = async () => {
-    await saveProof(editorRef, setSaveStatus, setProofs);
+    await saveProof(editorRef, setSaveStatus, setProofs, proofTitle);
   };
 
   const handleTitleClick = () => {
     setIsEditingTitle(true); 
   };
 
+  
   const handleTitleChange = (event) => { 
     setProofTitle(event.target.value);
+    localStorage.setItem("proofTitle", event.target.value);
   }; 
 
   const handleTitleBlur = (event) => { 
-    //setIsEditingTitle(false); 
-    setProofTitle(event.target.value); 
-    setIsEditingTitle(false)
+    setIsEditingTitle(false);
   }
   
   // line deco 
@@ -126,7 +128,7 @@ function App() {
         }
       ];
     
-      // to do -> fix error token. rn it's not actually doing anything (decorations is never used?)
+      // to do -> fix error token. 
       if (errorToken) {
         const lines = model.getLinesContent();
         const lineContent = lines[errorLine - 1];
@@ -162,7 +164,6 @@ function App() {
 
   const handleLoad = async (editorRef, ID) => {
     loadSavedProof(editorRef, ID); 
-    //await handleSelectProof(editorRef, proof.content, proof.filename);
   }
 
   // ------------------------------------------------
@@ -233,7 +234,7 @@ function App() {
           <div className='editor-container'>
               
               <div style={{
-                  height: "300px", 
+                  height: "500px", 
               }}>
 
                 <WebEditor 
@@ -258,7 +259,7 @@ function App() {
               {session && (
                 <button className="white-orange-button" 
                  onClick={handleSave} >
-                  Save Proof
+                  Save 
                 </button>
               )}
 
@@ -286,7 +287,7 @@ function App() {
                 <div className='small-button'>
                 
                   <button id="new-proof" 
-                      onClick={() => newProof(session, editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus)}  
+                      onClick={() => newProof(session, editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus, proofTitle)}  
                       style={{ display: "none"}}>
                       New proof 
                   </button>

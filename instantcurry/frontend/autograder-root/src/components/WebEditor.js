@@ -28,9 +28,9 @@ export const WebEditor = ({ editorRef, setErrorLine, setErrorToken, setFeedback,
   };
 
   export const newProof = async (session, editorRef, setErrorLine, 
-    setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus) => {
+    setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus, proofName) => {
     { session ? (
-      await saveProof(editorRef, setSaveStatus, setProofs), 
+      await saveProof(editorRef, setSaveStatus, setProofs, proofName), 
       handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)
     ) : (
       handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)
@@ -39,7 +39,7 @@ export const WebEditor = ({ editorRef, setErrorLine, setErrorToken, setFeedback,
 
 
   // saves current editor content in user database
-  export const saveProof = async (editorRef, setSaveStatus, setProofs) => { 
+  export const saveProof = async (editorRef, setSaveStatus, setProofs, proofName) => { 
   
     const code = editorRef.current.getValue();
     
@@ -49,7 +49,7 @@ export const WebEditor = ({ editorRef, setErrorLine, setErrorToken, setFeedback,
     }
   
     try {
-      const response = await saveToProofs(editorRef, code, setProofs);
+      const response = await saveToProofs(editorRef, code, setProofs, proofName);
         
       if (response.error) {
         setSaveStatus({ success: false, message: response.error });

@@ -130,7 +130,7 @@ export const fetchProofs = async (supabase, setProofs) => {
 };
 
 // saves a proof to database 
-export const saveToProofs = async (editorRef, proofContent, setProofs) => { // re-do args here
+export const saveToProofs = async (editorRef, proofContent, setProofs, proofName) => { // re-do args here
   try {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -148,7 +148,7 @@ export const saveToProofs = async (editorRef, proofContent, setProofs) => { // r
         { 
           user_id: user.id, 
           content: editorRef.current.getValue(), // "proof-content",  
-          filename: "test"      
+          filename: proofName,
         }
       ])
 
