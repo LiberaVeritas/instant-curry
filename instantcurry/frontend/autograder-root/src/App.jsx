@@ -181,7 +181,7 @@ function App() {
         className="small-image"
       /> 
       
-      <div className="padding-20"> 
+      <div className="padding-10"> 
         {session ? (
           <button 
             className="white-orange-button" 
@@ -212,7 +212,7 @@ function App() {
           
           </button>
           
-          <button 
+          <button // replace with email 
             onClick={() => handleLogIn("gitlab")} 
             className='login-button'>
             
@@ -222,20 +222,17 @@ function App() {
           
           </button>
           
-        </div>
-        )}
-        </div>
-        )}
-        </div>
-      </header>
+        </div> )} </div> )}
+      </div>
+    </header>
 
-      <div className='general-container'> 
-        <div className='left-container'>
-          <div className='editor-container'>
+    <div className='general-container'> 
+      <div className='left-container'>
+        <div className='editor-container'>
               
-              <div style={{
-                  height: "500px", 
-              }}>
+          <div style={{
+            height: "20vw", 
+          }}>
 
                 <WebEditor 
                   editorRef={editorRef}
@@ -251,7 +248,7 @@ function App() {
 
               <div className='orange-fill'>
                 
-              <button className="white-orange-button" 
+              <button className="run-button" 
                 onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)} >
                   Run
               </button>
@@ -320,6 +317,10 @@ function App() {
               </div>
             </div>
           </div> 
+
+          <div className='advice-container'>
+            Advice
+          </div>
         </div>
 
         <div className='right-container'> 
@@ -379,9 +380,9 @@ function App() {
 
           {session && 
           (
-            <div style={{ marginTop: "20px", textAlign: "center" }}>
+            <div style={{ marginTop: "20px"}}>
               <h3 className="section-title"> 
-                Saved proofs
+                  Saved Proofs
               </h3>
 
               <div className="section" >
@@ -395,7 +396,11 @@ function App() {
                     className='proof'>
                       {proof.filename}
 
-                      <button onClick={() => deleteProof(proof.id, setProofs, setFeedback)}>
+                      <button className='X-button' 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteProof(proof.id, setProofs, setFeedback);
+                      }}>
                         X
                       </button>
                   </div>

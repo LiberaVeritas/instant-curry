@@ -30,12 +30,13 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 15px; 
-  margin-bottom: 60px;
+  margin-bottom: 40px;
   background-color: #f97316; 
 }
 
-.padding-20 {
-  padding: 20px;
+.padding-10 {
+  padding: 10px;
+  padding-right: 20px;
 }
 
 /* containers */ 
@@ -43,19 +44,20 @@ body {
 .general-container { 
   width: 100vw;
   display: flex;
+  justify-content: space-between;
   flex-direction: row;
   align-items: center;
 }
 
 .left-container {
-  width: 70vw;
+  width: 80vw;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .right-container {
-  padding: 15px;
+  width: 20vw;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -73,6 +75,15 @@ body {
   margin: 20px;
   width: 90%;
   overflow: hidden;
+}
+
+.advice-container {
+  background-color: #f4ebde;
+  border-radius: 90px;    
+  height: 7vw;
+  text-align: center;
+  padding: 15px;
+  width: 80%;
 }
 
 
@@ -132,16 +143,32 @@ button {
   background-color: white;
   border: 2px solid rgb(255, 123, 0); 
   color: rgb(255, 123, 0);           
-  border-radius: 90px;      
-  padding: 10px 20px; 
-  margin: 15px;    
+  border-radius: 30px;      
+  padding: 15px 25px; 
+  margin-left: 15px;    
   cursor: pointer;
   transition: all 0.3s ease; 
   height: 75px; 
   font-size: 25px;
 }
 
-.clear-orange-button:hover, .white-orange-button:hover {
+.run-button {
+  background-color: white;
+  border: 10px double rgb(255, 123, 0);     
+  color: rgb(255, 123, 0);           
+  border-radius: 35px;  
+  font-size: 35px;    
+  margin-left: 15px;    
+  cursor: pointer;
+  transition: all 0.3s ease; 
+  height: 100px; 
+}
+
+.X-button { 
+  cursor: pointer;
+}
+
+.clear-orange-button:hover, .white-orange-button:hover, .run-button:hover {
   background-color: rgb(255, 123, 0); 
   color: white;             
 }
@@ -207,9 +234,10 @@ button {
 }
 
 /* for sample & saved proofs */ 
-
 .section-title { 
   color: rgb(255, 123, 0);
+  font-weight: bold;
+  font-size: 18px;
   width: 180px;
   text-align: center;
   margin-bottom: 10px;
@@ -218,11 +246,73 @@ button {
 
 .section {
   text-align: center;
-  width: 180px;
+  width: 200px;
   padding: 10px;
   background-color: rgb(255, 123, 0);
   border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+/* scrollable proofs box */ 
+.proofs-box {
+  width: 180px;
+  height: 120px;  
+  overflow-y: auto;
+  scrollbar-width: thin; 
+  scrollbar-color: rgba(255, 123, 0, 0.7) transparent; 
+  background-color: white;
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.proofs-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.proofs-box::-webkit-scrollbar-thumb {
+  background: rgba(255, 123, 0, 0.7);
+  border-radius: 10px;
+}
+
+.proofs-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.proof {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+}
+
+.proof:hover {
+  background: rgb(255, 200, 150);
+}
+
+.X-button {
+  background: rgba(255, 50, 0, 0.8);
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.X-button:hover {
+  background: rgb(200, 40, 0);
+}
+
 
 /* for code decorations, error highlighting */ 
 
@@ -262,8 +352,10 @@ button {
 
 .proof { 
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
   color: rgb(168, 111, 92);
-  padding: 5px;
+  padding: 10px;
   border-bottom: 1px solid rgb(255, 102, 8);
 }
 
