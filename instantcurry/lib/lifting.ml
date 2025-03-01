@@ -1,6 +1,8 @@
 open Synint
 open Core
 
+module P = Icparser.Parsed_ast
+
 (* lifting from parse trees to ASTs *)
 
 exception ScopeError of name 
@@ -8,66 +10,66 @@ type scope = Term | Stmt | Meta [@@deriving sexp]
 type scope_ctx = (name * scope) list [@@deriving sexp]
 
 
-let rec lift_ty (ctx : scope_ctx) (ty : Icparser.Parsed_ast.ty) : ty =
+let rec lift_ty (ctx : scope_ctx) (ty : P.ty) : ty =
   let lft = lift_ty ctx in
   match ty with
-  | Icparser.Parsed_ast.Ty_Nat -> Ty_Nat
-  | Icparser.Parsed_ast.Ty_List ty -> Ty_List (lft ty)
-  | Icparser.Parsed_ast.Ty_Arrow (ty, ty') -> Ty_Arrow (lft ty, lft ty')
-  | Icparser.Parsed_ast.Ty_Tree ty -> Ty_Tree (lft ty)
-  | Icparser.Parsed_ast.Ty_Var v -> Ty_Var v
+  | P.Ty_Nat -> Ty_Nat
+  | P.Ty_List ty -> Ty_List (lft ty)
+  | P.Ty_Arrow (ty, ty') -> Ty_Arrow (lft ty, lft ty')
+  | P.Ty_Tree ty -> Ty_Tree (lft ty)
+  | P.Ty_Var v -> Ty_Var v
 
-let rec lift_tm (ctx : scope_ctx) (t : Icparser.Parsed_ast.tm) : tm =
+let rec lift_tm (ctx : scope_ctx) (t : P.tm) : tm =
   let lft = lift_tm ctx in
   match t with
-  | Icparser.Parsed_ast.Nil -> Nil
-  | Icparser.Parsed_ast.Cons (t, t') -> Cons (lft t, lft t')
-  | Icparser.Parsed_ast.ListCase (l, n, x, xs, c) -> 
+  | P.Nil -> Nil
+  | P.Cons (t, t') -> Cons (lft t, lft t')
+  | P.ListCase (l, n, x, xs, c) -> 
     ListCase (lft l, lft n, x, xs, lift_tm ((x, Term) :: (xs, Term) :: ctx) c)
-  | Icparser.Parsed_ast.Nat n -> Nat n
-  | Icparser.Parsed_ast.Plus (t, t') -> Plus (lft t, lft t')
-  | Icparser.Parsed_ast.Minus (t, t') -> Minus (lft t, lft t')
-  | Icparser.Parsed_ast.Times (t, t') -> Times (lft t, lft t')
-  | Icparser.Parsed_ast.If0 (t, z, s) -> If0 (lft t, lft z, lft s)
-  | Icparser.Parsed_ast.App (t, t') -> App (lft t, lft t')
-  | Icparser.Parsed_ast.Fun (x, ty, t) -> Fun (x, (lift_ty ctx ty), lift_tm ((x, Term) :: ctx) t)
-  (*| Icparser.Parsed_ast.Empty -> Nil*)
-  | Icparser.Parsed_ast.Node (_, _, _) -> raise NotImplemented 
-  | Icparser.Parsed_ast.TreeCase _ -> raise NotImplemented
-  | Icparser.Parsed_ast.Var x -> 
+  | P.Nat n -> Nat n
+  | P.Plus (t, t') -> Plus (lft t, lft t')
+  | P.Minus (t, t') -> Minus (lft t, lft t')
+  | P.Times (t, t') -> Times (lft t, lft t')
+  | P.If0 (t, z, s) -> If0 (lft t, lft z, lft s)
+  | P.App (t, t') -> App (lft t, lft t')
+  | P.Fun (x, ty, t) -> Fun (x, (lift_ty ctx ty), lift_tm ((x, Term) :: ctx) t)
+  (*| P.Empty -> Nil*)
+  | P.Node (_, _, _) -> raise NotImplemented 
+  | P.TreeCase _ -> raise NotImplemented
+  | P.Var x -> 
     begin match List.Assoc.find ~equal:String.equal ctx x with
     | Some Term -> BVar x
     | Some Stmt -> Ref x
     | Some Meta -> MVar x
     | None -> raise (ScopeError x) 
     end
-  | Icparser.Parsed_ast.Empty -> raise NotImplemented
+  | P.Empty -> raise NotImplemented
 
     (* TODO *)
-let lift_eqn (ctx : scope_ctx) (eqn : Icparser.Parsed_ast.eqn) : eqn =
+let lift_eqn (ctx : scope_ctx) (eqn : P.eqn) : eqn =
   let (lhs, rhs) = eqn in
   { lhs = lift_tm ctx lhs; rhs = lift_tm ctx rhs }
 
-let lift_pat (pat : Icparser.Parsed_ast.pattern) : pattern =
+let lift_pat (pat : P.pattern) : pattern =
   match pat with
   | Pat_nil -> Pat_nil
   | Pat_cons (x, xs) -> Pat_cons (x, xs)
   | Pat_empty -> Pat_empty
   | Pat_node (l, x, r) -> Pat_node (l, x, r)
 
-let lift_just (thms : name list) (just : Icparser.Parsed_ast.name) : justification =
-  if String.equal just "defn" then ByDefinition else
+let lift_just (thms : name list) (just : P.name) : justification =
+  if String.equal just "defn" then ByDefinition else (*TODO commonsense, IH, LEMMA *)
   if List.mem ~equal:String.equal thms just then ByTheorem just
-  else raise (ScopeError just)
+  else raise (ScopeError (just ^ " not found"))
 
-let lift_side (thms : name list) (ctx : scope_ctx) (side : Icparser.Parsed_ast.side) : side =
+let lift_side (thms : name list) (ctx : scope_ctx) (side : P.side) : side =
   let (start, steps) = side in
   let start = lift_tm ctx start in
   let f = fun (tm, just) -> (lift_tm ctx tm, lift_just thms just) in
   { start = start;
     steps = List.map ~f:f steps }
 
-let lift_case (thms : name list) (ctx : scope_ctx) (case : Icparser.Parsed_ast.case) : case =
+let lift_case (thms : name list) (ctx : scope_ctx) (case : P.case) : case =
   let (name, pat, ihs, wts, lhs, rhs) = case in
     if not (match List.Assoc.find ~equal:String.equal ctx name with
       | Some Meta -> true
@@ -88,7 +90,7 @@ let lift_case (thms : name list) (ctx : scope_ctx) (case : Icparser.Parsed_ast.c
     lhs = lift_side thms ctx lhs;
     rhs = lift_side thms ctx rhs }
 
-let lift_proof (thms : name list) (ctx : scope_ctx) (prf : Icparser.Parsed_ast.proof) : proof =
+let lift_proof (thms : name list) (ctx : scope_ctx) (prf : P.proof) : proof =
   match prf with 
   | Proof (var,_,cases) -> 
     begin match List.Assoc.find ~equal:String.equal ctx var with
@@ -97,7 +99,7 @@ let lift_proof (thms : name list) (ctx : scope_ctx) (prf : Icparser.Parsed_ast.p
     end
   | Axiom -> Axiom
 
-let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : Icparser.Parsed_ast.stmt) : name list * scope_ctx * stmt =
+let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : P.stmt) : name list * scope_ctx * stmt =
   match stmt with
   | Theorem (name, args, claim, prf) -> 
     let ctx' = List.fold
@@ -133,7 +135,7 @@ let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : Icparser.Parsed_ast.s
                   body = t })
   | Print t -> (thms, ctx, Print (lift_tm ctx t))
 
-let lift_program (p : Icparser.Parsed_ast.program) : program =
+let lift_program (p : P.program) : program =
   let rec go thms ctx p =
     match p with
     | stmt :: p -> 

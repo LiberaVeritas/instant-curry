@@ -1,6 +1,19 @@
 # instant-curry
 
 
+## Error API
+Syntax errors throw ParserUtil.SyntaxError with a JSON string with fields:
+`
+line: line number in source where error occured
+start: error token start, in number of characters within line
+stop: error token stop, in number of characters within line
+message: error message (including Hints if any)
+state: internal parser state that led to the error
+`
+Note: the error token range can be 0 (start = stop)
+`message` can be `<YOUR SYNTAX ERROR MESSAGE HERE>` when a specific messsage doesn't exist. The state number is useful to report to help find where and how the error happened.
+
+
 
 ## Getting started
 

@@ -3,8 +3,6 @@
     open Parsed_ast
 %}
 
-(* TODO make type annotations optional *)
-
 %token EOF
 
 (* proof language keywords *)
@@ -36,14 +34,14 @@
 %token ELSE
 %token FUN
 %token END
-%token EMPTY
-%token NODE
+//%token EMPTY
+//%token NODE
 
 (* types *)
 %token TYNAT
 %token TYARROW
 %token TYLST
-%token TYTREE
+//%token TYTREE
 %token <string> TYVAR
 
 (* nats and idents *)
@@ -68,8 +66,10 @@
 
 (* precedence/associativity *)
 %right TYARROW
-%nonassoc TYLST
-%nonassoc TYTREE
+%nonassoc TYLST IF0 FUN LPAR MATCH
+%nonassoc NIL NATLIT IDENT
+%left PLUS MINUS
+%left TIMES
 
 // %nonassoc NIL EMPTY NODE NATLIT IDENT LPAR MATCH IF0 FUN
 // %right CONS
@@ -77,9 +77,8 @@
 // %left TIMES
 // %nonassoc APP (* TODO: this precedence is not respected? *)
 
-%start program
 
-%type <Parsed_ast.program> program
+%start <Parsed_ast.program> program
 
 %%
 
@@ -89,7 +88,7 @@ program:
 
 stmt:
 | THEOREM LPAR v = IDENT RPAR SEP 
-  FORALL ps = arg+ COLON 
+  FORALL ps = strict_arg+ COLON 
   c = eqn COLON t = ty SEP 
   p = proof                             { Theorem (v, ps, (c, t), p) }
 | DEFINITION SEP LET REC 
@@ -106,12 +105,15 @@ stmt:
   EQ tm = tm                            { Definition (f, false, ps, fresh (), tm) }
 | PRINT tm = tm SEP                     { Print tm }
 
+strict_arg:
+| LPAR i = IDENT COLON ty = ty RPAR     { (i, ty) }
+
 arg:
 | LPAR i = IDENT COLON ty = ty RPAR     { (i, ty) }
 | i = IDENT                             { (i, fresh ()) }
 | LPAR i = IDENT RPAR                   { (i, fresh ()) }
 
-
+(*TODO allow for def vars to const *)
 proof:
 | PROOF SEP 
   BY INDUCTION ON i = IDENT 
@@ -126,7 +128,7 @@ case:
 | CASE
   i = IDENT EQ p = pattern SEP
   ihs = ih*
-  WTS COLON wts = eqn SEP
+  WTS COLON wts = eqn SEP   (*TODO make WTS optional *)
   LHS lhs = side
   RHS rhs = side                        { (i, p, ihs, wts, lhs, rhs) }
 
@@ -145,10 +147,10 @@ step:
 pattern:
 | NIL                                   { Pat_nil }
 | x = IDENT CONS xs = IDENT             { Pat_cons (x, xs) }
-| EMPTY                                 { Pat_empty }
-| NODE LPAR l = IDENT COMMA
+(*| EMPTY                                 { Pat_empty }*)
+(*| NODE LPAR l = IDENT COMMA
             x = IDENT COMMA
-            r = IDENT RPAR              { Pat_node (l, x, r) }
+            r = IDENT RPAR              { Pat_node (l, x, r) }*)
 
 eqn:
 | t1 = tm EQ t2 = tm                    { (t1, t2) }
@@ -166,24 +168,28 @@ mul_tm:
 | t1 = mul_tm TIMES t2 = key_tm         { Times (t1, t2) }
 | t = key_tm                            { t }
 
+(*TODO exclude key_tm from general terms? like in if expr *)
 key_tm:
-| NODE LPAR l = tm COMMA
+(*| NODE LPAR l = tm COMMA
             x = tm COMMA
-            r = tm RPAR                 { Node (l, x, r) }
+            r = tm RPAR                 { Node (l, x, r) }*)
 | MATCH l = tm WITH 
-  BAR? NIL ARROW t1 = tm
+  BAR NIL ARROW t1 = tm
   BAR x = IDENT CONS xs = IDENT ARROW 
   t2 = tm END                           { ListCase (l, t1, x, xs, t2) }
-| MATCH t = tm WITH 
-  BAR? EMPTY ARROW t1 = tm
-  BAR NODE LPAR l = IDENT COMMA 
+(*| MATCH t = tm WITH 
+  BAR EMPTY ARROW t1 = tm
+  BAR NODE LPAR l = IDENT COMMA
                 x = IDENT COMMA
                 r = IDENT RPAR
-  ARROW t2 = tm END                     { TreeCase (t, t1, l, x, r, t2) }
+  ARROW t2 = tm END                     { TreeCase (t, t1, l, x, r, t2) }*)
 | IF0 t = tm THEN t1 = tm 
   ELSE t2 = tm END                      { If0 (t, t1, t2) }
+| FUN x = IDENT ARROW t = tm END        { Fun (x, fresh (), t) }
+| FUN LPAR x = IDENT RPAR
+ ARROW t = tm END                       { Fun (x, fresh (), t) }
 | FUN LPAR x = IDENT COLON ty = ty RPAR
-  ARROW t = tm END                      { Fun (x, ty, t) }
+ ARROW t = tm END                       { Fun (x, ty, t) }
 | t = app_tm                            { t }
 
 app_tm:
@@ -192,7 +198,7 @@ app_tm:
 
 atom_tm:
 | NIL                                   { Nil }
-| EMPTY                                 { Empty }
+(*| EMPTY                                 { Empty }*)
 | n = NATLIT                            { Nat n }
 | IDENT                                 { Var $1 }
 | LPAR t = tm RPAR                      { t }
@@ -233,7 +239,7 @@ ty:
 | TYNAT                                 { Ty_Nat }
 | t1 = ty TYARROW t2 = ty               { Ty_Arrow (t1, t2) }
 | t = ty TYLST                          { Ty_List t }
-| t = ty TYTREE                         { Ty_Tree t }
+(*| t = ty TYTREE                         { Ty_Tree t }*)
 | t = TYVAR                             { Ty_Var t }
 | LPAR t = ty RPAR                      { t }
 

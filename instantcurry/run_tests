@@ -1,0 +1,8 @@
+#!/bin/bash
+
+samples="$(ls ./sample/*.ic)"
+for target in ${samples};
+do
+	echo "testing file: ${target}"
+	dune exec instantcurry ${target}
+done

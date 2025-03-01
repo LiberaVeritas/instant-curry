@@ -13,6 +13,14 @@ type ty =
   | Ty_Var of string
   [@@deriving sexp]
 
+let rec string_of_ty (ty : ty) : string =
+  match ty with
+  | Ty_Arrow (ty, ty') -> "(" ^ string_of_ty ty ^ " -> " ^ string_of_ty ty' ^ ")"
+  | Ty_List ty -> "(" ^ string_of_ty ty ^ " list)" 
+  | Ty_Nat -> "nat"
+  | Ty_Tree ty -> "(" ^ string_of_ty ty ^ " tree)"
+  | Ty_Var _ -> "var"
+
 let fresh : unit -> ty =
   let cnt = ref 0 in
   fun () ->
@@ -36,7 +44,33 @@ type tm =
   | Var of name (* we'll figure out which particular kind of variable later *)
   [@@deriving sexp]
 
+let rec string_of_tm (tm : tm) : string =
+  match tm with
+  | Nil -> "[]"
+  | Empty -> "⊥"
+  | Cons (t, t') -> "(" ^ string_of_tm t ^ " :: " ^ string_of_tm t' ^ ")"
+  | Node _ -> "NODE"
+  | ListCase (l, n, x, xs, c) ->
+    "(match " ^ string_of_tm l ^ " with | nil -> " ^ string_of_tm n ^ 
+    " | " ^ x ^ " :: " ^ xs ^ " -> " ^ string_of_tm c ^ ")"
+  | TreeCase _ -> "TREECASE"
+  | Nat n -> string_of_int n
+  | Plus (t, t') -> "(" ^ string_of_tm t ^ " + " ^ string_of_tm t' ^ ")"
+  | Minus (t, t') -> "(" ^ string_of_tm t ^ " - " ^ string_of_tm t' ^ ")"
+  | Times (t, t') -> "(" ^ string_of_tm t ^ " * " ^ string_of_tm t' ^ ")"
+  | If0 (t, z, s) -> "(if0 " ^ string_of_tm t ^ 
+    " then " ^ string_of_tm z ^ " else " ^ string_of_tm s ^ ")"
+  | App (t, t') -> "(" ^ string_of_tm t ^ " " ^ string_of_tm t' ^ ")"
+  | Fun (x, ty, t) -> "(fun (" ^ x ^ " : " ^ string_of_ty ty ^ 
+    ") -> " ^ string_of_tm t ^ ")"
+  | Var x -> "Var " ^ x
+  
+
 type eqn = tm * tm [@@deriving sexp]
+
+let string_of_eqn eqn = 
+  let (t1, t2) = eqn in
+  string_of_tm t1 ^ " = " ^ string_of_tm t2
 
 type pattern = 
 | Pat_nil (* [] *)
@@ -62,7 +96,10 @@ type proof =
 type stmt = 
   | Theorem of name * (name * ty) list * (eqn * ty) * proof (* Name, quant vars, statement with type, proof *)
   | Definition of name * isrec * (name * ty) list * ty * tm (* function name, typed args, return type, body *)
+  (*TODO allow definition of vars to expressions *)
   | Print of tm (* Print result of evaluating term *)
   [@@deriving sexp]
+
+
 
 type program = stmt list [@@deriving sexp]
