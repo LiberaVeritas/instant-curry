@@ -43,7 +43,7 @@ rule read_token = parse
 | "RHS"                     { RHS }
 | "QED"                     { QED }
 | "AXIOM"                   { AXIOM }
-| "LEMMA"		    { LEMMA }
+| "LEMMA"		                { LEMMA }
 
 (* term language keywords *)
 | "let"                     { LET }
@@ -55,13 +55,13 @@ rule read_token = parse
 | "else"                    { ELSE }
 | "fun"                     { FUN }
 | "end"                     { END }
-| "Empty"                   { EMPTY }
-| "Node"                    { NODE }
+(*| "Empty"                   { EMPTY }*)
+(*| "Node"                    { NODE }*)
 
 (* types *)
 | "nat"                     { TYNAT }
 | "list"                    { TYLST }
-| "tree"                    { TYTREE }
+(*| "tree"                    { TYTREE }*)
 | "->"                      { TYARROW }
 | '\'' ([ 'a'-'z' ]+ as v)  { TYVAR (String.uppercase_ascii v) }
 

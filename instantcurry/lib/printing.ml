@@ -51,4 +51,3 @@ let string_of_stmt (s: stmt) : string =
 
 let string_of_prog (p: program) : string =
   List.fold ~f:(fun s s' -> s ^ "\n" ^ (string_of_stmt s')) ~init:"" p
-

@@ -1,5 +1,5 @@
 (library
  (name instantcurry)
- (libraries icparser core stdio)
+ (libraries icparser core stdio yojson)
  (preprocess (pps ppx_sexp_conv))
- (modules proof printing eval typechecking lifting synint))
+ (modules proof printing eval typechecking lifting synint logger))
