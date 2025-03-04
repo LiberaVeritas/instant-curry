@@ -193,7 +193,7 @@ export const handleClearEditor = (editorRef, setErrorLine, setErrorToken, setFee
 };
 
 // This is where the code actually gets sent to ocaml  
-export const handleGrade = (editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations) => {
+export const handleGrade = (editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations, setAdvice) => {
     let userCode = editorRef.current.getValue();
     userCode = userCode.replace(/\(\*[\s\S]*?\*\)/g, "").trim(); // Trim comments out
     
@@ -220,6 +220,11 @@ export const handleGrade = (editorRef, setFeedback, setErrorLine, setErrorToken,
         if (parsedResult.line) { 
           setErrorLine(parsedResult.line);
           setErrorToken(parsedResult.token || "");
+        }
+
+        // Advice 
+        if (parsedResult.advice) {
+          setAdvice(parsedResult.advice);
         }
       } 
 

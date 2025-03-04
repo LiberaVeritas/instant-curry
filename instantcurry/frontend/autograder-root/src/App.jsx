@@ -71,6 +71,8 @@ function App() {
   const [proofs, setProofs] = useState([]);
   const [saveStatus, setSaveStatus] = useState(null); 
   const [showLoginMenu, setShowLoginMenu] = useState(false);
+  const [advice, setAdvice] = 
+  useState("Start writing your proof and use Instant Curry to get some advice on it!")
 
   // init editor
   initializeEditor(editorRef);
@@ -234,50 +236,57 @@ function App() {
             height: "20vw", 
           }}>
 
-                <WebEditor 
-                  editorRef={editorRef}
-                  feedback={feedback} 
-                  setFeedback={setFeedback} 
-                  setErrorLine={setErrorLine} 
-                  setErrorToken={setErrorToken} 
-                  setDecorations={setDecorations} 
-                  errorLine={errorLine} 
-                  errorToken={errorToken} 
-                />
-              </div>
+            <WebEditor 
+              editorRef={editorRef}
+              feedback={feedback} 
+              setFeedback={setFeedback} 
+              setErrorLine={setErrorLine} 
+              setErrorToken={setErrorToken} 
+              setDecorations={setDecorations} 
+              errorLine={errorLine} 
+              errorToken={errorToken} 
+            />
 
-              <div className='orange-fill'>
-                
+          </div>
+
+          <div className='orange-fill'>
+            <div className="buttons"> 
               <button className="run-button" 
-                onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)} >
-                  Run
+                onClick={() => handleGrade(editorRef, setFeedback, 
+                setErrorLine, setErrorToken, setDecorations, setAdvice)} >
+                  RUN
               </button>
 
               {session && (
                 <button className="white-orange-button" 
                  onClick={handleSave} >
-                  Save 
+                  SAVE 
                 </button>
               )}
 
-              <div className='name-button'>
-                { isEditingTitle ? ( 
-                  <input 
+              <div className="name-button" onClick={handleTitleClick}>
+                {isEditingTitle ? (
+                  <input
                     type="text"
                     defaultValue={proofTitle}
                     onChange={(event) => handleTitleChange(event)}
-                    onBlur={(event) => handleTitleBlur(event)} 
+                    onBlur={(event) => handleTitleBlur(event)}
                     autoFocus
-                    
-                    />
+                    className="name-input"
+                  />
                 ) : (
-                  <h2 onClick={handleTitleClick} 
-                  style={{fontSize: "30px"}}>
-                    {proofTitle}
-                  </h2>
+                  <span className="name-text">{proofTitle}</span>
                 )}
+              </div>
                 </div>
-
+              
+              
+              
+             {/* <div class="input-group">
+                <label class="input-group__label" for="myInput">{proofTitle}</label>
+                <input type="text" id="myInput" class="input-group__input" value="This is my input" />
+              </div> */}
+              
 
               <div className="column-flex"> 
                   
@@ -318,8 +327,9 @@ function App() {
             </div>
           </div> 
 
-          <div className='advice-container'>
-            Advice
+          <div className="advice-container">
+              <h2 className="advice-title">Steps from here</h2>
+              <p className="advice-text">{advice}</p>
           </div>
         </div>
 
