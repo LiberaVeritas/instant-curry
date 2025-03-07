@@ -89,11 +89,9 @@ export const fetchProofs = async (supabase, setProofs) => {
     const { data, error } = await supabase
       .schema('api')
       .from('proofs')
-      .select('user_id, id, filename').eq('user_id', ID) //"id , filename, content, created_at")
-      //.eq('user_id(*)', ID)
+      .select('user_id, id, filename').eq('user_id', ID) 
       .order("created_at", { ascending: false });
 
-    console.log("fetchwing");
     if (error) throw error;
 
     // if user has no proofs, creates a placeholder proof
@@ -111,7 +109,7 @@ export const fetchProofs = async (supabase, setProofs) => {
         .from("proofs")
         .insert(
           {
-            user_id: ID, // user_id,
+            user_id: ID,
             content: "(* Demo. *)",
             filename: defaultFilename
           }

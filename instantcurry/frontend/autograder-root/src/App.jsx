@@ -1,44 +1,37 @@
 import React, { useRef, useState, useEffect } from 'react';
-import Header from "./components/Header"; // redo header
 import logo from "../media/name.png";
 import write from "../media/write.png";
 import clear from "../media/clear.png";
 import login from "../media/login.png";
+import download from "../media/DOWNLOAD.png";
+import upload from "../media/UPLOAD.png";
 
 
 import WebEditor, { 
   initializeEditor,
   handleClearEditor,
   newProof,
+  saveProof,
   handleGrade,
   handleSelectProof,
   handleDownload,
   handleFileUpload
  } from "./components/WebEditor";
 
-import { saveProof } from "./components/WebEditor";
-
-import supabase from './components/supabase';
-
 import {
-  //getSession,
   handleLogin,
   handleLogout,
   loadSavedProof,
-  //fetchProofs,
   listen,
   initSession,
   deleteProof
 } from "./components/supabase";
 
-// Buttons 
-import download from "../media/DOWNLOAD.png";
-import upload from "../media/UPLOAD.png";
-
 // Sample proofs
 import factProof from "../proofs/fact.ic?raw"; 
 import mapProof from "../proofs/map.ic?raw";
 import testProof from "../proofs/test.ic?raw";
+
 
 
 function App() {
@@ -251,11 +244,13 @@ function App() {
 
           <div className='orange-fill'>
             <div className="buttons"> 
-              <button className="run-button" 
-                onClick={() => handleGrade(editorRef, setFeedback, 
-                setErrorLine, setErrorToken, setDecorations, setAdvice)} >
-                  RUN
-              </button>
+            <button 
+              className="run-button" 
+              onClick={() => {
+                handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations, setAdvice);
+              }} >
+              RUN
+            </button>
 
               {session && (
                 <button className="white-orange-button" 
@@ -271,6 +266,11 @@ function App() {
                     defaultValue={proofTitle}
                     onChange={(event) => handleTitleChange(event)}
                     onBlur={(event) => handleTitleBlur(event)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        handleTitleBlur(event);
+                      }
+                    }}
                     autoFocus
                     className="name-input"
                   />
@@ -278,15 +278,8 @@ function App() {
                   <span className="name-text">{proofTitle}</span>
                 )}
               </div>
-                </div>
-              
-              
-              
-             {/* <div class="input-group">
-                <label class="input-group__label" for="myInput">{proofTitle}</label>
-                <input type="text" id="myInput" class="input-group__input" value="This is my input" />
-              </div> */}
-              
+              </div>
+            
 
               <div className="column-flex"> 
                   
@@ -334,8 +327,8 @@ function App() {
         </div>
 
         <div className='right-container'> 
-
-          <div> 
+        <div> 
+            
             <button 
               id="download-button" 
               onClick={() => handleDownload(editorRef)}
@@ -375,7 +368,7 @@ function App() {
               Browse Sample Proofs
           </h3>
           
-          <div className="section" >
+          <div className="section" style={{marginBottom: "15px"}} >
             <div className='proofs-box'>
               {proofFiles.map((file, index) => (
                 <div
@@ -388,13 +381,12 @@ function App() {
             </div>
           </div>
 
-          {session && 
-          (
-            <div style={{ marginTop: "20px"}}>
-              <h3 className="section-title"> 
+          <h3 className="section-title"> 
                   Saved Proofs
               </h3>
 
+          {session && 
+          (
               <div className="section" >
             
               <div className='proofs-box'>
@@ -417,47 +409,71 @@ function App() {
                   
                 ))}
               </div>
-            </div>
             </div> )}
           </div>
       </div>
       
-        
-      {feedback.message && ( // probably a better way to do this? 
-        <div
-          style={{
-            marginTop: "20px",
-            padding: "10px",
-            border: `1px solid ${
-              feedback.type === "success"
-                ? "green"
-                : feedback.type === "error"
-                ? "red"
-                : "grey"
-            }`,
-            backgroundColor:
-            feedback.type === "success"
-              ? "#d4edda"
-              : feedback.type === "error"
-              ? "#f8d7da"
-              : "#e9ecef", 
-            color:
-              feedback.type === "success"
-                ? "green"
-                : feedback.type === "error"
-                ? "red"
-                : "grey", 
-            borderRadius: "5px",
-            width: "80%",
-            margin: "20px auto",
-            textAlign: "center",
-          }}
-        >
-          {feedback.message}
-        </div>
-      )}
+      <FeedbackPopup 
+        feedback={feedback} 
+        onClose={() => setFeedback({ message: "", type: "" })} 
+      />
+    
     </div>
   );
 }
+
+
+const FeedbackPopup = ({ feedback, onClose }) => {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (feedback.message) {
+      setVisible(true);
+
+      const timer = setTimeout(() => { // Closes after 3 sec 
+        setVisible(false);
+        onClose(); // Clears feedback state in parent
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [feedback, onClose]);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: visible ? "20px" : "-100px", // Slide-in animation
+        left: "50%",
+        transform: "translateX(-50%)",
+        padding: "12px 20px",
+        borderRadius: "8px",
+        backgroundColor:
+          feedback.type === "success"
+            ? "#d4edda"
+            : feedback.type === "error"
+            ? "#f8d7da"
+            : "#e9ecef",
+        color:
+          feedback.type === "success"
+            ? "green"
+            : feedback.type === "error"
+            ? "red"
+            : "grey",
+        border: `1px solid ${
+          feedback.type === "success" ? "green" : feedback.type === "error" ? "red" : "grey"
+        }`,
+        textAlign: "center",
+        minWidth: "250px",
+        maxWidth: "80%",
+        transition: "bottom 0.3s ease-in-out", 
+        boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
+      }}
+    >
+      {feedback.message}
+    </div>
+  );
+};
+
 
 export default App;

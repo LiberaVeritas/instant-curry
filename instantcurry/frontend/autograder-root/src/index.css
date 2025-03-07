@@ -86,7 +86,8 @@ body {
 
 .advice-container {
   background-color: #f4ebde;
-  border-radius: 90px;
+  border-radius: 40px;
+  border: 5px solid rgba(228, 211, 190, 0.646);
   height: 7vw;
   padding: 25px;
   padding-left: 55px;
@@ -101,11 +102,12 @@ body {
   font-weight: bold;
   font-size: 1.2rem;
   margin-bottom: 5px;
+  color: rgb(48, 31, 31)
 }
 
 .advice-text {
   font-size: 1rem;
-  color: #333;
+  color: #402c2c;
 }
 
 
@@ -152,7 +154,6 @@ button {
   border-radius: 30px;
   padding: 10px 20px;
   margin-left: 20px;
-  height: 50px;
   width: 200px;
   color: #744306;
   text-align: left;
