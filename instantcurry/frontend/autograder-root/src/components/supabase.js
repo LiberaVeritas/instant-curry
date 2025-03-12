@@ -6,8 +6,8 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: { persistSession: true }
   });
   
-// need to figure out the session var, inconsistent across here & App.jsx i think
-export const getSession = async () => {
+
+  export const getSession = async () => {
   const { data: { session } } = await supabase.auth.getSession();
   return session;
 };
@@ -105,15 +105,7 @@ export const fetchProofs = async (supabase, setProofs) => {
 
     if (error) throw error;
 
-    // if user has no proofs, creates a placeholder proof
-    // eventually remove this, but the database wasn't working if the user didn't have at least one. 
-    //    actually that should be fixed now with the policy fix
-
     if (!data || data.length === 0) {
-      
-      // move this logic to the placeholder in the naming function 
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); 
-      const defaultFilename = `proof_${timestamp}.ic`;
 
       const { data: newProof, error: insertError } = await supabase
         .schema("api")
@@ -139,7 +131,7 @@ export const fetchProofs = async (supabase, setProofs) => {
 };
 
 // saves a proof to database 
-export const saveToProofs = async (editorRef, proofContent, setProofs, proofName) => { // re-do args here
+export const saveToProofs = async (editorRef, setProofs, proofName) => { // re-do args here
   try {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();

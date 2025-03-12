@@ -1,12 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import logo from "../media/name.png";
-import write from "../media/write.png";
-import clear from "../media/clear.png";
-import login from "../media/login.png";
-import download from "../media/DOWNLOAD.png";
-import upload from "../media/UPLOAD.png";
-import mail from "../media/mail.png";
-
+import { logo, write, clear, login, download, upload, mail } from "../media/media";
 
 import WebEditor, { 
   initializeEditor,
@@ -42,17 +35,22 @@ function App() {
   // State management
   const editorRef = useRef(null);
   const [feedback, setFeedback] = useState({ message: "", type: "" });
+  
+  // For code decorations, error highlighting
   const [errorLine, setErrorLine] = useState(null);
   const [errorToken, setErrorToken] = useState("");
   const [decorations, setDecorations] = useState([]);
+
+  // For editing the proof title 
   const [proofTitle, setProofTitle] = useState(() => {
-    return localStorage.getItem("proofTitle") || "Proof";
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); 
+    const defaultFilename = `proof_${timestamp}.ic`
+    return localStorage.getItem("proofTitle") || {defaultFilename};
   });
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   
+  // Sample proofs 
   const proofFiles = [ 
-    // to do -> change, put them in 'proofs' under all users if that's possible? 
-      // or another table, so can change the examples easier
     { name: "Fact Proof", content: factProof },
     { name: "Map Proof", content: mapProof },
     { name: "Test Proof", content: testProof },
@@ -66,25 +64,21 @@ function App() {
   const [advice, setAdvice] = 
   useState("Start writing your proof and use Instant Curry to get some advice on it!")
 
-  // init editor
-  initializeEditor(editorRef);
-  
-  // init sessions & listener 
-  useEffect(() => {
-    initSession(setSession, setProofs);
-    listen(setSession); 
-  }, []);
+  // ------------------------------------------------
+  // HELPER FUNS 
+  // ------------------------------------------------
+
 
   // save helper function
   const handleSave = async () => {
     await saveProof(editorRef, setSaveStatus, setProofs, proofTitle);
   };
 
+  // title editing 
   const handleTitleClick = () => {
     setIsEditingTitle(true); 
   };
 
-  
   const handleTitleChange = (event) => { 
     setProofTitle(event.target.value);
     localStorage.setItem("proofTitle", event.target.value);
@@ -93,58 +87,6 @@ function App() {
   const handleTitleBlur = (event) => { 
     setIsEditingTitle(false);
   }
-
-  // line deco 
-  useEffect(() => {
-      // set up Editor 
-      if (!editorRef.current) return;
-      const editor = editorRef.current;
-      const model = editor.getModel();
-      if (!model) return;
-
-      // clear prev decorations
-      setDecorations((prevDecorations) => {
-        return editor.deltaDecorations(prevDecorations, []);
-      });
-    
-      if (!errorLine) return;  // If no error, return early
-      
-      editor.revealLineInCenter(errorLine, monaco.editor.ScrollType.Smooth);    // scrolls to the error line smoothly
-    
-      let decorations = [
-        {
-          range: new monaco.Range(errorLine, 1, errorLine, 1),
-          options: {
-            isWholeLine: true,
-            className: "error-highlight fade-in",
-            glyphMarginClassName: "error-glyph", 
-          }
-        }
-      ];
-    
-      // to do -> fix error token. 
-      if (errorToken) {
-        const lines = model.getLinesContent();
-        const lineContent = lines[errorLine - 1];
-    
-        if (lineContent) {
-          const startIndex = lineContent.indexOf(errorToken);
-          if (startIndex !== -1) {
-            decorations.push({
-              range: new monaco.Range(errorLine, startIndex + 1, errorLine, startIndex + errorToken.length + 1),
-              options: {
-                inlineClassName: "error-token"
-              }
-            });
-          }}}
-
-      setDecorations(editor.deltaDecorations([], decorations));
-  }, [errorLine, errorToken]); 
-    
-
-  // ------------------------------------------------
-  // Proof Writing, grading, retrieving 
-  // ------------------------------------------------
 
   // login, logout and load helper functions 
   const handleLogIn = async (provider, email) => {
@@ -161,13 +103,65 @@ function App() {
   }
 
   // ------------------------------------------------
+  // useEffects()  
+  // ------------------------------------------------
+  
+  // init session, listener & editor
+  useEffect(() => {
+    // init editor
+    initializeEditor(editorRef);
+    initSession(setSession, setProofs);
+    listen(setSession); 
+  }, []);
+
+  // set up Editor with decorations
+  useEffect(() => {
+      if (!editorRef.current || !errorLine) return;
+
+      const editor = editorRef.current;
+      const model = editor.getModel();
+      if (!model) return;
+
+      // clear prev decorations
+      setDecorations((prevDecorations) => {
+        return editor.deltaDecorations(prevDecorations, []);
+      });
+        
+      editor.revealLineInCenter(errorLine, monaco.editor.ScrollType.Smooth);    // isn't smooth anymore? 
+    
+      let decorations = [
+        {
+          range: new monaco.Range(errorLine, 1, errorLine, 1),
+          options: {
+            isWholeLine: true,
+            className: "error-highlight fade-in",
+            glyphMarginClassName: "error-glyph", 
+          }
+        }
+      ];
+      
+      // error token is not displayed currently? 
+      const lineContent = model.getLineContent(errorLine);
+      const startIndex = lineContent.indexOf(errorToken);
+
+      if (errorToken && startIndex !== -1) {
+        decorations.push({
+          range: new monaco.Range(errorLine, startIndex + 1, errorLine, startIndex + errorToken.length + 1),
+          options: { inlineClassName: "error-token" },
+        });
+      }
+      setDecorations(editor.deltaDecorations([], decorations));
+
+  }, [errorLine, errorToken]);
+
+  // ------------------------------------------------
   // RETURN 
   // ------------------------------------------------
 
   return (
     <div>
-
-    <header className="header">
+      {/* Header with login */}
+      <header className="header">
       
       <img 
         src={logo} 
@@ -177,11 +171,13 @@ function App() {
       
       <div className="padding-10"> 
         {session ? (
+          
           <button 
             className="white-orange-button" 
             onClick={handleLogOut}>
               Logout
           </button>
+          
           ) : (
             
           <div style={{ position: "relative" }}>
@@ -194,73 +190,74 @@ function App() {
             />
 
             { showLoginMenu && (
-            <LoginMenu handleLogIn={handleLogIn} /> ) }  
-               </div> )}
+              <LoginMenu handleLogIn={handleLogIn} /> 
+            ) }  
+          
+          </div> )}
+      
       </div>
-    </header>
+      </header>
 
-    <div className='general-container'> 
-      <div className='left-container'>
-        <div className='editor-container'>
-              
-          <div style={{
-            height: "20vw", 
-          }}>
+      <div className='general-container'> 
+        <div className='left-container'>
+          <div className='editor-container'>
+          
+            {/* Web Editor */}
+            <div style={{ height: "20vw", }}>
 
-            <WebEditor 
-              editorRef={editorRef}
-              feedback={feedback} 
-              setFeedback={setFeedback} 
-              setErrorLine={setErrorLine} 
-              setErrorToken={setErrorToken} 
-              setDecorations={setDecorations} 
-              errorLine={errorLine} 
-              errorToken={errorToken} 
-            />
+              <WebEditor 
+                editorRef={editorRef}
+                feedback={feedback} 
+                setFeedback={setFeedback} 
+                setErrorLine={setErrorLine} 
+                setErrorToken={setErrorToken} 
+                setDecorations={setDecorations} 
+                errorLine={errorLine} 
+                errorToken={errorToken} 
+              />
 
-          </div>
+            </div>
 
-          <div className='orange-fill'>
-            <div className="buttons"> 
-            <button 
-              className="run-button" 
-              onClick={() => {
-                handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations, setAdvice);
-              }} >
-              RUN
-            </button>
-
-              {session && (
-                <button className="white-orange-button" 
-                 onClick={handleSave} >
-                  SAVE 
+            {/* Orange component under code editor with title & buttons */}
+            <div className='orange-fill'>
+              <div className="buttons"> 
+                <button 
+                  className="run-button" 
+                  onClick={() => {
+                    handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations, setAdvice);
+                  }} >
+                  RUN
                 </button>
-              )}
 
-              <div className="name-button" onClick={handleTitleClick}>
-                {isEditingTitle ? (
-                  <input
-                    type="text"
-                    defaultValue={proofTitle}
-                    onChange={(event) => handleTitleChange(event)}
-                    onBlur={(event) => handleTitleBlur(event)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        handleTitleBlur(event);
-                      }
-                    }}
-                    autoFocus
-                    className="name-input"
-                  />
-                ) : (
-                  <span className="name-text">{proofTitle}</span>
+                {session && (
+                  <button className="white-orange-button" 
+                  onClick={handleSave} >
+                    SAVE 
+                  </button>
                 )}
+
+                <div className="name-button" onClick={handleTitleClick}>
+                  {isEditingTitle ? (
+                    <input
+                      type="text"
+                      defaultValue={proofTitle}
+                      onChange={(event) => handleTitleChange(event)}
+                      onBlur={(event) => handleTitleBlur(event)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          handleTitleBlur(event);
+                        }
+                      }}
+                      autoFocus
+                      className="name-input"
+                    />
+                  ) : (
+                    <span className="name-text">{proofTitle}</span>
+                  )}
+                </div>
               </div>
-              </div>
-            
 
               <div className="column-flex"> 
-                  
                 <div className='small-button'>
                 
                   <button id="new-proof" 
@@ -281,7 +278,7 @@ function App() {
                 <div className='small-button'>
                 
                   <button id="clear-proof" 
-                    onClick={() => handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)}  
+                    onClick={() => handleClearEditor(editorRef, setProofTitle)}  
                     style={{ display: "none"}}>
                       Clear proof 
                   </button>
@@ -305,8 +302,9 @@ function App() {
         </div>
 
         <div className='right-container'> 
-        <div> 
-            
+          
+          {/* Download & Upload buttons */}
+          <div> 
             <button 
               id="download-button" 
               onClick={() => handleDownload(editorRef)}
@@ -320,11 +318,9 @@ function App() {
                 alt="Download" 
                 className="wide-icon"/> 
             </label>
-            
           </div>
           
           <div>
-            
             <input
               type="file"
               id="upload-file"
@@ -339,9 +335,10 @@ function App() {
                 alt="Upload" 
                 className="wide-icon"/> 
             </label>
-
           </div>
           
+
+          {/* Sample Proofs Section */}
           <h3 className="section-title"> 
               Browse Sample Proofs
           </h3>
@@ -359,8 +356,7 @@ function App() {
             </div>
           </div>
 
-            
-
+          {/* Saved Proofs section */}
           {session && 
           (
             
@@ -392,6 +388,7 @@ function App() {
           </div>
       </div>
       
+      {/* Modal popup for error/feedback messages */}
       <FeedbackPopup 
         feedback={feedback} 
         onClose={() => setFeedback({ message: "", type: "" })} 
@@ -400,7 +397,6 @@ function App() {
     </div>
   );
 }
-
 
 const FeedbackPopup = ({ feedback, onClose }) => {
   const [visible, setVisible] = useState(false);
@@ -502,10 +498,8 @@ const LoginMenu = ({ handleLogIn }) => {
               </button>
             </div>
           </div>
-        </>
-      )}
-    </>
-  );
+        </>)}
+    </>);
 };
 
 

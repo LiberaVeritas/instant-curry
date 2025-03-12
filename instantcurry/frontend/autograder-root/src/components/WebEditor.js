@@ -30,12 +30,13 @@ export const WebEditor = ({ editorRef, setErrorLine, setErrorToken, setFeedback,
   };
 
   export const newProof = async (session, editorRef, setErrorLine, 
-    setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus, proofName) => {
+    setErrorToken, setFeedback, setDecorations, setProofs, setSaveStatus, proofName, setProofTitle) => {
     { session ? (
-      await saveProof(editorRef, setSaveStatus, setProofs, proofName), 
-      handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)
+      await saveProof(editorRef, setSaveStatus, setProofs, proofName),
+      handleClearEditor(editorRef, setProofTitle)
+      
     ) : (
-      handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)
+      handleClearEditor(editorRef, setProofTitle)
     )}
   };
 
@@ -51,7 +52,7 @@ export const WebEditor = ({ editorRef, setErrorLine, setErrorToken, setFeedback,
     }
   
     try {
-      const response = await saveToProofs(editorRef, code, setProofs, proofName);
+      const response = await saveToProofs(editorRef, setProofs, proofName);
         
       if (response.error) {
         setSaveStatus({ success: false, message: response.error });
@@ -60,7 +61,7 @@ export const WebEditor = ({ editorRef, setErrorLine, setErrorToken, setFeedback,
       }
     } catch (error) {
       console.error("Error saving proof:", error);
-      setSaveStatus({ success: false, message: "An unexpected error occurred." });
+      setSaveStatus({ success: false, message: "Unexpected error." });
     }
   };
 
@@ -189,9 +190,13 @@ export const handleEditorChange = (editorRef, setErrorLine, setErrorToken, setFe
 };
 
 // Clear editor content
-export const handleClearEditor = (editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations) => {
+export const handleClearEditor = (editorRef, setProofTitle) => {
   editorRef.current.setValue(""); 
   localStorage.removeItem("userCode");      // remove saved content from localStorage
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const defaultFilename = `proof_${timestamp}.ic`;
+  setProofTitle(defaultFilename);
+  localStorage.setItem("proofTitle", defaultFilename);
 };
 
 // This is where the code actually gets sent to ocaml  
