@@ -20,10 +20,12 @@ export const WebEditor = ({ editorRef, setErrorLine, setErrorToken, setFeedback,
   };
 
   // load a proof, for sample section and saved proofs 
-  export const handleSelectProof = (editorRef, proofContent, fileName) => {
+  export const handleSelectProof = (editorRef, proofContent, fileName, setProofTitle) => {
     // to do -> add fileName in layout (bottom section)
     if (editorRef.current) {
       editorRef.current.setValue(proofContent);
+      setProofTitle(fileName);
+      localStorage.setItem("proofTitle", proofName);
     }
   };
 

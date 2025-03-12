@@ -12,10 +12,19 @@ export const getSession = async () => {
   return session;
 };
 
-// login logic - currently gitlab & github. 
-export const handleLogin = async (provider, setSession) => {
-  await supabase.auth.signInWithOAuth({ provider: provider });
+// login logic
+export const handleLogin = async (provider, setSession, email) => {
+  if (provider === "email") {
+    const { error } = await supabase.auth.signInWithOtp({ email: email });
   
+    if (error) {
+      console.error("Email login failed:", error.message);
+      return;
+    }
+    alert("Check your email for the login link!");
+  } else {
+    await supabase.auth.signInWithOAuth({ provider: provider });
+  }
   const { data } = await supabase.auth.getSession();
   setSession(data.session);
 };
@@ -27,18 +36,20 @@ export const getUserID = async () => {
 }
 
 // load a saved proof
-export const loadSavedProof = async (editorRef, ID) => { 
+export const loadSavedProof = async (editorRef, ID, setProofTitle) => { 
 
   try {
     const { data, error } = await supabase
       .schema('api')
       .from('proofs')
-      .select('content').eq('id', ID) 
+      .select('content, filename').eq('id', ID) 
       .single();
 
     if (error) throw error;
     
     editorRef.current.setValue(data.content);
+    setProofTitle(data.filename);
+    localStorage.setItem("proofTitle", data.filename);
 
   } catch (error) {
     console.error("Error fetching proofs:", error.message);

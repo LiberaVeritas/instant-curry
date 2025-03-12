@@ -5,6 +5,7 @@ import clear from "../media/clear.png";
 import login from "../media/login.png";
 import download from "../media/DOWNLOAD.png";
 import upload from "../media/UPLOAD.png";
+import mail from "../media/mail.png";
 
 
 import WebEditor, { 
@@ -31,8 +32,6 @@ import {
 import factProof from "../proofs/fact.ic?raw"; 
 import mapProof from "../proofs/map.ic?raw";
 import testProof from "../proofs/test.ic?raw";
-
-
 
 function App() {
 
@@ -94,7 +93,7 @@ function App() {
   const handleTitleBlur = (event) => { 
     setIsEditingTitle(false);
   }
-  
+
   // line deco 
   useEffect(() => {
       // set up Editor 
@@ -148,8 +147,8 @@ function App() {
   // ------------------------------------------------
 
   // login, logout and load helper functions 
-  const handleLogIn = async (provider) => {
-    await handleLogin(provider, setSession);
+  const handleLogIn = async (provider, email) => {
+    await handleLogin(provider, setSession, email);
     setShowLoginMenu(false); // Close menu after clicking
   }
 
@@ -157,8 +156,8 @@ function App() {
     await handleLogout(setSession, setProofs); 
   }
 
-  const handleLoad = async (editorRef, ID) => {
-    loadSavedProof(editorRef, ID); 
+  const handleLoad = async (editorRef, ID, setProofTitle) => {
+    loadSavedProof(editorRef, ID, setProofTitle); 
   }
 
   // ------------------------------------------------
@@ -184,7 +183,9 @@ function App() {
               Logout
           </button>
           ) : (
+            
           <div style={{ position: "relative" }}>
+            
             <img 
               src={login} 
               alt="Login" 
@@ -192,32 +193,9 @@ function App() {
               onClick={() => setShowLoginMenu(!showLoginMenu)}
             />
 
-            {showLoginMenu && (
-              <div 
-                className='login-menu'
-              >
-          
-          <button 
-            onClick={() => handleLogIn("github")} 
-            className='login-button'>
-            
-            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" 
-              alt="GitHub" 
-              className="login-icon" />
-          
-          </button>
-          
-          <button // replace with email 
-            onClick={() => handleLogIn("gitlab")} 
-            className='login-button'>
-            
-            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968853.png" 
-              alt="GitLab" 
-              className="login-icon" />
-          
-          </button>
-          
-        </div> )} </div> )}
+            { showLoginMenu && (
+            <LoginMenu handleLogIn={handleLogIn} /> ) }  
+               </div> )}
       </div>
     </header>
 
@@ -373,7 +351,7 @@ function App() {
               {proofFiles.map((file, index) => (
                 <div
                   key={index}
-                  onClick={() => handleSelectProof(editorRef, file.content, file.name)}
+                  onClick={() => handleSelectProof(editorRef, file.content, file.name, setProofTitle)}
                   className='proof'>
                     {file.name}
                 </div>
@@ -381,20 +359,21 @@ function App() {
             </div>
           </div>
 
-          <h3 className="section-title"> 
-                  Saved Proofs
-              </h3>
+            
 
           {session && 
           (
-              <div className="section" >
             
+              <div className="section" >
+                <h3 className="section-title" style={{color: "white"}}> 
+                  Saved Proofs
+                </h3>
               <div className='proofs-box'>
 
               {proofs.map((proof) => (
                   <div
                     key={proof.id}
-                    onClick={() => handleLoad(editorRef, proof.id)}
+                    onClick={() => handleLoad(editorRef, proof.id, setProofTitle)}
                     className='proof'>
                       {proof.filename}
 
@@ -472,6 +451,60 @@ const FeedbackPopup = ({ feedback, onClose }) => {
     >
       {feedback.message}
     </div>
+  );
+};
+
+const LoginMenu = ({ handleLogIn }) => {
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [email, setEmail] = useState("");
+
+  const handleEmailLogin = () => {
+    if (!email) {
+      alert("Please enter a valid email");
+      return;
+    }
+    handleLogIn("email", email); 
+    setShowEmailModal(false); 
+  };
+
+  return (
+    <>
+      <div className="login-menu">
+        <button onClick={() => handleLogIn("github", "")} className="login-button">
+          <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" className="login-icon" />
+        </button>
+
+        <button onClick={() => handleLogIn("gitlab", "")} className="login-button">
+          <img src="https://cdn-icons-png.flaticon.com/512/5968/5968853.png" alt="GitLab" className="login-icon" />
+        </button>
+
+        <button onClick={() => setShowEmailModal(true)} className="login-button">
+          <img src={mail} alt="Email Login" style={{width: "40px"}}/>
+        </button>
+      </div>
+
+      {showEmailModal && (
+        <>
+          <div className="modal-overlay" onClick={() => setShowEmailModal(false)}></div>
+          <div className="modal">
+            <div className="modal-content">
+              <span className="close" onClick={() => setShowEmailModal(false)}>&times;</span>
+              <h3>Login with Email</h3>
+              <input 
+                type="email" 
+                placeholder="Enter your email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                className="email-input"
+              />
+              <button onClick={handleEmailLogin} className="modal-button">
+                Submit
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 };
 
