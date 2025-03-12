@@ -21,7 +21,7 @@ message is the error message (including Hints if any)
 state is the internal parser state that led to the error.
   useful to report to help find where and how the error happened.
 *)
-let jsonify line start stop msg state : string =
+let jsonify line start stop msg advice state : string =
   Yojson.Basic.pretty_to_string @@ 
   `Assoc 
   [
@@ -31,11 +31,12 @@ let jsonify line start stop msg state : string =
     ("stop", `Int stop);
     ("message", `String msg);
     ("state", `Int state);
+    ("advice", `String advice);
   ]
 
 let succeed v =
   (* The parser has succeeded and produced a semantic value. Print it. *)
-  Printf.printf "Parsing succeeded\n%!";
+  Printf.printf "Parsing succeeded\n";
   v
   
 (* [env checkpoint] extracts a parser environment out of a checkpoint,
@@ -106,12 +107,22 @@ let fail text buffer (checkpoint : _ I.checkpoint) =
   (* Expand away the $i keywords that might appear in the message. *)
   let message = E.expand (get text checkpoint) message in
   
+  (* Split message by HINT: token *)
+  let res = String.substr_replace_all message ~pattern:"\nHint: " ~with_:"`" in
+  let res = String.split res ~on:'`' in
+  let (message, advice) = 
+    match res with
+    | [] -> ("", "")
+    | x::[] -> (x, "")
+    | x::y::_ -> (x, y)
+  in
+  
   let (pos1, pos2) = positions in
   let start = (pos1.pos_cnum - pos1.pos_bol) in
   let stop = (pos2.pos_cnum - pos2.pos_bol) in
   (* Show these three components. *)
   let () = Stdio.printf "%s%s%s%!" location indication message in
-  raise (SyntaxError (jsonify (line_num positions) start stop message (state checkpoint)))
+  raise (SyntaxError (jsonify (line_num positions) start stop message advice (state checkpoint)))
   (* required to typecheck -> Parsed_ast.program *)
   
   
