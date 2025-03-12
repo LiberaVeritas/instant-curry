@@ -1,45 +1,30 @@
 import React, { useRef, useState, useEffect } from 'react';
-import Header from "./components/Header"; // redo header
-import logo from "../media/name.png";
-import write from "../media/write.png";
-import clear from "../media/clear.png";
-import login from "../media/login.png";
-
+import { logo, write, clear, login, download, upload, mail } from "../media/media";
 
 import WebEditor, { 
   initializeEditor,
   handleClearEditor,
   newProof,
+  saveProof,
   handleGrade,
   handleSelectProof,
   handleDownload,
   handleFileUpload
  } from "./components/WebEditor";
 
-import { saveProof } from "./components/WebEditor";
-
-import supabase from './components/supabase';
-
 import {
-  //getSession,
   handleLogin,
   handleLogout,
   loadSavedProof,
-  //fetchProofs,
   listen,
   initSession,
   deleteProof
 } from "./components/supabase";
 
-// Buttons 
-import download from "../media/DOWNLOAD.png";
-import upload from "../media/UPLOAD.png";
-
 // Sample proofs
 import factProof from "../proofs/fact.ic?raw"; 
 import mapProof from "../proofs/map.ic?raw";
 import testProof from "../proofs/test.ic?raw";
-
 
 function App() {
 
@@ -50,17 +35,22 @@ function App() {
   // State management
   const editorRef = useRef(null);
   const [feedback, setFeedback] = useState({ message: "", type: "" });
+  
+  // For code decorations, error highlighting
   const [errorLine, setErrorLine] = useState(null);
   const [errorToken, setErrorToken] = useState("");
   const [decorations, setDecorations] = useState([]);
+
+  // For editing the proof title 
   const [proofTitle, setProofTitle] = useState(() => {
-    return localStorage.getItem("proofTitle") || "Proof";
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); 
+    const defaultFilename = `proof_${timestamp}.ic`
+    return localStorage.getItem("proofTitle") || {defaultFilename};
   });
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   
+  // Sample proofs 
   const proofFiles = [ 
-    // to do -> change, put them in 'proofs' under all users if that's possible? 
-      // or another table, so can change the examples easier
     { name: "Fact Proof", content: factProof },
     { name: "Map Proof", content: mapProof },
     { name: "Test Proof", content: testProof },
@@ -71,26 +61,24 @@ function App() {
   const [proofs, setProofs] = useState([]);
   const [saveStatus, setSaveStatus] = useState(null); 
   const [showLoginMenu, setShowLoginMenu] = useState(false);
+  const [advice, setAdvice] = 
+  useState("Start writing your proof and use Instant Curry to get some advice on it!")
 
-  // init editor
-  initializeEditor(editorRef);
-  
-  // init sessions & listener 
-  useEffect(() => {
-    initSession(setSession, setProofs);
-    listen(setSession); 
-  }, []);
+  // ------------------------------------------------
+  // HELPER FUNS 
+  // ------------------------------------------------
+
 
   // save helper function
   const handleSave = async () => {
     await saveProof(editorRef, setSaveStatus, setProofs, proofTitle);
   };
 
+  // title editing 
   const handleTitleClick = () => {
     setIsEditingTitle(true); 
   };
 
-  
   const handleTitleChange = (event) => { 
     setProofTitle(event.target.value);
     localStorage.setItem("proofTitle", event.target.value);
@@ -99,11 +87,37 @@ function App() {
   const handleTitleBlur = (event) => { 
     setIsEditingTitle(false);
   }
+
+  // login, logout and load helper functions 
+  const handleLogIn = async (provider, email) => {
+    await handleLogin(provider, setSession, email);
+    setShowLoginMenu(false); // Close menu after clicking
+  }
+
+  const handleLogOut = async () => { 
+    await handleLogout(setSession, setProofs); 
+  }
+
+  const handleLoad = async (editorRef, ID, setProofTitle) => {
+    loadSavedProof(editorRef, ID, setProofTitle); 
+  }
+
+  // ------------------------------------------------
+  // useEffects()  
+  // ------------------------------------------------
   
-  // line deco 
+  // init session, listener & editor
   useEffect(() => {
-      // set up Editor 
-      if (!editorRef.current) return;
+    // init editor
+    initializeEditor(editorRef);
+    initSession(setSession, setProofs);
+    listen(setSession); 
+  }, []);
+
+  // set up Editor with decorations
+  useEffect(() => {
+      if (!editorRef.current || !errorLine) return;
+
       const editor = editorRef.current;
       const model = editor.getModel();
       if (!model) return;
@@ -112,10 +126,8 @@ function App() {
       setDecorations((prevDecorations) => {
         return editor.deltaDecorations(prevDecorations, []);
       });
-    
-      if (!errorLine) return;  // If no error, return early
-      
-      editor.revealLineInCenter(errorLine, monaco.editor.ScrollType.Smooth);    // scrolls to the error line smoothly
+        
+      editor.revealLineInCenter(errorLine, monaco.editor.ScrollType.Smooth);    // isn't smooth anymore? 
     
       let decorations = [
         {
@@ -127,44 +139,20 @@ function App() {
           }
         }
       ];
-    
-      // to do -> fix error token. 
-      if (errorToken) {
-        const lines = model.getLinesContent();
-        const lineContent = lines[errorLine - 1];
-    
-        if (lineContent) {
-          const startIndex = lineContent.indexOf(errorToken);
-          if (startIndex !== -1) {
-            decorations.push({
-              range: new monaco.Range(errorLine, startIndex + 1, errorLine, startIndex + errorToken.length + 1),
-              options: {
-                inlineClassName: "error-token"
-              }
-            });
-          }}}
+      
+      // error token is not displayed currently? 
+      const lineContent = model.getLineContent(errorLine);
+      const startIndex = lineContent.indexOf(errorToken);
 
+      if (errorToken && startIndex !== -1) {
+        decorations.push({
+          range: new monaco.Range(errorLine, startIndex + 1, errorLine, startIndex + errorToken.length + 1),
+          options: { inlineClassName: "error-token" },
+        });
+      }
       setDecorations(editor.deltaDecorations([], decorations));
-  }, [errorLine, errorToken]); 
-    
 
-  // ------------------------------------------------
-  // Proof Writing, grading, retrieving 
-  // ------------------------------------------------
-
-  // login, logout and load helper functions 
-  const handleLogIn = async (provider) => {
-    await handleLogin(provider, setSession);
-    setShowLoginMenu(false); // Close menu after clicking
-  }
-
-  const handleLogOut = async () => { 
-    await handleLogout(setSession, setProofs); 
-  }
-
-  const handleLoad = async (editorRef, ID) => {
-    loadSavedProof(editorRef, ID); 
-  }
+  }, [errorLine, errorToken]);
 
   // ------------------------------------------------
   // RETURN 
@@ -172,8 +160,8 @@ function App() {
 
   return (
     <div>
-
-    <header className="header">
+      {/* Header with login */}
+      <header className="header">
       
       <img 
         src={logo} 
@@ -181,15 +169,19 @@ function App() {
         className="small-image"
       /> 
       
-      <div className="padding-20"> 
+      <div className="padding-10"> 
         {session ? (
+          
           <button 
             className="white-orange-button" 
             onClick={handleLogOut}>
               Logout
           </button>
+          
           ) : (
+            
           <div style={{ position: "relative" }}>
+            
             <img 
               src={login} 
               alt="Login" 
@@ -197,93 +189,75 @@ function App() {
               onClick={() => setShowLoginMenu(!showLoginMenu)}
             />
 
-            {showLoginMenu && (
-              <div 
-                className='login-menu'
-              >
+            { showLoginMenu && (
+              <LoginMenu handleLogIn={handleLogIn} /> 
+            ) }  
           
-          <button 
-            onClick={() => handleLogIn("github")} 
-            className='login-button'>
-            
-            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" 
-              alt="GitHub" 
-              className="login-icon" />
-          
-          </button>
-          
-          <button 
-            onClick={() => handleLogIn("gitlab")} 
-            className='login-button'>
-            
-            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968853.png" 
-              alt="GitLab" 
-              className="login-icon" />
-          
-          </button>
-          
-        </div>
-        )}
-        </div>
-        )}
-        </div>
+          </div> )}
+      
+      </div>
       </header>
 
       <div className='general-container'> 
         <div className='left-container'>
           <div className='editor-container'>
-              
-              <div style={{
-                  height: "500px", 
-              }}>
+          
+            {/* Web Editor */}
+            <div style={{ height: "20vw", }}>
 
-                <WebEditor 
-                  editorRef={editorRef}
-                  feedback={feedback} 
-                  setFeedback={setFeedback} 
-                  setErrorLine={setErrorLine} 
-                  setErrorToken={setErrorToken} 
-                  setDecorations={setDecorations} 
-                  errorLine={errorLine} 
-                  errorToken={errorToken} 
-                />
+              <WebEditor 
+                editorRef={editorRef}
+                feedback={feedback} 
+                setFeedback={setFeedback} 
+                setErrorLine={setErrorLine} 
+                setErrorToken={setErrorToken} 
+                setDecorations={setDecorations} 
+                errorLine={errorLine} 
+                errorToken={errorToken} 
+              />
+
+            </div>
+
+            {/* Orange component under code editor with title & buttons */}
+            <div className='orange-fill'>
+              <div className="buttons"> 
+                <button 
+                  className="run-button" 
+                  onClick={() => {
+                    handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations, setAdvice);
+                  }} >
+                  RUN
+                </button>
+
+                {session && (
+                  <button className="white-orange-button" 
+                  onClick={handleSave} >
+                    SAVE 
+                  </button>
+                )}
+
+                <div className="name-button" onClick={handleTitleClick}>
+                  {isEditingTitle ? (
+                    <input
+                      type="text"
+                      defaultValue={proofTitle}
+                      onChange={(event) => handleTitleChange(event)}
+                      onBlur={(event) => handleTitleBlur(event)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          handleTitleBlur(event);
+                        }
+                      }}
+                      autoFocus
+                      className="name-input"
+                    />
+                  ) : (
+                    <span className="name-text">{proofTitle}</span>
+                  )}
+                </div>
               </div>
 
-              <div className='orange-fill'>
-                
-              <button className="white-orange-button" 
-                onClick={() => handleGrade(editorRef, setFeedback, setErrorLine, setErrorToken, setDecorations)} >
-                  Run
-              </button>
-
-              {session && (
-                <button className="white-orange-button" 
-                 onClick={handleSave} >
-                  Save 
-                </button>
-              )}
-
-              <div className='name-button'>
-                { isEditingTitle ? ( 
-                  <input 
-                    type="text"
-                    defaultValue={proofTitle}
-                    onChange={(event) => handleTitleChange(event)}
-                    onBlur={(event) => handleTitleBlur(event)} 
-                    autoFocus
-                    
-                    />
-                ) : (
-                  <h2 onClick={handleTitleClick} 
-                  style={{fontSize: "30px"}}>
-                    {proofTitle}
-                  </h2>
-                )}
-                </div>
-
-
               <div className="column-flex"> 
-                  
                 <div className='small-button'>
                 
                   <button id="new-proof" 
@@ -304,7 +278,7 @@ function App() {
                 <div className='small-button'>
                 
                   <button id="clear-proof" 
-                    onClick={() => handleClearEditor(editorRef, setErrorLine, setErrorToken, setFeedback, setDecorations)}  
+                    onClick={() => handleClearEditor(editorRef, setProofTitle)}  
                     style={{ display: "none"}}>
                       Clear proof 
                   </button>
@@ -320,10 +294,16 @@ function App() {
               </div>
             </div>
           </div> 
+
+          <div className="advice-container">
+              <h2 className="advice-title">Steps from here</h2>
+              <p className="advice-text">{advice}</p>
+          </div>
         </div>
 
         <div className='right-container'> 
-
+          
+          {/* Download & Upload buttons */}
           <div> 
             <button 
               id="download-button" 
@@ -338,11 +318,9 @@ function App() {
                 alt="Download" 
                 className="wide-icon"/> 
             </label>
-            
           </div>
           
           <div>
-            
             <input
               type="file"
               id="upload-file"
@@ -357,19 +335,20 @@ function App() {
                 alt="Upload" 
                 className="wide-icon"/> 
             </label>
-
           </div>
           
+
+          {/* Sample Proofs Section */}
           <h3 className="section-title"> 
               Browse Sample Proofs
           </h3>
           
-          <div className="section" >
+          <div className="section" style={{marginBottom: "15px"}} >
             <div className='proofs-box'>
               {proofFiles.map((file, index) => (
                 <div
                   key={index}
-                  onClick={() => handleSelectProof(editorRef, file.content, file.name)}
+                  onClick={() => handleSelectProof(editorRef, file.content, file.name, setProofTitle)}
                   className='proof'>
                     {file.name}
                 </div>
@@ -377,72 +356,151 @@ function App() {
             </div>
           </div>
 
+          {/* Saved Proofs section */}
           {session && 
           (
-            <div style={{ marginTop: "20px", textAlign: "center" }}>
-              <h3 className="section-title"> 
-                Saved proofs
-              </h3>
-
-              <div className="section" >
             
+              <div className="section" >
+                <h3 className="section-title" style={{color: "white"}}> 
+                  Saved Proofs
+                </h3>
               <div className='proofs-box'>
 
               {proofs.map((proof) => (
                   <div
                     key={proof.id}
-                    onClick={() => handleLoad(editorRef, proof.id)}
+                    onClick={() => handleLoad(editorRef, proof.id, setProofTitle)}
                     className='proof'>
                       {proof.filename}
 
-                      <button onClick={() => deleteProof(proof.id, setProofs, setFeedback)}>
+                      <button className='X-button' 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteProof(proof.id, setProofs, setFeedback);
+                      }}>
                         X
                       </button>
                   </div>
                   
                 ))}
               </div>
-            </div>
             </div> )}
           </div>
       </div>
       
-        
-      {feedback.message && ( // probably a better way to do this? 
-        <div
-          style={{
-            marginTop: "20px",
-            padding: "10px",
-            border: `1px solid ${
-              feedback.type === "success"
-                ? "green"
-                : feedback.type === "error"
-                ? "red"
-                : "grey"
-            }`,
-            backgroundColor:
-            feedback.type === "success"
-              ? "#d4edda"
-              : feedback.type === "error"
-              ? "#f8d7da"
-              : "#e9ecef", 
-            color:
-              feedback.type === "success"
-                ? "green"
-                : feedback.type === "error"
-                ? "red"
-                : "grey", 
-            borderRadius: "5px",
-            width: "80%",
-            margin: "20px auto",
-            textAlign: "center",
-          }}
-        >
-          {feedback.message}
-        </div>
-      )}
+      {/* Modal popup for error/feedback messages */}
+      <FeedbackPopup 
+        feedback={feedback} 
+        onClose={() => setFeedback({ message: "", type: "" })} 
+      />
+    
     </div>
   );
 }
+
+const FeedbackPopup = ({ feedback, onClose }) => {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (feedback.message) {
+      setVisible(true);
+
+      const timer = setTimeout(() => { // Closes after 3 sec 
+        setVisible(false);
+        onClose(); // Clears feedback state in parent
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [feedback, onClose]);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: visible ? "20px" : "-100px", // Slide-in animation
+        left: "50%",
+        transform: "translateX(-50%)",
+        padding: "12px 20px",
+        borderRadius: "8px",
+        backgroundColor:
+          feedback.type === "success"
+            ? "#d4edda"
+            : feedback.type === "error"
+            ? "#f8d7da"
+            : "#e9ecef",
+        color:
+          feedback.type === "success"
+            ? "green"
+            : feedback.type === "error"
+            ? "red"
+            : "grey",
+        border: `1px solid ${
+          feedback.type === "success" ? "green" : feedback.type === "error" ? "red" : "grey"
+        }`,
+        textAlign: "center",
+        minWidth: "250px",
+        maxWidth: "80%",
+        transition: "bottom 0.3s ease-in-out", 
+        boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
+      }}
+    >
+      {feedback.message}
+    </div>
+  );
+};
+
+const LoginMenu = ({ handleLogIn }) => {
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [email, setEmail] = useState("");
+
+  const handleEmailLogin = () => {
+    if (!email) {
+      alert("Please enter a valid email");
+      return;
+    }
+    handleLogIn("email", email); 
+    setShowEmailModal(false); 
+  };
+
+  return (
+    <>
+      <div className="login-menu">
+        <button onClick={() => handleLogIn("github", "")} className="login-button">
+          <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" className="login-icon" />
+        </button>
+
+        <button onClick={() => handleLogIn("gitlab", "")} className="login-button">
+          <img src="https://cdn-icons-png.flaticon.com/512/5968/5968853.png" alt="GitLab" className="login-icon" />
+        </button>
+
+        <button onClick={() => setShowEmailModal(true)} className="login-button">
+          <img src={mail} alt="Email Login" style={{width: "40px"}}/>
+        </button>
+      </div>
+
+      {showEmailModal && (
+        <>
+          <div className="modal-overlay" onClick={() => setShowEmailModal(false)}></div>
+          <div className="modal">
+            <div className="modal-content">
+              <span className="close" onClick={() => setShowEmailModal(false)}>&times;</span>
+              <h3>Login with Email</h3>
+              <input 
+                type="email" 
+                placeholder="Enter your email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                className="email-input"
+              />
+              <button onClick={handleEmailLogin} className="modal-button">
+                Submit
+              </button>
+            </div>
+          </div>
+        </>)}
+    </>);
+};
+
 
 export default App;
