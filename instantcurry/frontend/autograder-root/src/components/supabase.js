@@ -6,16 +6,25 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: { persistSession: true }
   });
   
-// need to figure out the session var, inconsistent across here & App.jsx i think
-export const getSession = async () => {
+
+  export const getSession = async () => {
   const { data: { session } } = await supabase.auth.getSession();
   return session;
 };
 
-// login logic - currently gitlab & github. 
-export const handleLogin = async (provider, setSession) => {
-  await supabase.auth.signInWithOAuth({ provider: provider });
+// login logic
+export const handleLogin = async (provider, setSession, email) => {
+  if (provider === "email") {
+    const { error } = await supabase.auth.signInWithOtp({ email: email });
   
+    if (error) {
+      console.error("Email login failed:", error.message);
+      return;
+    }
+    alert("Check your email for the login link!");
+  } else {
+    await supabase.auth.signInWithOAuth({ provider: provider });
+  }
   const { data } = await supabase.auth.getSession();
   setSession(data.session);
 };
@@ -27,18 +36,20 @@ export const getUserID = async () => {
 }
 
 // load a saved proof
-export const loadSavedProof = async (editorRef, ID) => { 
+export const loadSavedProof = async (editorRef, ID, setProofTitle) => { 
 
   try {
     const { data, error } = await supabase
       .schema('api')
       .from('proofs')
-      .select('content').eq('id', ID) 
+      .select('content, filename').eq('id', ID) 
       .single();
 
     if (error) throw error;
     
     editorRef.current.setValue(data.content);
+    setProofTitle(data.filename);
+    localStorage.setItem("proofTitle", data.filename);
 
   } catch (error) {
     console.error("Error fetching proofs:", error.message);
@@ -89,29 +100,19 @@ export const fetchProofs = async (supabase, setProofs) => {
     const { data, error } = await supabase
       .schema('api')
       .from('proofs')
-      .select('user_id, id, filename').eq('user_id', ID) //"id , filename, content, created_at")
-      //.eq('user_id(*)', ID)
+      .select('user_id, id, filename').eq('user_id', ID) 
       .order("created_at", { ascending: false });
 
-    console.log("fetchwing");
     if (error) throw error;
 
-    // if user has no proofs, creates a placeholder proof
-    // eventually remove this, but the database wasn't working if the user didn't have at least one. 
-    //    actually that should be fixed now with the policy fix
-
     if (!data || data.length === 0) {
-      
-      // move this logic to the placeholder in the naming function 
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-"); 
-      const defaultFilename = `proof_${timestamp}.ic`;
 
       const { data: newProof, error: insertError } = await supabase
         .schema("api")
         .from("proofs")
         .insert(
           {
-            user_id: ID, // user_id,
+            user_id: ID,
             content: "(* Demo. *)",
             filename: defaultFilename
           }
@@ -130,7 +131,7 @@ export const fetchProofs = async (supabase, setProofs) => {
 };
 
 // saves a proof to database 
-export const saveToProofs = async (editorRef, proofContent, setProofs, proofName) => { // re-do args here
+export const saveToProofs = async (editorRef, setProofs, proofName) => { // re-do args here
   try {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
