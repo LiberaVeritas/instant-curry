@@ -1,4 +1,4 @@
 (executable
  (name autograder)
  (modules lexer parser autograder)
- (libraries js_of_ocaml js_of_ocaml.ppx menhirLib))
+ (libraries js_of_ocaml js_of_ocaml-ppx menhirLib))

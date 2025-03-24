@@ -3,6 +3,7 @@
 samples="$(ls ./sample/*.ic)"
 for target in ${samples};
 do
+  echo ""
 	echo "testing file: ${target}"
-	dune exec instantcurry ${target}
+	./run ${target}
 done

@@ -31,9 +31,9 @@ type tm =
   | Nil
   | Cons of tm * tm
   | Empty
-  | Node of tm * tm * tm
+  (*| Node of tm * tm * tm*)
   | ListCase of tm (* scrutinee *) * tm (* nil case *) * name * name * tm (* cons case (and its two bound vars) *)
-  | TreeCase of tm (* scrutinee *) * tm (* empty case *) * name * name * name * tm (* node case (and its three bound vars) *)
+  (*| TreeCase of tm (* scrutinee *) * tm (* empty case *) * name * name * name * tm (* node case (and its three bound vars) *)*)
   | Nat of int
   | Plus of tm * tm
   | Minus of tm * tm
@@ -49,11 +49,11 @@ let rec string_of_tm (tm : tm) : string =
   | Nil -> "[]"
   | Empty -> "⊥"
   | Cons (t, t') -> "(" ^ string_of_tm t ^ " :: " ^ string_of_tm t' ^ ")"
-  | Node _ -> "NODE"
+  (*| Node _ -> "NODE"*)
   | ListCase (l, n, x, xs, c) ->
     "(match " ^ string_of_tm l ^ " with | nil -> " ^ string_of_tm n ^ 
     " | " ^ x ^ " :: " ^ xs ^ " -> " ^ string_of_tm c ^ ")"
-  | TreeCase _ -> "TREECASE"
+  (*| TreeCase _ -> "TREECASE"*)
   | Nat n -> string_of_int n
   | Plus (t, t') -> "(" ^ string_of_tm t ^ " + " ^ string_of_tm t' ^ ")"
   | Minus (t, t') -> "(" ^ string_of_tm t ^ " - " ^ string_of_tm t' ^ ")"
@@ -75,8 +75,8 @@ let string_of_eqn eqn =
 type pattern = 
 | Pat_nil (* [] *)
 | Pat_cons of name * name (* x :: xs *)
-| Pat_empty (* Empty *)
-| Pat_node of name * name * name (* Node (l, x, r) *)
+(*| Pat_empty (* Empty *)*)
+(*| Pat_node of name * name * name (* Node (l, x, r) *)*)
 [@@deriving sexp]
 
 type side = tm * (tm * name) list (* steps with justification *) [@@deriving sexp]

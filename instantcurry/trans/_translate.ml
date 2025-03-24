@@ -29,15 +29,15 @@ let translate_tm (t : tm) (buf : Buffer.t) : unit =
     | Nil -> add "Nil"
     | Cons (x, xs) -> add "Cons "; go x; add " "; go xs
     | Empty -> add "Empty"
-    | Node (l, x, r) -> add "Node "; go l; add " "; go x; add " "; go r
+    (*| Node (l, x, r) -> add "Node "; go l; add " "; go x; add " "; go r*)
     | ListCase (l, n, x, xs, c) -> 
       add "match "; go l; add " with ";
       add "| Nil => "; go n; 
       add (" | Cons " ^ x ^ " " ^ xs ^ " => "); go c; add " end"
-    | TreeCase (t, e, lx, vx, rx, n) ->
+    (*| TreeCase (t, e, lx, vx, rx, n) ->
       add "match "; go t; add " with ";
       add "| Empty => "; go e; 
-      add (" | Node " ^ lx ^ " " ^ vx ^ " " ^ rx ^ " => "); go n; add " end"
+      add (" | Node " ^ lx ^ " " ^ vx ^ " " ^ rx ^ " => "); go n; add " end" *)
     | Nat n -> add @@ string_of_int n
     | Plus (n, m) -> add "plus "; go n; add " "; go m
     | Minus (n, m) -> add "minus "; go n; add " "; go m

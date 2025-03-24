@@ -24,6 +24,8 @@ let () =
   let ptree = ParserUtil.parse_loop lexbuf text in
   let prog = Lifting.lift_program ptree in
   let _ = Typechecking.typecheck_prog prog in
+  let _ = Proof.check_prog prog in
+  printf "program checked\n";
   ()
 
 

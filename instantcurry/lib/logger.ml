@@ -70,8 +70,8 @@ let lift_pat (pat : P.pattern) : pattern =
   match pat with
   | Pat_nil -> Pat_nil
   | Pat_cons (x, xs) -> Pat_cons (x, xs)
-  | Pat_empty -> Pat_empty
-  | Pat_node (l, x, r) -> Pat_node (l, x, r)
+  (*| Pat_empty -> Pat_empty
+  | Pat_node (l, x, r) -> Pat_node (l, x, r)*)
 
 let lift_just (thms : name list) (just : P.name) : justification =
   if String.equal just "defn" then ByDefinition else
@@ -94,8 +94,8 @@ let lift_case (thms : name list) (ctx : scope_ctx) (case : P.case) : case =
     then raise (ScopeError name) else
   let ctx = match pat with
    | Pat_cons (x, xs) -> (x, Meta) :: (xs, Meta) :: ctx  (* patterns introduce metavars *)
-   | Pat_empty -> ctx
-   | Pat_node (l, x, r) -> (l, Meta) :: (x, Meta) :: (r, Meta) :: ctx
+  (* | Pat_empty -> ctx
+   | Pat_node (l, x, r) -> (l, Meta) :: (x, Meta) :: (r, Meta) :: ctx*)
    | Pat_nil -> ctx 
   in
   let thms = List.fold ~f:(fun thms (n, _) -> n :: thms) ~init:thms ihs in  (* ihs introduce new thms *)

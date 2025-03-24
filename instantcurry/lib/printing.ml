@@ -39,9 +39,14 @@ let rec string_of_tm (t : tm) : string =
 let string_of_args _ = "(args)"
 let string_of_thm_stmt _ = "(thm stmt)"
 let string_of_proof _ = "(proof)"
+let string_of_pattern pat =
+  match pat with
+  | Pat_nil -> "[]"
+  | Pat_cons (n1, n2) -> n1 ^ " :: " ^ n2
 
 let string_of_eqn (eqn : eqn) =
   string_of_tm eqn.lhs ^ " = " ^ string_of_tm eqn.rhs
+
 
 let string_of_stmt (s: stmt) : string =
   match s with 
