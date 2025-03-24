@@ -51,7 +51,7 @@ WTS: app (rev (map f (x :: xs))) acc = map_tr f (x :: xs) acc.
 LHS = app (rev (map f (x :: xs))) acc.
     = app (rev ((f x) :: (map f xs))) acc -- BY defn.
     = app (app (rev (map f xs)) ((f x) :: [])) acc -- BY defn.
-    = app (rev (map f xs)) (app ((f x) :: []) acc) -- BY LEMMA assoc.
+    = app (rev (map f xs)) (app ((f x) :: []) acc) -- BY commonsense.
     = map_tr f xs (app ((f x) :: []) acc) -- BY IH1.
 
 RHS = map_tr f (x :: xs) acc.

@@ -62,8 +62,8 @@ let rec tm_equal tm1 tm2 =
 type pattern = 
   | Pat_nil (* [] *)
   | Pat_cons of name * name (* x :: xs *)
-  | Pat_empty
-  | Pat_node of name * name * name
+  (*| Pat_empty*)
+  (*| Pat_node of name * name * name*)
   [@@deriving sexp]
 
 let (++) a b = App (a, b)
@@ -75,7 +75,8 @@ type claim = {
   ty : ty
 } [@@deriving sexp]
 
-type thm_stmt = {
+type thm_stmt = 
+{
   quantifiers : (name * ty) list; (* variables universally quantified in the statement *)
   claim : claim (* that the LHS = the RHS *)
 }
@@ -89,6 +90,8 @@ type thm_stmt = {
 type justification =
     | ByDefinition (* To think about: how to specify which definition exactly? *)
     | ByTheorem of name
+    | ByIH of name
+    | ByCommonsense
     [@@deriving sexp]
 
 type step = (tm * justification) [@@deriving sexp]

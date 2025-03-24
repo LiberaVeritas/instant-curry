@@ -22,7 +22,7 @@
 %token RHS
 %token QED
 %token AXIOM
-%token LEMMA
+(*%token LEMMA*)
 
 (* term language keywords *)
 %token LET
@@ -91,6 +91,7 @@ stmt:
   FORALL ps = strict_arg+ COLON 
   c = eqn COLON t = ty SEP 
   p = proof                             { Theorem (v, ps, (c, t), p) }
+  (* TODO disallow "IH*" as theorem name *)
 | DEFINITION SEP LET REC 
   f = IDENT ps = arg+ COLON ty = ty
   EQ tm = tm                            { Definition (f, true, ps, ty, tm) }
@@ -140,7 +141,7 @@ side:
   steps = step*                         { (t, steps) }
 
 step:
-| EQ t = tm DASH BY LEMMA i = IDENT SEP	{ (t, "LEMMA " ^ i) }
+(*| EQ t = tm DASH BY LEMMA i = IDENT SEP	{ (t, "LEMMA " ^ i) }*)
 | EQ t = tm DASH BY i = IDENT SEP       { (t, i) }
 | EQ t = tm DASH BY ih = IH SEP         { (t, "IH" ^ string_of_int ih) }
 
