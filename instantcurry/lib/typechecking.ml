@@ -237,11 +237,11 @@ let typecheck_case (delta : ctx) (sigma : ctx) (c : case) : unit =
     | Some { qvars = _; typ = (Ty_List _) } -> delta
     | Some { qvars = _; typ = _ } -> raise (IllTyped "pattern disagrees with case var")
     | None -> raise (IllTyped "case on nonexistent var") end
-  | Pat_empty -> raise (IllTyped "empty pattern") 
-  | Pat_node (_, _, _) -> 
+  (*| Pat_empty -> raise (IllTyped "empty pattern") *)
+  (*| Pat_node (_, _, _) -> 
     begin match lookup delta c.var with
     | Some { qvars = _; typ = _ } -> raise (IllTyped "pattern disagrees with case var")
-    | None -> raise (IllTyped "case on nonexistent var") end 
+    | None -> raise (IllTyped "case on nonexistent var") end *)
   in 
   (* todo: check wts is valid *)
   

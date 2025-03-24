@@ -26,7 +26,7 @@ LHS = sum [] + acc.
     = 0 + acc           -- BY defn.
     = acc               -- BY commonsense.
 
-RHS = sum_tr l acc.
+RHS = sum_tr [] acc.
     = acc               -- BY defn.
 
 CASE l = x :: xs.

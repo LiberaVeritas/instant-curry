@@ -9,6 +9,7 @@ exception ScopeError of name
 type scope = Term | Stmt | Meta [@@deriving sexp]
 type scope_ctx = (name * scope) list [@@deriving sexp]
 
+let mem_assoc = List.Assoc.mem ~equal:String.equal
 
 let rec lift_ty (ctx : scope_ctx) (ty : P.ty) : ty =
   let lft = lift_ty ctx in
@@ -34,8 +35,8 @@ let rec lift_tm (ctx : scope_ctx) (t : P.tm) : tm =
   | P.App (t, t') -> App (lft t, lft t')
   | P.Fun (x, ty, t) -> Fun (x, (lift_ty ctx ty), lift_tm ((x, Term) :: ctx) t)
   (*| P.Empty -> Nil*)
-  | P.Node (_, _, _) -> raise NotImplemented 
-  | P.TreeCase _ -> raise NotImplemented
+  (*| P.Node (_, _, _) -> raise NotImplemented 
+  | P.TreeCase _ -> raise NotImplemented*)
   | P.Var x -> 
     begin match List.Assoc.find ~equal:String.equal ctx x with
     | Some Term -> BVar x
@@ -54,12 +55,16 @@ let lift_pat (pat : P.pattern) : pattern =
   match pat with
   | Pat_nil -> Pat_nil
   | Pat_cons (x, xs) -> Pat_cons (x, xs)
-  | Pat_empty -> Pat_empty
-  | Pat_node (l, x, r) -> Pat_node (l, x, r)
+  (*| Pat_empty -> Pat_empty*)
+  (*| Pat_node (l, x, r) -> Pat_node (l, x, r)*)
 
 let lift_just (thms : name list) (just : P.name) : justification =
-  if String.equal just "defn" then ByDefinition else (*TODO commonsense, IH, LEMMA *)
-  if List.mem ~equal:String.equal thms just then ByTheorem just
+  if String.equal just "defn" then ByDefinition else 
+  if String.equal just "commonsense" then ByCommonsense else
+  if String.equal just "eval" then ByCommonsense else
+  if String.is_prefix just ~prefix:"IH" then ByIH just else
+  if List.mem ~equal:String.equal thms just then ByTheorem just 
+  
   else raise (ScopeError (just ^ " not found"))
 
 let lift_side (thms : name list) (ctx : scope_ctx) (side : P.side) : side =
@@ -78,8 +83,8 @@ let lift_case (thms : name list) (ctx : scope_ctx) (case : P.case) : case =
     then raise (ScopeError name) else
   let ctx = match pat with
    | Pat_cons (x, xs) -> (x, Meta) :: (xs, Meta) :: ctx  (* patterns introduce metavars *)
-   | Pat_empty -> ctx
-   | Pat_node (l, x, r) -> (l, Meta) :: (x, Meta) :: (r, Meta) :: ctx
+   (*| Pat_empty -> ctx*)
+   (*| Pat_node (l, x, r) -> (l, Meta) :: (x, Meta) :: (r, Meta) :: ctx*)
    | Pat_nil -> ctx 
   in
   let thms = List.fold ~f:(fun thms (n, _) -> n :: thms) ~init:thms ihs in  (* ihs introduce new thms *)
@@ -102,6 +107,7 @@ let lift_proof (thms : name list) (ctx : scope_ctx) (prf : P.proof) : proof =
 let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : P.stmt) : name list * scope_ctx * stmt =
   match stmt with
   | Theorem (name, args, claim, prf) -> 
+    if mem_assoc ctx name then raise (ScopeError ("theorem " ^ name ^ " already stated")) else
     let ctx' = List.fold
                 ~f:(fun ctx (x, _) -> (x, Meta) :: ctx)
                 ~init:ctx
@@ -114,6 +120,7 @@ let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : P.stmt) : name list *
                         stmt = { quantifiers = args; claim = {eqn=eqn; ty=t}};
                         proof = lift_proof thms ctx' prf })
   | Definition (f, isrec, args, ty, t) -> 
+    if mem_assoc ctx f then raise (ScopeError (f ^ " already exists")) else
     let ctx' = List.fold 
               ~f:(fun ctx arg -> (fst arg, Term) :: ctx) 
               ~init:((f, Stmt) :: ctx) 

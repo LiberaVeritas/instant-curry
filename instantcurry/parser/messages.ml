@@ -1,71 +1,91 @@
 
-(* This file was auto-generated based on "merged.messages". *)
+(* This file was auto-generated based on "new_merged". *)
 
 (* Please note that the function [message] can raise [Not_found]. *)
 
 let message =
   fun s ->
     match s with
-    | 185 ->
-        "I expected a statement here, but instead I found '$0'.\nHint: Valid statememts are one of:\n  DEFINITION.\n  THEOREM ...\n  PRINT ...\n"
-    | 183 ->
-        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
-    | 182 ->
-        "I expected a '=' here, but instead I found '$0'.\n"
-    | 181 ->
-        "I expected a type here, but instead, I found '$0'. This looks like an invalid type declaration.\n  Hint: Valid types are:\n    nat\n    'a\n    'a list\n    'a -> 'b\n    (where 'a and 'b are any valid types)\n"
-    | 179 ->
-        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
-    | 177 ->
-        "I expected a list of arguments here, but instead I found '$0'.\n"
-    | 175 ->
-        "I expected a '=' or more arguments here, but instead I found '$0'.\n"
-    | 173 ->
-        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
-    | 172 ->
-        "I expected a '=' here, but instead I found '$0'.\n"
-    | 171 ->
-        "I expected a type here, but instead, I found '$0'. This looks like an invalid type declaration.\nHint: Valid types are:\n  nat\n  'a\n  'a list\n  'a -> 'b\n  (where 'a and 'b are any valid types)\n"
-    | 169 ->
-        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
-    | 160 ->
-        "I expected an argument name here, but '$0' is not a valid name.\nHint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':\n  x\n  y_2\n  arg_name\n"
-    | 159 ->
-        "I expected the name of the function you are defining here, but '$0' is not a valid name.\nHint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':\n  x\n  y_2\n  arg_name\n"
-    | 158 ->
-        "I expected a 'rec' or the name of the function here, but instead I found '$0'.\n"
-    | 157 ->
-        "I expected a 'let' here, but instead I found '$0'.\n"
-    | 156 ->
-        "I expected a '.' here, but instead I found '$0'.\n"
-    | 153 ->
-        "I expected a '.' here, but instead I found '$0'.\n"
-    | 152 ->
-        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
-    | 149 ->
-        "I expected a '.' here, but instead I found '$0'.\n"
-    | 146 ->
-        "I expected another case or a 'QED.' here, but instead I found '$0'.\n"
-    | 144 ->
-        "I expected a '.' to end the proof here, but instead I found '$0'.\n"
-    | 141 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 139 ->
-        "I expected an expression, but instead I found '$0'.\nHint: Valid proof steps should be written like:\n  RHS = expression.\n      = ...           -- BY justification.\n"
     | 138 ->
-        "I expected a 'RHS' to start the other side of the proof, but instead I found '$0'.\nHint: Valid proof steps should be written like:\n  LHS = expression.\n      = ...           -- BY justification.\n  ...\n  RHS = expression.\n      = ...           -- BY justification.\n"
-    | 135 ->
-        "I expected another step, a 'RHS', or a 'QED.' here, but instead I found '$0'.\n"
-    | 133 ->
-        "I expected a '.' to end the justification, but instead I found '$0'.\nHint: Valid proof steps should be written like:\n  LHS = expression.\n      = ...           -- BY justification.\n"
-    | 131 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 129 ->
-        "I expected a '.' to end the justification, but instead I found '$0'.\nHint: Valid proof steps should be written like:\n  LHS = expression.\n      = ...           -- BY justification.\n"
     | 128 ->
-        "I expected a lemma name here, but '$0' is not a valid name.\nHint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':\n  x\n  y_2\n  arg_name\n"
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 127 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 113 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 112 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 111 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 101 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 97 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 96 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 95 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 94 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 48 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 46 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 41 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 37 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 182 ->
+        "I expected a statement here, but instead I found '$0'.\nHint: Valid statememts are one of:\n  DEFINITION.\n  THEOREM ...\n  PRINT ...\n"
+    | 180 ->
+        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
+    | 179 ->
+        "I expected a '=' here, but instead I found '$0'.\n"
+    | 178 ->
+        "I expected a type here, but instead, I found '$0'. This looks like an invalid type declaration.\n  Hint: Valid types are:\n    nat\n    'a\n    'a list\n    'a -> 'b\n    (where 'a and 'b are any valid types)\n"
+    | 176 ->
+        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
+    | 174 ->
+        "I expected a list of arguments here, but instead I found '$0'.\n"
+    | 172 ->
+        "I expected a '=' or more arguments here, but instead I found '$0'.\n"
+    | 170 ->
+        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
+    | 169 ->
+        "I expected a '=' here, but instead I found '$0'.\n"
+    | 168 ->
+        "I expected a type here, but instead, I found '$0'. This looks like an invalid type declaration.\nHint: Valid types are:\n  nat\n  'a\n  'a list\n  'a -> 'b\n  (where 'a and 'b are any valid types)\n"
+    | 166 ->
+        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
+    | 157 ->
+        "I expected an argument name here, but '$0' is not a valid name.\nHint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':\n  x\n  y_2\n  arg_name\n"
+    | 156 ->
+        "I expected the name of the function you are defining here, but '$0' is not a valid name.\nHint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':\n  x\n  y_2\n  arg_name\n"
+    | 155 ->
+        "I expected a 'rec' or the name of the function here, but instead I found '$0'.\n"
+    | 154 ->
+        "I expected a 'let' here, but instead I found '$0'.\n"
+    | 153 ->
+        "I expected a '.' here, but instead I found '$0'.\n"
+    | 150 ->
+        "I expected a '.' here, but instead I found '$0'.\n"
+    | 149 ->
+        "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
+    | 146 ->
+        "I expected a '.' here, but instead I found '$0'.\n"
+    | 143 ->
+        "I expected another case or a 'QED.' here, but instead I found '$0'.\n"
+    | 141 ->
+        "I expected a '.' to end the proof here, but instead I found '$0'.\n"
+    | 136 ->
+        "I expected an expression, but instead I found '$0'.\nHint: Valid proof steps should be written like:\n  RHS = expression.\n      = ...           -- BY justification.\n"
+    | 135 ->
+        "I expected a 'RHS' to start the other side of the proof, but instead I found '$0'.\nHint: Valid proof steps should be written like:\n  LHS = expression.\n      = ...           -- BY justification.\n  ...\n  RHS = expression.\n      = ...           -- BY justification.\n"
+    | 132 ->
+        "I expected another step, a 'RHS', or a 'QED.' here, but instead I found '$0'.\n"
+    | 130 ->
+        "I expected a '.' to end the justification, but instead I found '$0'.\nHint: Valid proof steps should be written like:\n  LHS = expression.\n      = ...           -- BY justification.\n"
     | 126 ->
         "I expected a 'BY' followed by a justification here, but instead I found '$0'.\nHint: Valid proof steps should be written like:\n  LHS = expression.\n      = ...           -- BY justification.\n"
     | 125 ->
@@ -88,12 +108,6 @@ let message =
         "I expected an expression of the lhs of the equation to be solved here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
     | 116 ->
         "I expected a ':' followed by the equation to be solved here, but instead I found '$0'.\n"
-    | 113 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 112 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 111 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 110 ->
         "I expected a 'WTS' or a list of induction hypotheses here, but instead I found '$0'.\n"
     | 109 ->
@@ -108,16 +122,6 @@ let message =
         "I expected a '=' here, but instead I found '$0'.\nHint: Valid cases should be written like:\n  CASE l = [].\n  or \n  CASE l = x::xs.\n"
     | 102 ->
         "I expected the name of the induction variable here, but '$0' is not a valid name.\nHint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':\n  x\n  y_2\n  arg_name\n"
-    | 101 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 97 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 96 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 95 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 94 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 93 ->
         "I expected the name of the induction variable here, but '$0' is not a valid name.\nHint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':\n  x\n  y_2\n  arg_name\n"
     | 92 ->
@@ -186,20 +190,12 @@ let message =
         "I expected an 'end' here, but instead I found '$0'.\nHint: Anonymous functions should be written like this:\n  fun (arg : type) => body end\n  or\n  fun (arg) => body end\n  or\n  fun arg => body end\n"
     | 49 ->
         "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
-    | 48 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 47 ->
         "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
-    | 46 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 45 ->
         "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
-    | 41 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 38 ->
         "I expected an expression here, but instead I found '$0'.\nHint: Valid expressions should evaluate to a value.\n"
-    | 37 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 35 ->
         "I expected an 'end' here, but instead I found '$0'.\nHint: Anonymous functions should be written like this:\n  fun (arg : type) => body end\n  or\n  fun (arg) => body end\n  or\n  fun arg => body end\n"
     | 34 ->
@@ -238,7 +234,7 @@ let message =
         "I expected an expression here, but '$0' is not part of a valid expression.\nHint: Valid expressions should evaluate to a value.\n"
     | 26 ->
         "I expected an expression to pattern match on here, but '$0' is not part of a valid expression.\nHint: Valid expressions should evaluate to a value.\n"
-    | 165 ->
+    | 162 ->
         "I expected one of '->', 'list', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.\nHint: Valid types are:\n  nat\n  'a\n  'a list\n  'a -> 'b\n  (where 'a and 'b are any valid types)\n"
     | 16 ->
         "I expected one of '->', 'list', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.\nHint: Valid types are:\n  nat\n  'a\n  'a list\n  'a -> 'b\n  (where 'a and 'b are any valid types)\n"
@@ -248,11 +244,11 @@ let message =
         "I expected one of '->', 'list', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.\nHint: Valid types are:\n  nat\n  'a\n  'a list\n  'a -> 'b\n  (where 'a and 'b are any valid types)\n"
     | 12 ->
         "I expected a type here, but '$0' is not a valid type.\nHint: Valid types are:\n  nat\n  'a\n  'a list\n  'a -> 'b\n  (where 'a and 'b are any valid types)\n"
-    | 164 ->
-        "I expected a type for '$2' here, but '$0' is not a valid type.\nHint: Valid types are:\n  nat\n  'a\n  'a list\n  'a -> 'b\n  (where 'a and 'b are any valid types)\n"
-    | 162 ->
-        "I expected either a ')', or ':' followed by a type here, but instead I found '$0'.\n"
     | 161 ->
+        "I expected a type for '$2' here, but '$0' is not a valid type.\nHint: Valid types are:\n  nat\n  'a\n  'a list\n  'a -> 'b\n  (where 'a and 'b are any valid types)\n"
+    | 159 ->
+        "I expected either a ')', or ':' followed by a type here, but instead I found '$0'.\n"
+    | 158 ->
         "I expected an argument name here, but '$0' is not a valid name.\nHint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':\n  x\n  y_2\n  arg_name\n"
     | 6 ->
         "I expected a list of arguments here, but instead I found '$0'.\nHint: Did you forget a '('? Theorems should be stated like this:\n  THEOREM (theorem_name).\n  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.\n  PROOF.\n  ...\n"
