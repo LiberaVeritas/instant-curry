@@ -6,3 +6,6 @@
 /out
 error_templates
 new_messages.messages
+new
+new_merged
+old.messages
