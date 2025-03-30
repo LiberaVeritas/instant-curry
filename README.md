@@ -289,9 +289,10 @@ Note the comma after `BY INDUCTION ON l,` followed by `GENERALIZE <vars>...`.
 
 
 ## TODO
-* useful error messages to UI for typechecking, lifting, proof checking.
+* useful error messages to UI for typechecking and proof checking.
 * distributivity for commonsense?
 * induction over naturals?
+* tree type?
 * remove requirement for a number after `IH`. are multiple IHs ever needed?
 * check IHs are valid.
 * check there are two cases, one of base and list each. (are there any situations where this isn't the case?) 
