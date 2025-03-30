@@ -4,7 +4,6 @@
 .DS_Store
 /test*
 /out
-error_templates
 new_messages.messages
 new
 old.messages

@@ -1,0 +1,70 @@
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+I expected ')' here, but instead I found '$0'. Did you forget to close the parenthesis?
+Hint: Theorems should be stated like this:
+  THEOREM (theorem_name).
+  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.
+  PROOF.
+  ...
+
+I expected a type here, but instead, I found '$0'. This looks like an invalid type declaration.
+  Hint: Valid types are:
+    nat
+    'a
+    'a list
+    'a -> 'b
+    (where 'a and 'b are any valid types)
+
+I expected a 'BY INDUCTION ON l' here, but instead I found '$0'.
+Hint: Proofs should be stated like this:
+  PROOF.
+  BY INDUCTION ON l.
+  ...
+  
+I expected an argument name here, but '$0' is not a valid name.
+Hint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':
+  x
+  y_2
+  arg_name
+
+I expected a '=' here, but instead I found '$0'.
+Hint: Valid cases should be written like this:
+  CASE l = [].
+  or 
+  CASE l = x :: xs.
+
+I expected a 'LHS' to start the proof steps here, but instead I found '$0'.
+Hint: Valid proof steps should be written like this:
+  LHS = expression.
+      = ...           -- BY justification.
+
+      
+I expected a ':' followed by the equation of the inductive hypothesis here, but instead I found '$0'.
+Hint: Inductive hypotheses should be stated like this:
+  IH1 : lhs = rhs.
+
+Hint: Proofs should be stated like this:
+  PROOF.
+  BY INDUCTION ON l.
+  CASE l = [].
+  ...
+
+Hint: Proofs should be stated like this:
+  PROOF.
+  BY INDUCTION ON l.
+  ...
+  or
+  PROOF.
+  BY INDUCTION ON l, GENERALIZE x y ...
+
+I expected a justification for the proof step here, but instead I found '$0'.
+  Hint: Valid proof steps should be written like:
+    LHS = expression.
+        = ...           -- BY defn of function_name.
+        or
+        = ...           -- BY defn.         
+        or
+        = ...           -- BY IH1.    
+        or
+        = ...           -- BY theorem_name. 

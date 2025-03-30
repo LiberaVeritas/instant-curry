@@ -52,7 +52,9 @@ let rec sum_tr (l : nat list) (acc : nat) : nat =
 
 
 THEOREM (app_nil).
-FORALL (l : 'a list) : app l [] = l : 'a list.
+FORALL (l : 'a list) : 
+  app l [] = l : 'a list.
+  
 PROOF. BY INDUCTION ON l.
 
 CASE l = [].
