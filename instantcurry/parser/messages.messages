@@ -4,7 +4,7 @@ program: WTS
 ##
 ## program' -> . program [ # ]
 ##
-## The known suffix of the stack is as follows:
+## The known suffix the stack is as follows:
 ##
 ##
 
@@ -2125,7 +2125,7 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON ID
 ## EQ tm DASH BY DEFN
 ##
 
-I expected a '.' or a 'OF' followed by a function name here, but instead I found '$0'.
+I expected a '.' or a 'of' followed by a function name here, but instead I found '$0'.
 Hint: Valid proof steps should be written like this:
   LHS = expression.
       = ...           -- BY defn of function_name.

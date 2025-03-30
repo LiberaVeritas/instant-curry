@@ -151,12 +151,16 @@ let check_commonsense env prev curr : bool =
   (* by eval *)
   if (curr = unmark @@ eval env prev) then true else
   match prev, curr with
-  | Plus (Nat 0, e), _ -> 
-    printf "(add 0)\n"; 
-    curr = e
+  | Plus (Nat 0, e), _
   | Plus (e, Nat 0), _ -> 
     printf "(add 0)\n";
     curr = e
+  
+  | Times (Nat 1, e), _
+  | Times (e, Nat 1), _ ->
+    printf "(times 1)\n"; 
+    curr = e
+    
   (* associativity *)
   | Plus (Plus (a1, a2), a3), Plus (b1, Plus (b2, b3))
   | Plus (a1, Plus (a2, a3)), Plus (Plus (b1, b2), b3)
@@ -174,18 +178,7 @@ let check_commonsense env prev curr : bool =
     printf "(commut)\n";
     a1 = b2 && 
     a2 = b1
-  (* empty list *)
-  | Cons (Nil, Nil), Nil
-  | Nil, Cons (Nil, Nil) -> true
-  
-  | Cons (xs, Nil), Cons (Nil, ys)
-  | Cons (Nil, xs), Cons (ys, Nil) 
-  | Cons (xs, Nil), ys
-  | Cons (Nil, xs), ys 
-  | ys, Cons (xs, Nil)
-  | ys, Cons (Nil, xs) ->
-    printf "(assoc)\n";
-    ys = xs
+ 
   | _ -> false
 
 
@@ -371,6 +364,5 @@ let exec_stmt (env : env) (thms: thms) (s : stmt) : env * thms =
 
 
 let check_prog (p : program) : env * thms =
-  printf "Checking program...\n";
   fold_left (fun (env, thms) stmt  -> exec_stmt env thms stmt ) ([], []) p
 

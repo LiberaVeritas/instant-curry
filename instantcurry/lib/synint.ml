@@ -9,7 +9,7 @@ type ty =
   | Ty_Nat
   | Ty_Arrow of ty * ty
   | Ty_List of ty
-  | Ty_Tree of ty
+  (*| Ty_Tree of ty*)
   | Ty_Var of name
   [@@deriving sexp]
   
@@ -18,7 +18,7 @@ let rec ty_equal t1 t2 =
   | Ty_Nat, Ty_Nat -> true
   | Ty_Arrow (s1, s2), Ty_Arrow (p1, p2) -> ty_equal s1 p1 && ty_equal s2 p2
   | Ty_List s, Ty_List p -> ty_equal s p
-  | Ty_Tree s, Ty_Tree p -> ty_equal s p
+  (*| Ty_Tree s, Ty_Tree p -> ty_equal s p*)
   | Ty_Var s, Ty_Var p -> String.equal s p
   | _ -> false
 

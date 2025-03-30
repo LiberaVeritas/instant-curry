@@ -5,14 +5,14 @@ open Core
 module L = MenhirLib.LexerUtil
 
 (* remove grade and export to run in cli *)
-let grade text =
+(*let grade text =
   let lexbuf = Lexing.from_string text in
   let ptree = ParserUtil.parse_loop lexbuf text in
   let prog = Lifting.lift_program ptree in
   let _ = Typechecking.typecheck_prog prog in
   ()
 
-let export () = (Js_of_ocaml.Js.export "grade" grade)
+let export () = (Js_of_ocaml.Js.export "grade" grade)*)
 
 let add_common ptree =
   (* load common theorems if exists *)
@@ -34,7 +34,7 @@ let add_common ptree =
 let () =
   let args = Sys.get_argv () in 
   let () = Stdio.printf "%s\n" args.(1) in
-  if (String.equal args.(1) "export") export ()
+  if (String.equal args.(1) "export") then () (*export ()*)
   else
   
   let infile = args.(1) in
@@ -51,8 +51,9 @@ let () =
   let prog = Lifting.lift_program ptree in
   printf "Lifting succeeded\n";
   let _ = Typechecking.typecheck_prog prog in
+  printf "Typechecking succeeded\n";
   let _ = Proof.check_prog prog in
-  printf "program checked\n";
+  printf "Proof checking succeeded\n";
   ()
 
 

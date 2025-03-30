@@ -23,6 +23,7 @@ WTS: sum (x :: xs) + acc = sum_tr (x :: xs) acc.
 LHS = sum (x :: xs) + acc.
     = x + sum xs + acc      -- BY defn.
     = sum xs + x + acc      -- BY commonsense.
+
     = sum xs + (x + acc)      -- BY commonsense.
 
 RHS = sum_tr (x :: xs) acc.

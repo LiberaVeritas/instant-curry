@@ -9,7 +9,7 @@ let rec string_of_ty (ty : ty) : string =
   | Ty_Arrow (ty, ty') -> "(" ^ string_of_ty ty ^ " -> " ^ string_of_ty ty' ^ ")"
   | Ty_List ty -> "(" ^ string_of_ty ty ^ " list)" 
   | Ty_Nat -> "nat"
-  | Ty_Tree ty -> "(" ^ string_of_ty ty ^ " tree)"
+  (*| Ty_Tree ty -> "(" ^ string_of_ty ty ^ " tree)"*)
   | Ty_Var _ -> "var"
 
 let rec string_of_tm (t : tm) : string =

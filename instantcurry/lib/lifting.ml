@@ -17,7 +17,7 @@ let rec lift_ty (ctx : scope_ctx) (ty : P.ty) : ty =
   | P.Ty_Nat -> Ty_Nat
   | P.Ty_List ty -> Ty_List (lft ty)
   | P.Ty_Arrow (ty, ty') -> Ty_Arrow (lft ty, lft ty')
-  | P.Ty_Tree ty -> Ty_Tree (lft ty)
+  (*| P.Ty_Tree ty -> Ty_Tree (lft ty)*)
   | P.Ty_Var v -> Ty_Var v
 
 let rec lift_tm (ctx : scope_ctx) (t : P.tm) : tm =
@@ -68,7 +68,8 @@ let lift_just (thms : name list) (just : P.name) : justification =
     then ByDefinition (Some (snd @@ String.rsplit2_exn ~on:' ' just)) else
   
   if String.equal just "commonsense" then ByCommonsense else
-  if String.equal just "common sense" then ByCommonsense else
+  (* TODO in parser.mly
+  if String.equal just "common sense" then ByCommonsense else *)
   
   if String.equal just "eval" then ByEval else
   
@@ -128,9 +129,13 @@ let lift_case (thms : name list) (ctx : scope_ctx) (stmt : thm_stmt) gen_vars (c
 let var_of (name, _, _, _, _, _) =
   name
   
+
 let lift_proof (thms : name list) (ctx : scope_ctx) (stmt : thm_stmt) (prf : P.proof) : proof =
   match prf with 
   | Proof (var, gen_vars, cases) -> 
+    if not (List.length cases = 2) then raise (ScopeError "there should be 2 cases")
+    else (* TODO check there are 2 cases, one base and one list *)
+
     let gen_vars =
       match gen_vars with
       | None -> []

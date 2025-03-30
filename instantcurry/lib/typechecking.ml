@@ -57,7 +57,7 @@ let rec get_vars (ty: ty) : name list =
   | Ty_Nat -> []
   | Ty_Arrow (t1, t2) -> get_vars t1 @ get_vars t2
   | Ty_List t' -> get_vars t'
-  | Ty_Tree t' -> get_vars t'
+  (*| Ty_Tree t' -> get_vars t'*)
 
 (* type -> type scheme. Free vars get universally quantified *)
 let generalize (gamma : ctx) (ty : ty) : ty_scheme =
@@ -81,7 +81,7 @@ let apply_sub (ty: ty) (sub : sub) : ty =
     | Ty_Nat -> Ty_Nat
     | Ty_Arrow (t1, t2) -> Ty_Arrow (apply t1, apply t2)
     | Ty_List ty' -> Ty_List (apply ty')
-    | Ty_Tree ty' -> Ty_Tree (apply ty')
+    (*| Ty_Tree ty' -> Ty_Tree (apply ty')*)
   in
   apply ty
   
@@ -124,7 +124,7 @@ let rec unify (t1: ty) (t2: ty) : sub =
     let sub2 = unify (apply_sub y1 sub1) (apply_sub y2 sub1) in
     compose_sub sub1 sub2
   | Ty_List t1, Ty_List t2 -> unify t1 t2
-  | Ty_Tree t1, Ty_Tree t2 -> unify t1 t2
+  (*| Ty_Tree t1, Ty_Tree t2 -> unify t1 t2*)
   | Ty_Var var, ty | ty, Ty_Var var -> unify_var var ty
   | _ -> raise (IllTyped ("unification error " ^ (to_string (sexp_of_ty t1)) ^ " " ^(to_string (sexp_of_ty t2))))
   
