@@ -33,9 +33,12 @@ type tm =
   | Times of tm * tm
   | If0 of tm (* scrutinee *) * tm (* zero case *) * tm (* successor case *)
   | App of tm * tm
+  | MApp of tm * tm (* meta apply block, for recursive proof checking *)
   | Fun of name * ty * tm (* anonymous function *)
+  | MFun of name * ty * tm (* meta fun block, prevent evaluation *)
   | BVar of name (* A bound variable *)
   | Ref of name (* A free variable, e.g. a self-reference in a recursive function. *)
+  | MRef of name (* meta ref block, for recursive proof checking *)
   | UVar of uv_name (* A unification variable *)
   | MVar of name
     (* A meta variable, referring to a quantified variable in the metalanguage. *)
@@ -88,10 +91,11 @@ type thm_stmt =
 (* IMPORTANT: the metalanguage does not really have a syntax of terms for now. *)
 
 type justification =
-    | ByDefinition (* To think about: how to specify which definition exactly? *)
+    | ByDefinition of name option
     | ByTheorem of name
     | ByIH of name
     | ByCommonsense
+    | ByEval
     [@@deriving sexp]
 
 type step = (tm * justification) [@@deriving sexp]
@@ -113,7 +117,7 @@ type case = {
 [@@deriving sexp]
 
 type proof = 
-| Proof of name * case list (* Induction variable, cases *)
+| Proof of name * case list (* Induction variable, gen vars, cases *)
 | Axiom
 [@@deriving sexp]
 
@@ -132,6 +136,11 @@ type stmt =
     body : tm
   }
   | Print of tm
+  (*| Const of {
+    name: string;
+    val: tm;
+    ty: ty;
+  }*)
   [@@deriving sexp]
 
 type program = stmt list [@@deriving sexp]

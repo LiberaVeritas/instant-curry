@@ -36,7 +36,7 @@ let jsonify line start stop msg advice state : string =
 
 let succeed v =
   (* The parser has succeeded and produced a semantic value. Print it. *)
-  Printf.printf "Parsing succeeded\n";
+  (*Printf.printf "Parsing succeeded\n";*)
   v
   
 (* [env checkpoint] extracts a parser environment out of a checkpoint,
@@ -88,7 +88,13 @@ let get text checkpoint i =
 let get_line text (pos1, _) =
   let start = pos1.pos_bol in
   let last = String.index_from_exn text start '\n' in
-  String.sub ~pos:start ~len:(last - start) text
+  let res = 
+    if (pos1.pos_cnum = pos1.pos_bol) then 
+      "... " ^ String.sub ~pos:(start-5) ~len:(last - (start-5)) text 
+    else
+      String.sub ~pos:(start) ~len:(last - start) text 
+  in
+  res
 
 let line_num (pos1,_) =
   pos1.pos_lnum

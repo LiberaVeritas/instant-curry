@@ -15,7 +15,7 @@ program: THEOREM WTS
 ##
 ## Ends in an error in state: 1.
 ##
-## stmt -> THEOREM . LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
+## stmt -> THEOREM . LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
 ##
 ## The known suffix of the stack is as follows:
 ## THEOREM
@@ -32,7 +32,7 @@ program: THEOREM LPAR WTS
 ##
 ## Ends in an error in state: 2.
 ##
-## stmt -> THEOREM LPAR . IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
+## stmt -> THEOREM LPAR . IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
 ##
 ## The known suffix of the stack is as follows:
 ## THEOREM LPAR
@@ -48,7 +48,7 @@ program: THEOREM LPAR IDENT WTS
 ##
 ## Ends in an error in state: 3.
 ##
-## stmt -> THEOREM LPAR IDENT . RPAR SEP FORALL nonempty_list(arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
+## stmt -> THEOREM LPAR IDENT . RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
 ##
 ## The known suffix of the stack is as follows:
 ## THEOREM LPAR IDENT
@@ -65,7 +65,7 @@ program: THEOREM LPAR IDENT RPAR WTS
 ##
 ## Ends in an error in state: 4.
 ##
-## stmt -> THEOREM LPAR IDENT RPAR . SEP FORALL nonempty_list(arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
+## stmt -> THEOREM LPAR IDENT RPAR . SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
 ##
 ## The known suffix of the stack is as follows:
 ## THEOREM LPAR IDENT RPAR
@@ -82,7 +82,7 @@ program: THEOREM LPAR IDENT RPAR SEP WTS
 ##
 ## Ends in an error in state: 5.
 ##
-## stmt -> THEOREM LPAR IDENT RPAR SEP . FORALL nonempty_list(arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
+## stmt -> THEOREM LPAR IDENT RPAR SEP . FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
 ##
 ## The known suffix of the stack is as follows:
 ## THEOREM LPAR IDENT RPAR SEP
@@ -99,7 +99,7 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL WTS
 ##
 ## Ends in an error in state: 6.
 ##
-## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL . nonempty_list(arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
+## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL . nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
 ##
 ## The known suffix of the stack is as follows:
 ## THEOREM LPAR IDENT RPAR SEP FORALL
@@ -114,7 +114,7 @@ Hint: Did you forget a '('? Theorems should be stated like this:
 
 program: DEFINITION SEP LET IDENT LPAR WTS
 ##
-## Ends in an error in state: 7.
+## Ends in an error in state: 158.
 ##
 ## arg -> LPAR . IDENT COLON ty RPAR [ LPAR IDENT EQ COLON ]
 ## arg -> LPAR . IDENT RPAR [ LPAR IDENT EQ COLON ]
@@ -129,10 +129,9 @@ Hint: Valid names start with a lowercase letter, followed by alphanumeric charac
   y_2
   arg_name
 
-
 program: DEFINITION SEP LET IDENT LPAR IDENT WTS
 ##
-## Ends in an error in state: 8.
+## Ends in an error in state: 159.
 ##
 ## arg -> LPAR IDENT . COLON ty RPAR [ LPAR IDENT EQ COLON ]
 ## arg -> LPAR IDENT . RPAR [ LPAR IDENT EQ COLON ]
@@ -145,7 +144,7 @@ I expected either a ')', or ':' followed by a type here, but instead I found '$0
 
 program: DEFINITION SEP LET IDENT LPAR IDENT COLON WTS
 ##
-## Ends in an error in state: 10.
+## Ends in an error in state: 161.
 ##
 ## arg -> LPAR IDENT COLON . ty RPAR [ LPAR IDENT EQ COLON ]
 ##
@@ -158,15 +157,14 @@ Hint: Valid types are:
   nat
   'a
   'a list
-  'a tree
   'a -> 'b
   (where 'a and 'b are any valid types)
 
 program: PRINT FUN LPAR IDENT COLON LPAR WTS
 ##
-## Ends in an error in state: 13.
+## Ends in an error in state: 12.
 ##
-## ty -> LPAR . ty RPAR [ TYTREE TYLST TYARROW SEP RPAR EQ ]
+## ty -> LPAR . ty RPAR [ TYLST TYARROW SEP RPAR EQ ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAR
@@ -177,37 +175,34 @@ Hint: Valid types are:
   nat
   'a
   'a list
-  'a tree
   'a -> 'b
   (where 'a and 'b are any valid types)
 
 program: PRINT FUN LPAR IDENT COLON LPAR TYNAT SEP
 ##
-## Ends in an error in state: 14.
+## Ends in an error in state: 13.
 ##
-## ty -> ty . TYARROW ty [ TYTREE TYLST TYARROW RPAR ]
-## ty -> ty . TYLST [ TYTREE TYLST TYARROW RPAR ]
-## ty -> ty . TYTREE [ TYTREE TYLST TYARROW RPAR ]
-## ty -> LPAR ty . RPAR [ TYTREE TYLST TYARROW SEP RPAR EQ ]
+## ty -> ty . TYARROW ty [ TYLST TYARROW RPAR ]
+## ty -> ty . TYLST [ TYLST TYARROW RPAR ]
+## ty -> LPAR ty . RPAR [ TYLST TYARROW SEP RPAR EQ ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAR ty
 ##
 
-I expected one of '->', 'list', 'tree', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.
+I expected one of '->', 'list', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.
 Hint: Valid types are:
   nat
   'a
   'a list
-  'a tree
   'a -> 'b
   (where 'a and 'b are any valid types)
 
 program: PRINT FUN LPAR IDENT COLON TYNAT TYARROW WTS
 ##
-## Ends in an error in state: 17.
+## Ends in an error in state: 15.
 ##
-## ty -> ty TYARROW . ty [ TYTREE TYLST TYARROW SEP RPAR EQ ]
+## ty -> ty TYARROW . ty [ TYLST TYARROW SEP RPAR EQ ]
 ##
 ## The known suffix of the stack is as follows:
 ## ty TYARROW
@@ -218,181 +213,114 @@ Hint: Valid types are:
   nat
   'a
   'a list
-  'a tree
   'a -> 'b
   (where 'a and 'b are any valid types)
 
 program: PRINT FUN LPAR IDENT COLON TYNAT TYARROW TYNAT WTS
 ##
-## Ends in an error in state: 18.
+## Ends in an error in state: 16.
 ##
-## ty -> ty . TYARROW ty [ TYTREE TYLST TYARROW SEP RPAR EQ ]
-## ty -> ty TYARROW ty . [ TYTREE TYLST TYARROW SEP RPAR EQ ]
-## ty -> ty . TYLST [ TYTREE TYLST TYARROW SEP RPAR EQ ]
-## ty -> ty . TYTREE [ TYTREE TYLST TYARROW SEP RPAR EQ ]
+## ty -> ty . TYARROW ty [ TYLST TYARROW SEP RPAR EQ ]
+## ty -> ty TYARROW ty . [ TYLST TYARROW SEP RPAR EQ ]
+## ty -> ty . TYLST [ TYLST TYARROW SEP RPAR EQ ]
 ##
 ## The known suffix of the stack is as follows:
 ## ty TYARROW ty
 ##
 
-I expected one of '->', 'list', 'tree', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.
+I expected one of '->', 'list', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.
 Hint: Valid types are:
   nat
   'a
   'a list
-  'a tree
   'a -> 'b
   (where 'a and 'b are any valid types)
 
 program: DEFINITION SEP LET IDENT LPAR IDENT COLON TYNAT SEP
 ##
-## Ends in an error in state: 20.
+## Ends in an error in state: 162.
 ##
 ## arg -> LPAR IDENT COLON ty . RPAR [ LPAR IDENT EQ COLON ]
-## ty -> ty . TYARROW ty [ TYTREE TYLST TYARROW RPAR ]
-## ty -> ty . TYLST [ TYTREE TYLST TYARROW RPAR ]
-## ty -> ty . TYTREE [ TYTREE TYLST TYARROW RPAR ]
+## ty -> ty . TYARROW ty [ TYLST TYARROW RPAR ]
+## ty -> ty . TYLST [ TYLST TYARROW RPAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAR IDENT COLON ty
 ##
 
-I expected one of '->', 'list', 'tree', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.
+I expected one of '->', 'list', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.
 Hint: Valid types are:
   nat
   'a
   'a list
-  'a tree
   'a -> 'b
   (where 'a and 'b are any valid types)
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT EQ
-##
-## Ends in an error in state: 23.
-##
-## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) . COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
-##
-## The known suffix of the stack is as follows:
-## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg)
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 179, spurious reduction of production nonempty_list(arg) -> arg
-##
-
-I expected a ':' followed by an equation stating the theorem here, but instead I found '$0'.
-Hint: Theorems should be stated like this:
-  THEOREM (theorem_name).
-  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.
-  PROOF.
-  ...
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON WTS
-##
-## Ends in an error in state: 24.
-##
-## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON . eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
-##
-## The known suffix of the stack is as follows:
-## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON
-##
-
-I expected an expression for the lhs of an equation here, but '$0' is not part of a valid expression.
-Hint: Valid expressions should evaluate to a value:
-  variable
-  [num]
-  [num] op [num]
-  function application
-  if..then..else..end expression
-
-program: PRINT  WTS
-##
-## Ends in an error in state: 25.
-##
-## key_tm ->  . LPAR tm COMMA tm COMMA tm RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  LPAR WTS
+program: PRINT MATCH WTS
 ##
 ## Ends in an error in state: 26.
 ##
-## key_tm ->  LPAR . tm COMMA tm COMMA tm RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH WTS
-##
-## Ends in an error in state: 29.
-##
-## key_tm -> MATCH . tm WITH option(BAR) NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-## key_tm -> MATCH . tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH . tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## MATCH
 ##
 
 I expected an expression to pattern match on here, but '$0' is not part of a valid expression.
-Hint: Valid expressions are:
-  variable
-  [num]
-  [num] op [num]
-  function application
-  if..then..else..end expression
+Hint: Valid expressions should evaluate to a value.
 
 program: PRINT LPAR WTS
 ##
-## Ends in an error in state: 30.
+## Ends in an error in state: 27.
 ##
-## atom_tm -> LPAR . tm RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END  ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## atom_tm -> LPAR . tm RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAR
 ##
 
-I expected a term here, but instead I found '$0'.
+I expected an expression here, but '$0' is not part of a valid expression.
+Hint: Valid expressions should evaluate to a value.
 
 program: PRINT IF0 WTS
 ##
-## Ends in an error in state: 31.
+## Ends in an error in state: 28.
 ##
-## key_tm -> IF0 . tm THEN tm ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> IF0 . tm THEN tm ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF0
 ##
 
-I expected a term here, but instead I found '$0'.
+I expected an expression here, but '$0' is not part of a valid expression.
+Hint: Valid expressions should evaluate to a value.
 
 program: PRINT FUN WTS
 ##
-## Ends in an error in state: 33.
+## Ends in an error in state: 30.
 ##
-## key_tm -> FUN . LPAR IDENT COLON ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> FUN . IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+## key_tm -> FUN . LPAR IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+## key_tm -> FUN . LPAR IDENT COLON ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## FUN
 ##
 
-I expected a '(' here, but instead I found a '$0'.
+I expected an argument for 'fun' here, but instead I found '$0'.
 Hint: Anonymous functions should be written like this:
   fun (arg : type) => body end
+  or
+  fun (arg) => body end
+  or
+  fun arg => body end
 
 program: PRINT FUN LPAR WTS
 ##
-## Ends in an error in state: 34.
+## Ends in an error in state: 31.
 ##
-## key_tm -> FUN LPAR . IDENT COLON ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> FUN LPAR . IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+## key_tm -> FUN LPAR . IDENT COLON ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## FUN LPAR
@@ -406,23 +334,28 @@ Hint: Valid names start with a lowercase letter, followed by alphanumeric charac
 
 program: PRINT FUN LPAR IDENT WTS
 ##
-## Ends in an error in state: 35.
+## Ends in an error in state: 32.
 ##
-## key_tm -> FUN LPAR IDENT . COLON ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> FUN LPAR IDENT . RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+## key_tm -> FUN LPAR IDENT . COLON ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## FUN LPAR IDENT
 ##
 
-I expected a ':' here followed by a type for '$1', but instead I found a '$0'.
+I expected a ')', or a ':'followed by a type for '$1' here, but instead I found '$0'.
 Hint: Anonymous functions should be written like this:
   fun (arg : type) => body end
+  or
+  fun (arg) => body end
+  or
+  fun arg => body end
 
 program: PRINT FUN LPAR IDENT COLON WTS
 ##
-## Ends in an error in state: 36.
+## Ends in an error in state: 51.
 ##
-## key_tm -> FUN LPAR IDENT COLON . ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> FUN LPAR IDENT COLON . ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## FUN LPAR IDENT COLON
@@ -433,65 +366,272 @@ Hint: Valid types are:
   nat
   'a
   'a list
-  'a tree
   'a -> 'b
   (where 'a and 'b are any valid types)
 
 program: PRINT FUN LPAR IDENT COLON TYNAT SEP
 ##
-## Ends in an error in state: 37.
+## Ends in an error in state: 52.
 ##
-## key_tm -> FUN LPAR IDENT COLON ty . RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-## ty -> ty . TYARROW ty [ TYTREE TYLST TYARROW RPAR ]
-## ty -> ty . TYLST [ TYTREE TYLST TYARROW RPAR ]
-## ty -> ty . TYTREE [ TYTREE TYLST TYARROW RPAR ]
+## key_tm -> FUN LPAR IDENT COLON ty . RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+## ty -> ty . TYARROW ty [ TYLST TYARROW RPAR ]
+## ty -> ty . TYLST [ TYLST TYARROW RPAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## FUN LPAR IDENT COLON ty
 ##
 
-I expected one of '->', 'list', 'tree', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.
+I expected one of '->', 'list', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.
 Hint: Valid types are:
   nat
   'a
   'a list
-  'a tree
   'a -> 'b
   (where 'a and 'b are any valid types)
 
 program: PRINT FUN LPAR IDENT COLON TYNAT RPAR WTS
 ##
-## Ends in an error in state: 38.
+## Ends in an error in state: 53.
 ##
-## key_tm -> FUN LPAR IDENT COLON ty RPAR . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> FUN LPAR IDENT COLON ty RPAR . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## FUN LPAR IDENT COLON ty RPAR
 ##
 
-I expected a '=>' here, but instead I found a '$0'.
+I expected a '=>' here, but instead I found '$0'.
 Hint: Anonymous functions should be written like this:
   fun (arg : type) => body end
+  or
+  fun (arg) => body end
+  or
+  fun arg => body end
 
 program: PRINT FUN LPAR IDENT COLON TYNAT RPAR ARROW WTS
 ##
-## Ends in an error in state: 39.
+## Ends in an error in state: 54.
 ##
-## key_tm -> FUN LPAR IDENT COLON ty RPAR ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> FUN LPAR IDENT COLON ty RPAR ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## FUN LPAR IDENT COLON ty RPAR ARROW
 ##
 
-I expected an expression for the function body here, but instead I found a '$0'.
+I expected an expression for the function body here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR WTS
+##
+## Ends in an error in state: 7.
+##
+## strict_arg -> LPAR . IDENT COLON ty RPAR [ LPAR COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAR
+##
+
+I expected an argument name here, but '$0' is not a valid name.
+Hint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':
+  x
+  y_2
+  arg_name
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT WTS
+##
+## Ends in an error in state: 8.
+##
+## strict_arg -> LPAR IDENT . COLON ty RPAR [ LPAR COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAR IDENT
+##
+
+I expected ':' here followed by a type for '$1', but instead I found '$0'.
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON WTS
+##
+## Ends in an error in state: 9.
+##
+## strict_arg -> LPAR IDENT COLON . ty RPAR [ LPAR COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAR IDENT COLON
+##
+
+I expected a type here, but instead, I found '$0'. This looks like an invalid type declaration.
+Hint: Valid types are:
+  nat
+  'a
+  'a list
+  'a -> 'b
+  (where 'a and 'b are any valid types)
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT SEP
+##
+## Ends in an error in state: 18.
+##
+## strict_arg -> LPAR IDENT COLON ty . RPAR [ LPAR COLON ]
+## ty -> ty . TYARROW ty [ TYLST TYARROW RPAR ]
+## ty -> ty . TYLST [ TYLST TYARROW RPAR ]
+##
+## The known suffix of the stack is as follows:
+## LPAR IDENT COLON ty
+##
+
+I expected one of '->', 'list', or ')' here, but instead, I found '$0'. This looks like an invalid type declaration.
+Hint: Valid types are:
+  nat
+  'a
+  'a list
+  'a -> 'b
+  (where 'a and 'b are any valid types)
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR WTS
+##
+## Ends in an error in state: 20.
+##
+## nonempty_list(strict_arg) -> strict_arg . [ COLON ]
+## nonempty_list(strict_arg) -> strict_arg . nonempty_list(strict_arg) [ COLON ]
+##
+## The known suffix of the stack is as follows:
+## strict_arg
+##
+
+I expected a ':', or more arguments here, but instead I found '$0'.
+Hint: Theorems should be stated like this:
+  THEOREM (theorem_name).
+  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.
+  PROOF.
+  ...
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON WTS
+##
+## Ends in an error in state: 23.
+##
+## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON . eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
+##
+## The known suffix of the stack is as follows:
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON
+##
+
+I expected an expression for the lhs of the theorem statement here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+program: PRINT FUN LPAR IDENT RPAR WTS
+##
+## Ends in an error in state: 33.
+##
+## key_tm -> FUN LPAR IDENT RPAR . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## FUN LPAR IDENT RPAR
+##
+
+I expected a '=>' here, but instead I found '$0'.
 Hint: Anonymous functions should be written like this:
   fun (arg : type) => body end
+  or
+  fun (arg) => body end
+  or
+  fun arg => body end
 
-program: PRINT FUN LPAR IDENT COLON TYNAT RPAR ARROW  WITH
+program: PRINT FUN LPAR IDENT RPAR ARROW WTS
 ##
-## Ends in an error in state: 41.
+## Ends in an error in state: 34.
 ##
-## key_tm -> FUN LPAR IDENT COLON ty RPAR ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> FUN LPAR IDENT RPAR ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## FUN LPAR IDENT RPAR ARROW
+##
+
+I expected an expression for the function body here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+program: PRINT FUN LPAR IDENT RPAR ARROW IDENT WITH
+##
+## Ends in an error in state: 35.
+##
+## key_tm -> FUN LPAR IDENT RPAR ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## FUN LPAR IDENT RPAR ARROW tm
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
+##
+
+I expected an 'end' here, but instead I found '$0'.
+Hint: Anonymous functions should be written like this:
+  fun (arg : type) => body end
+  or
+  fun (arg) => body end
+  or
+  fun arg => body end
+
+program: PRINT IDENT TIMES WTS
+##
+## Ends in an error in state: 38.
+##
+## mul_tm -> mul_tm TIMES . key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## mul_tm TIMES
+##
+
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+program: PRINT IDENT PLUS WTS
+##
+## Ends in an error in state: 45.
+##
+## addsub_tm -> addsub_tm PLUS . mul_tm [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## addsub_tm PLUS
+##
+
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+program: PRINT IDENT MINUS WTS
+##
+## Ends in an error in state: 47.
+##
+## addsub_tm -> addsub_tm MINUS . mul_tm [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## addsub_tm MINUS
+##
+
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+program: PRINT IDENT CONS WTS
+##
+## Ends in an error in state: 49.
+##
+## tm -> addsub_tm CONS . tm [ WITH THEOREM THEN SEP RPAR PRINT EQ EOF END ELSE DEFINITION DASH COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## addsub_tm CONS
+##
+
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+program: PRINT FUN LPAR IDENT COLON TYNAT RPAR ARROW IDENT WITH
+##
+## Ends in an error in state: 55.
+##
+## key_tm -> FUN LPAR IDENT COLON ty RPAR ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## FUN LPAR IDENT COLON ty RPAR ARROW tm
@@ -500,121 +640,83 @@ program: PRINT FUN LPAR IDENT COLON TYNAT RPAR ARROW  WITH
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
- I expected an 'end' here, but instead I found a '$0'.
+I expected an 'end' here, but instead I found '$0'.
 Hint: Anonymous functions should be written like this:
   fun (arg : type) => body end
+  or
+  fun (arg) => body end
+  or
+  fun arg => body end
 
-program: PRINT IF0  THEN  ELSE  END WTS
-##
-## Ends in an error in state: 43.
-##
-## addsub_tm -> mul_tm . [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-## mul_tm -> mul_tm . TIMES key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## mul_tm
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  TIMES WTS
-##
-## Ends in an error in state: 44.
-##
-## mul_tm -> mul_tm TIMES . key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## mul_tm TIMES
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  WTS
-##
-## Ends in an error in state: 47.
-##
-## app_tm -> app_tm . atom_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END  ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-## key_tm -> app_tm . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## app_tm
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  PLUS WTS
-##
-## Ends in an error in state: 51.
-##
-## addsub_tm -> addsub_tm PLUS . mul_tm [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## addsub_tm PLUS
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  PLUS IF0  THEN  ELSE  END WTS
-##
-## Ends in an error in state: 52.
-##
-## addsub_tm -> addsub_tm PLUS mul_tm . [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-## mul_tm -> mul_tm . TIMES key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## addsub_tm PLUS mul_tm
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  MINUS WTS
-##
-## Ends in an error in state: 53.
-##
-## addsub_tm -> addsub_tm MINUS . mul_tm [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## addsub_tm MINUS
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  MINUS IF0  THEN  ELSE  END WTS
-##
-## Ends in an error in state: 54.
-##
-## addsub_tm -> addsub_tm MINUS mul_tm . [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-## mul_tm -> mul_tm . TIMES key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## addsub_tm MINUS mul_tm
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  CONS WTS
-##
-## Ends in an error in state: 55.
-##
-## tm -> addsub_tm CONS . tm [ WITH THEOREM THEN SEP RPAR PRINT EQ EOF END ELSE DEFINITION DASH COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## addsub_tm CONS
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT IF0  WITH
+program: PRINT FUN IDENT WTS
 ##
 ## Ends in an error in state: 57.
 ##
-## key_tm -> IF0 tm . THEN tm ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> FUN IDENT . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## FUN IDENT
+##
+
+I expected a '=>' here, but instead I found '$0'.
+Hint: Anonymous functions should be written like this:
+  fun (arg : type) => body end
+  or
+  fun (arg) => body end
+  or
+  fun arg => body end
+
+program: PRINT FUN IDENT ARROW WTS
+##
+## Ends in an error in state: 58.
+##
+## key_tm -> FUN IDENT ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## FUN IDENT ARROW
+##
+
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+program: PRINT FUN IDENT ARROW IDENT WITH
+##
+## Ends in an error in state: 59.
+##
+## key_tm -> FUN IDENT ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## FUN IDENT ARROW tm
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
+##
+
+I expected an 'end' here, but instead I found '$0'.
+Hint: Anonymous functions should be written like this:
+  fun (arg : type) => body end
+  or
+  fun (arg) => body end
+  or
+  fun arg => body end
+
+program: PRINT IF0 IDENT WITH
+##
+## Ends in an error in state: 61.
+##
+## key_tm -> IF0 tm . THEN tm ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF0 tm
@@ -623,33 +725,34 @@ program: PRINT IF0  WITH
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
 I expected a 'then' here, but instead I found '$0'.
 Hint: Valid if expressions are written like:
   if x then y else z end
 
-program: PRINT IF0  THEN WTS
+program: PRINT IF0 IDENT THEN WTS
 ##
-## Ends in an error in state: 58.
+## Ends in an error in state: 62.
 ##
-## key_tm -> IF0 tm THEN . tm ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> IF0 tm THEN . tm ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF0 tm THEN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
-program: PRINT IF0  THEN  WITH
+program: PRINT IF0 IDENT THEN IDENT WITH
 ##
-## Ends in an error in state: 59.
+## Ends in an error in state: 63.
 ##
-## key_tm -> IF0 tm THEN tm . ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> IF0 tm THEN tm . ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF0 tm THEN tm
@@ -658,33 +761,34 @@ program: PRINT IF0  THEN  WITH
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
-I expected a 'else' here, but instead I found '$0'.
+I expected an 'else' here, but instead I found '$0'.
 Hint: Valid if expressions are written like:
   if x then y else z end
 
-program: PRINT IF0  THEN  ELSE WTS
+program: PRINT IF0 IDENT THEN IDENT ELSE WTS
 ##
-## Ends in an error in state: 60.
+## Ends in an error in state: 64.
 ##
-## key_tm -> IF0 tm THEN tm ELSE . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> IF0 tm THEN tm ELSE . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF0 tm THEN tm ELSE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
-program: PRINT IF0  THEN  ELSE  WITH
+program: PRINT IF0 IDENT THEN IDENT ELSE IDENT WITH
 ##
-## Ends in an error in state: 61.
+## Ends in an error in state: 65.
 ##
-## key_tm -> IF0 tm THEN tm ELSE tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> IF0 tm THEN tm ELSE tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF0 tm THEN tm ELSE tm
@@ -693,21 +797,21 @@ program: PRINT IF0  THEN  ELSE  WITH
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
 I expected an 'end' here, but instead I found '$0'.
 Hint: Valid if expressions are written like:
   if x then y else z end
 
-program: PRINT LPAR  WITH
+program: PRINT LPAR IDENT WITH
 ##
-## Ends in an error in state: 63.
+## Ends in an error in state: 67.
 ##
-## atom_tm -> LPAR tm . RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END  ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## atom_tm -> LPAR tm . RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAR tm
@@ -716,21 +820,19 @@ program: PRINT LPAR  WITH
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
-I expected a ')' here, but instead I found '$0'.
+I expected a ')' here, but instead I found '$0'. Did you forget to close the parenthesis?
 
-
-program: PRINT MATCH  THEOREM
+program: PRINT MATCH IDENT THEOREM
 ##
-## Ends in an error in state: 65.
+## Ends in an error in state: 69.
 ##
-## key_tm -> MATCH tm . WITH option(BAR) NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-## key_tm -> MATCH tm . WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm . WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## MATCH tm
@@ -739,454 +841,217 @@ program: PRINT MATCH  THEOREM
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
 I expected a 'with' here, but instead I found '$0'.
-Hint: Valid match expressions are written like:
-  match l with 
-  | pattern1 => ...
-  | pattern2 => ...
-  ...
-  end                       
+Hint: Valid match expressions should be written like:
+  match l with
+  | [] => ...
+  | x::xs => ...
+  end
 
-program: PRINT MATCH  WITH WTS
+program: PRINT MATCH IDENT WITH WTS
 ##
-## Ends in an error in state: 66.
+## Ends in an error in state: 70.
 ##
-## key_tm -> MATCH tm WITH . option(BAR) NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-## key_tm -> MATCH tm WITH . option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH . BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
 ## MATCH tm WITH
 ##
 
-I expected a '|' followed by a pattern here, but instead I found '$0'.
-Hint: Valid match expressions are written like:
-  match l with 
-  | pattern1 -> ...
-  | pattern2 -> ...
-  ...
-  end     
+I expected a '|' here, but instead I found '$0'.
+Hint: Valid match expressions should be written like:
+  match l with
+  | [] => ...
+  | x::xs => ...
+  end
 
-program: PRINT MATCH  WITH BAR WTS
-##
-## Ends in an error in state: 68.
-##
-## key_tm -> MATCH tm WITH option(BAR) . NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-## key_tm -> MATCH tm WITH option(BAR) .  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH NIL WTS
-##
-## Ends in an error in state: 69.
-##
-## key_tm -> MATCH tm WITH option(BAR) NIL . ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) NIL
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH NIL ARROW WTS
-##
-## Ends in an error in state: 70.
-##
-## key_tm -> MATCH tm WITH option(BAR) NIL ARROW . tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) NIL ARROW
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH NIL ARROW  WITH
+program: PRINT MATCH IDENT WITH BAR WTS
 ##
 ## Ends in an error in state: 71.
 ##
-## key_tm -> MATCH tm WITH option(BAR) NIL ARROW tm . BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH BAR . NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) NIL ARROW tm
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## MATCH tm WITH BAR
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '[]' here, but instead I found '$0'. The empty list case should come first.
+Hint: Valid match expressions should be written like:
+  match l with
+  | [] => ...
+  | x::xs => ...
+  end
 
-program: PRINT MATCH  WITH NIL ARROW  BAR WTS
+program: PRINT MATCH IDENT WITH BAR NIL WTS
 ##
 ## Ends in an error in state: 72.
 ##
-## key_tm -> MATCH tm WITH option(BAR) NIL ARROW tm BAR . IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH BAR NIL . ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) NIL ARROW tm BAR
+## MATCH tm WITH BAR NIL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '=>' here, but instead I found '$0'.
+Hint: Valid match expressions should be written like:
+  match l with
+  | [] => ...
+  | x::xs => ...
+  end
 
-program: PRINT MATCH  WITH NIL ARROW  BAR IDENT WTS
+program: PRINT MATCH IDENT WITH BAR NIL ARROW WTS
 ##
 ## Ends in an error in state: 73.
 ##
-## key_tm -> MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT . CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH BAR NIL ARROW . tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT
+## MATCH tm WITH BAR NIL ARROW
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
-program: PRINT MATCH  WITH NIL ARROW  BAR IDENT CONS WTS
+program: PRINT MATCH IDENT WITH BAR NIL ARROW IDENT WITH
 ##
 ## Ends in an error in state: 74.
 ##
-## key_tm -> MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT CONS . IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH BAR NIL ARROW tm . BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT CONS
+## MATCH tm WITH BAR NIL ARROW tm
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '|' here, but instead I found '$0'.
+Hint: Valid match expressions should be written like:
+  match l with
+  | [] => ...
+  | x::xs => ...
+  end
 
-program: PRINT MATCH  WITH NIL ARROW  BAR IDENT CONS IDENT WTS
+program: PRINT MATCH IDENT WITH BAR NIL ARROW IDENT BAR WTS
 ##
 ## Ends in an error in state: 75.
 ##
-## key_tm -> MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT CONS IDENT . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR . IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT CONS IDENT
+## MATCH tm WITH BAR NIL ARROW tm BAR
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a name to bind to the head of the list here, but '$0' is not a valid name.
+Hint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':
+  x
+  y_2
+  arg_name
 
-program: PRINT MATCH  WITH NIL ARROW  BAR IDENT CONS IDENT ARROW WTS
+program: PRINT MATCH IDENT WITH BAR NIL ARROW IDENT BAR IDENT WTS
 ##
 ## Ends in an error in state: 76.
 ##
-## key_tm -> MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT CONS IDENT ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT . CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT CONS IDENT ARROW
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '::' here, but instead I found '$0'.
+Hint: Valid match expressions should be written like:
+  match l with
+  | [] => ...
+  | x::xs => ...
+  end
 
-program: PRINT MATCH  WITH NIL ARROW  BAR IDENT CONS IDENT ARROW  WITH
+program: PRINT MATCH IDENT WITH BAR NIL ARROW IDENT BAR IDENT CONS WTS
 ##
 ## Ends in an error in state: 77.
 ##
-## key_tm -> MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT CONS IDENT ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS . IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) NIL ARROW tm BAR IDENT CONS IDENT ARROW tm
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected name to bind to the rest of the list here, but '$0' is not a valid name.
+Hint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':
+  x
+  y_2
+  arg_name
 
-program: PRINT MATCH  WITH  WTS
+program: PRINT MATCH IDENT WITH BAR NIL ARROW IDENT BAR IDENT CONS IDENT WTS
+##
+## Ends in an error in state: 78.
+##
+## key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT
+##
+
+I expected a '=>' here, but instead I found '$0'.
+Hint: Valid match expressions should be written like:
+  match l with
+  | [] => ...
+  | x::xs => ...
+  end
+
+program: PRINT MATCH IDENT WITH BAR NIL ARROW IDENT BAR IDENT CONS IDENT ARROW WTS
 ##
 ## Ends in an error in state: 79.
 ##
-## key_tm -> MATCH tm WITH option(BAR)  . ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR) 
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
-program: PRINT MATCH  WITH  ARROW WTS
+program: PRINT MATCH IDENT WITH BAR NIL ARROW IDENT BAR IDENT CONS IDENT ARROW IDENT WITH
 ##
 ## Ends in an error in state: 80.
 ##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW . tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
+## key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
 ##
 ## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  WITH
-##
-## Ends in an error in state: 81.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm . BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an 'end' here, but instead I found '$0'.
+Hint: Valid match expressions should be written like:
+  match l with
+  | [] => ...
+  | x::xs => ...
+  end
 
-program: PRINT MATCH  WITH  ARROW  BAR WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT WITH
 ##
 ## Ends in an error in state: 82.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR .  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  WTS
-##
-## Ends in an error in state: 83.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  . LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  LPAR WTS
-##
-## Ends in an error in state: 84.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR . IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  LPAR IDENT WTS
-##
-## Ends in an error in state: 85.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT . COMMA IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  LPAR IDENT COMMA WTS
-##
-## Ends in an error in state: 86.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA . IDENT COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  LPAR IDENT COMMA IDENT WTS
-##
-## Ends in an error in state: 87.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT . COMMA IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  LPAR IDENT COMMA IDENT COMMA WTS
-##
-## Ends in an error in state: 88.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA . IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  LPAR IDENT COMMA IDENT COMMA IDENT WTS
-##
-## Ends in an error in state: 89.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT . RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR WTS
-##
-## Ends in an error in state: 90.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW WTS
-##
-## Ends in an error in state: 91.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT MATCH  WITH  ARROW  BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW  WITH
-##
-## Ends in an error in state: 92.
-##
-## key_tm -> MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## MATCH tm WITH option(BAR)  ARROW tm BAR  LPAR IDENT COMMA IDENT COMMA IDENT RPAR ARROW tm
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  LPAR  WITH
-##
-## Ends in an error in state: 94.
-##
-## key_tm ->  LPAR tm . COMMA tm COMMA tm RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR tm
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  LPAR  COMMA WTS
-##
-## Ends in an error in state: 95.
-##
-## key_tm ->  LPAR tm COMMA . tm COMMA tm RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR tm COMMA
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  LPAR  COMMA  WITH
-##
-## Ends in an error in state: 96.
-##
-## key_tm ->  LPAR tm COMMA tm . COMMA tm RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR tm COMMA tm
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  LPAR  COMMA  COMMA WTS
-##
-## Ends in an error in state: 97.
-##
-## key_tm ->  LPAR tm COMMA tm COMMA . tm RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR tm COMMA tm COMMA
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: PRINT  LPAR  COMMA  COMMA  WITH
-##
-## Ends in an error in state: 98.
-##
-## key_tm ->  LPAR tm COMMA tm COMMA tm . RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COMMA COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR tm COMMA tm COMMA tm
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  WITH
-##
-## Ends in an error in state: 100.
 ##
 ## eqn -> tm . EQ tm [ SEP COLON ]
 ##
@@ -1197,17 +1062,17 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  WITH
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '=' here, but instead I found '$0'.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ WTS
 ##
-## Ends in an error in state: 101.
+## Ends in an error in state: 83.
 ##
 ## eqn -> tm EQ . tm [ SEP COLON ]
 ##
@@ -1215,72 +1080,93 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ WTS
 ## tm EQ
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  WITH
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT WITH
 ##
-## Ends in an error in state: 103.
+## Ends in an error in state: 85.
 ##
-## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn . COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
+## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn . COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
 ##
 ## The known suffix of the stack is as follows:
-## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
-## In state 102, spurious reduction of production eqn -> tm EQ tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
+## In state 84, spurious reduction of production eqn -> tm EQ tm
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a ':' here followed by the type of the equational expression, but instead I found '$0'.
+Hint: Theorems should be stated like this:
+  THEOREM (theorem_name).
+  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.
+  PROOF.
+  ...
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON WTS
 ##
-## Ends in an error in state: 104.
+## Ends in an error in state: 86.
 ##
-## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn COLON . ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
+## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON . ty SEP proof [ THEOREM PRINT EOF DEFINITION ]
 ##
 ## The known suffix of the stack is as follows:
-## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn COLON
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a type here, but instead, I found '$0'.
+Hint: Valid types are:
+  nat
+  'a
+  'a list
+  'a -> 'b
+  (where 'a and 'b are any valid types)
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT RPAR
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT RPAR
 ##
-## Ends in an error in state: 105.
+## Ends in an error in state: 87.
 ##
-## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn COLON ty . SEP proof [ THEOREM PRINT EOF DEFINITION ]
-## ty -> ty . TYARROW ty [ TYTREE TYLST TYARROW SEP ]
-## ty -> ty . TYLST [ TYTREE TYLST TYARROW SEP ]
-## ty -> ty . TYTREE [ TYTREE TYLST TYARROW SEP ]
+## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty . SEP proof [ THEOREM PRINT EOF DEFINITION ]
+## ty -> ty . TYARROW ty [ TYLST TYARROW SEP ]
+## ty -> ty . TYLST [ TYLST TYARROW SEP ]
 ##
 ## The known suffix of the stack is as follows:
-## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn COLON ty
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' here, but instead I found '$0'.
+Hint: Theorems should be stated like this:
+  THEOREM (theorem_name).
+  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.
+  PROOF.
+  ...
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP WTS
 ##
-## Ends in an error in state: 106.
+## Ends in an error in state: 88.
 ##
-## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn COLON ty SEP . proof [ THEOREM PRINT EOF DEFINITION ]
+## stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP . proof [ THEOREM PRINT EOF DEFINITION ]
 ##
 ## The known suffix of the stack is as follows:
-## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(arg) COLON eqn COLON ty SEP
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'PROOF.' here, but instead I found '$0'.
+Hint: Theorems should be stated like this:
+  THEOREM (theorem_name).
+  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.
+  PROOF.
+  ...
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF WTS
 ##
-## Ends in an error in state: 107.
+## Ends in an error in state: 89.
 ##
 ## proof -> PROOF . SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -1288,11 +1174,16 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## PROOF
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' here, but instead I found '$0'. Did you forget to end 'PROOF' with '.'?
+Hint: Theorems should be stated like this:
+  THEOREM (theorem_name).
+  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.
+  PROOF.
+  ...
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP WTS
 ##
-## Ends in an error in state: 108.
+## Ends in an error in state: 90.
 ##
 ## proof -> PROOF SEP . BY INDUCTION ON IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -1300,11 +1191,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## PROOF SEP
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'BY INDUCTION ON l' here, but instead I found '$0'.
+Hint: Proofs should be stated like this:
+  PROOF.
+  BY INDUCTION ON l.
+  ...
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY WTS
 ##
-## Ends in an error in state: 109.
+## Ends in an error in state: 91.
 ##
 ## proof -> PROOF SEP BY . INDUCTION ON IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -1312,11 +1207,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## PROOF SEP BY
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'BY INDUCTION ON l' here, but instead I found '$0'.
+Hint: Proofs should be stated like this:
+  PROOF.
+  BY INDUCTION ON l.
+  ...
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION WTS
 ##
-## Ends in an error in state: 110.
+## Ends in an error in state: 92.
 ##
 ## proof -> PROOF SEP BY INDUCTION . ON IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -1324,11 +1223,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## PROOF SEP BY INDUCTION
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'BY INDUCTION ON l' here, but instead I found '$0'.
+Hint: Proofs should be stated like this:
+  PROOF.
+  BY INDUCTION ON l.
+  ...
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON WTS
 ##
-## Ends in an error in state: 111.
+## Ends in an error in state: 93.
 ##
 ## proof -> PROOF SEP BY INDUCTION ON . IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -1336,72 +1239,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## PROOF SEP BY INDUCTION ON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected the name of the induction variable here, but '$0' is not a valid name.
+Hint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':
+  x
+  y_2
+  arg_name
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE WTS
 ##
-## Ends in an error in state: 112.
-##
-## proof -> PROOF SEP BY INDUCTION ON IDENT . option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION ]
-##
-## The known suffix of the stack is as follows:
-## PROOF SEP BY INDUCTION ON IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT COMMA WTS
-##
-## Ends in an error in state: 113.
-##
-## generalize -> COMMA . GENERALIZE nonempty_list(IDENT) [ SEP ]
-##
-## The known suffix of the stack is as follows:
-## COMMA
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT COMMA GENERALIZE WTS
-##
-## Ends in an error in state: 114.
-##
-## generalize -> COMMA GENERALIZE . nonempty_list(IDENT) [ SEP ]
-##
-## The known suffix of the stack is as follows:
-## COMMA GENERALIZE
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT COMMA GENERALIZE IDENT WTS
-##
-## Ends in an error in state: 115.
-##
-## nonempty_list(IDENT) -> IDENT . [ SEP ]
-## nonempty_list(IDENT) -> IDENT . nonempty_list(IDENT) [ SEP ]
-##
-## The known suffix of the stack is as follows:
-## IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP WTS
-##
-## Ends in an error in state: 119.
-##
-## proof -> PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP . list(case) QED SEP [ THEOREM PRINT EOF DEFINITION ]
-##
-## The known suffix of the stack is as follows:
-## PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE WTS
-##
-## Ends in an error in state: 120.
+## Ends in an error in state: 102.
 ##
 ## case -> CASE . IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
 ##
@@ -1409,11 +1255,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected the name of the induction variable here, but '$0' is not a valid name.
+Hint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':
+  x
+  y_2
+  arg_name
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT WTS
 ##
-## Ends in an error in state: 121.
+## Ends in an error in state: 103.
 ##
 ## case -> CASE IDENT . EQ pattern SEP list(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
 ##
@@ -1421,11 +1271,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '=' here, but instead I found '$0'.
+Hint: Valid cases should be written like:
+  CASE l = [].
+  or 
+  CASE l = x::xs.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ WTS
 ##
-## Ends in an error in state: 122.
+## Ends in an error in state: 104.
 ##
 ## case -> CASE IDENT EQ . pattern SEP list(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
 ##
@@ -1433,95 +1287,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE IDENT EQ
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a list pattern here, but instead I found '$0'.
+Hint: Valid list patterns should be written like:
+  []
+  or
+  x::xs
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ IDENT WTS
 ##
-## Ends in an error in state: 123.
-##
-## pattern ->  . LPAR IDENT COMMA IDENT COMMA IDENT RPAR [ SEP ]
-##
-## The known suffix of the stack is as follows:
-## 
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  LPAR WTS
-##
-## Ends in an error in state: 124.
-##
-## pattern ->  LPAR . IDENT COMMA IDENT COMMA IDENT RPAR [ SEP ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  LPAR IDENT WTS
-##
-## Ends in an error in state: 125.
-##
-## pattern ->  LPAR IDENT . COMMA IDENT COMMA IDENT RPAR [ SEP ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  LPAR IDENT COMMA WTS
-##
-## Ends in an error in state: 126.
-##
-## pattern ->  LPAR IDENT COMMA . IDENT COMMA IDENT RPAR [ SEP ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR IDENT COMMA
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  LPAR IDENT COMMA IDENT WTS
-##
-## Ends in an error in state: 127.
-##
-## pattern ->  LPAR IDENT COMMA IDENT . COMMA IDENT RPAR [ SEP ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR IDENT COMMA IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  LPAR IDENT COMMA IDENT COMMA WTS
-##
-## Ends in an error in state: 128.
-##
-## pattern ->  LPAR IDENT COMMA IDENT COMMA . IDENT RPAR [ SEP ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR IDENT COMMA IDENT COMMA
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  LPAR IDENT COMMA IDENT COMMA IDENT WTS
-##
-## Ends in an error in state: 129.
-##
-## pattern ->  LPAR IDENT COMMA IDENT COMMA IDENT . RPAR [ SEP ]
-##
-## The known suffix of the stack is as follows:
-##  LPAR IDENT COMMA IDENT COMMA IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ IDENT WTS
-##
-## Ends in an error in state: 132.
+## Ends in an error in state: 106.
 ##
 ## pattern -> IDENT . CONS IDENT [ SEP ]
 ##
@@ -1529,11 +1303,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '::' here, but instead I found '$0'.
+Hint: Valid list patterns should be written like:
+  []
+  or
+  x::xs
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ IDENT CONS WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ IDENT CONS WTS
 ##
-## Ends in an error in state: 133.
+## Ends in an error in state: 107.
 ##
 ## pattern -> IDENT CONS . IDENT [ SEP ]
 ##
@@ -1541,11 +1319,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## IDENT CONS
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected name to bind to the rest of the list here, but '$0' is not a valid name.
+Hint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':
+  x
+  y_2
+  arg_name
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL WTS
 ##
-## Ends in an error in state: 136.
+## Ends in an error in state: 109.
 ##
 ## case -> CASE IDENT EQ pattern . SEP list(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
 ##
@@ -1553,11 +1335,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE IDENT EQ pattern
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' here, but instead I found '$0'.
+Hint: Valid cases should be written like:
+  CASE l = [].
+  or 
+  CASE l = x::xs.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WITH
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WITH
 ##
-## Ends in an error in state: 137.
+## Ends in an error in state: 110.
 ##
 ## case -> CASE IDENT EQ pattern SEP . list(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
 ##
@@ -1565,57 +1351,11 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE IDENT EQ pattern SEP
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'WTS' or a list of induction hypotheses here, but instead I found '$0'.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP IH WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS WTS
 ##
-## Ends in an error in state: 138.
-##
-## ih -> IH . COLON eqn SEP [ WTS IH ]
-##
-## The known suffix of the stack is as follows:
-## IH
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP IH COLON WTS
-##
-## Ends in an error in state: 139.
-##
-## ih -> IH COLON . eqn SEP [ WTS IH ]
-##
-## The known suffix of the stack is as follows:
-## IH COLON
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP IH COLON  EQ  WITH
-##
-## Ends in an error in state: 140.
-##
-## ih -> IH COLON eqn . SEP [ WTS IH ]
-##
-## The known suffix of the stack is as follows:
-## IH COLON eqn
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
-## In state 102, spurious reduction of production eqn -> tm EQ tm
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS WTS
-##
-## Ends in an error in state: 143.
+## Ends in an error in state: 116.
 ##
 ## case -> CASE IDENT EQ pattern SEP list(ih) WTS . COLON eqn SEP LHS side RHS side [ QED CASE ]
 ##
@@ -1623,11 +1363,11 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE IDENT EQ pattern SEP list(ih) WTS
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a ':' followed by the equation to be solved here, but instead I found '$0'.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON WTS
 ##
-## Ends in an error in state: 144.
+## Ends in an error in state: 117.
 ##
 ## case -> CASE IDENT EQ pattern SEP list(ih) WTS COLON . eqn SEP LHS side RHS side [ QED CASE ]
 ##
@@ -1635,11 +1375,12 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE IDENT EQ pattern SEP list(ih) WTS COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression of the lhs of the equation to be solved here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  WITH
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT WITH
 ##
-## Ends in an error in state: 145.
+## Ends in an error in state: 118.
 ##
 ## case -> CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn . SEP LHS side RHS side [ QED CASE ]
 ##
@@ -1650,18 +1391,18 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
-## In state 102, spurious reduction of production eqn -> tm EQ tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
+## In state 84, spurious reduction of production eqn -> tm EQ tm
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' here to end the equation to be solved here, but instead I found '$0'.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP WTS
 ##
-## Ends in an error in state: 146.
+## Ends in an error in state: 119.
 ##
 ## case -> CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP . LHS side RHS side [ QED CASE ]
 ##
@@ -1669,11 +1410,14 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'LHS' to start the proof steps here, but instead I found '$0'.
+Hint: Valid proof steps should be written like:
+  LHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS WTS
 ##
-## Ends in an error in state: 147.
+## Ends in an error in state: 120.
 ##
 ## case -> CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP LHS . side RHS side [ QED CASE ]
 ##
@@ -1681,11 +1425,12 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP LHS
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ WTS
 ##
-## Ends in an error in state: 148.
+## Ends in an error in state: 121.
 ##
 ## side -> EQ . tm SEP list(step) [ RHS QED CASE ]
 ##
@@ -1693,11 +1438,14 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## EQ
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value. Proof steps should be written like:
+  LHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  WITH
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT WITH
 ##
-## Ends in an error in state: 149.
+## Ends in an error in state: 122.
 ##
 ## side -> EQ tm . SEP list(step) [ RHS QED CASE ]
 ##
@@ -1708,17 +1456,20 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' here, but instead I found '$0'.
+Hint: Valid proof steps should be written like:
+  LHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP WTS
 ##
-## Ends in an error in state: 150.
+## Ends in an error in state: 123.
 ##
 ## side -> EQ tm SEP . list(step) [ RHS QED CASE ]
 ##
@@ -1726,13 +1477,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## EQ tm SEP
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '=' here, but instead I found '$0'.
+Hint: Valid proof steps should be written like:
+  LHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP EQ WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP EQ WTS
 ##
-## Ends in an error in state: 151.
+## Ends in an error in state: 124.
 ##
-## step -> EQ . tm DASH BY LEMMA IDENT SEP [ RHS QED EQ CASE ]
 ## step -> EQ . tm DASH BY IDENT SEP [ RHS QED EQ CASE ]
 ## step -> EQ . tm DASH BY IH SEP [ RHS QED EQ CASE ]
 ##
@@ -1740,13 +1493,15 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## EQ
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value. Proof steps should be written like:
+  LHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP EQ  WITH
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP EQ IDENT WITH
 ##
-## Ends in an error in state: 152.
+## Ends in an error in state: 125.
 ##
-## step -> EQ tm . DASH BY LEMMA IDENT SEP [ RHS QED EQ CASE ]
 ## step -> EQ tm . DASH BY IDENT SEP [ RHS QED EQ CASE ]
 ## step -> EQ tm . DASH BY IH SEP [ RHS QED EQ CASE ]
 ##
@@ -1757,19 +1512,21 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '--' followed by a justification here, but instead I found '$0'.
+Hint: Valid proof steps should be written like:
+  LHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP EQ  DASH WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP EQ IDENT DASH WTS
 ##
-## Ends in an error in state: 153.
+## Ends in an error in state: 126.
 ##
-## step -> EQ tm DASH . BY LEMMA IDENT SEP [ RHS QED EQ CASE ]
 ## step -> EQ tm DASH . BY IDENT SEP [ RHS QED EQ CASE ]
 ## step -> EQ tm DASH . BY IH SEP [ RHS QED EQ CASE ]
 ##
@@ -1777,61 +1534,14 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## EQ tm DASH
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'BY' followed by a justification here, but instead I found '$0'.
+Hint: Valid proof steps should be written like:
+  LHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP EQ  DASH BY WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP EQ IDENT DASH BY IDENT WTS
 ##
-## Ends in an error in state: 154.
-##
-## step -> EQ tm DASH BY . LEMMA IDENT SEP [ RHS QED EQ CASE ]
-## step -> EQ tm DASH BY . IDENT SEP [ RHS QED EQ CASE ]
-## step -> EQ tm DASH BY . IH SEP [ RHS QED EQ CASE ]
-##
-## The known suffix of the stack is as follows:
-## EQ tm DASH BY
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP EQ  DASH BY LEMMA WTS
-##
-## Ends in an error in state: 155.
-##
-## step -> EQ tm DASH BY LEMMA . IDENT SEP [ RHS QED EQ CASE ]
-##
-## The known suffix of the stack is as follows:
-## EQ tm DASH BY LEMMA
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP EQ  DASH BY LEMMA IDENT WTS
-##
-## Ends in an error in state: 156.
-##
-## step -> EQ tm DASH BY LEMMA IDENT . SEP [ RHS QED EQ CASE ]
-##
-## The known suffix of the stack is as follows:
-## EQ tm DASH BY LEMMA IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP EQ  DASH BY IH WTS
-##
-## Ends in an error in state: 158.
-##
-## step -> EQ tm DASH BY IH . SEP [ RHS QED EQ CASE ]
-##
-## The known suffix of the stack is as follows:
-## EQ tm DASH BY IH
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP EQ  DASH BY IDENT WTS
-##
-## Ends in an error in state: 160.
+## Ends in an error in state: 130.
 ##
 ## step -> EQ tm DASH BY IDENT . SEP [ RHS QED EQ CASE ]
 ##
@@ -1839,11 +1549,14 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## EQ tm DASH BY IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' to end the justification, but instead I found '$0'.
+Hint: Valid proof steps should be written like:
+  LHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP EQ  DASH BY IDENT SEP WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP EQ IDENT DASH BY IDENT SEP WTS
 ##
-## Ends in an error in state: 162.
+## Ends in an error in state: 132.
 ##
 ## list(step) -> step . list(step) [ RHS QED CASE ]
 ##
@@ -1851,11 +1564,11 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## step
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected another step, a 'RHS', or a 'QED.' here, but instead I found '$0'.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP QED
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP QED
 ##
-## Ends in an error in state: 165.
+## Ends in an error in state: 135.
 ##
 ## case -> CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP LHS side . RHS side [ QED CASE ]
 ##
@@ -1866,15 +1579,21 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 150, spurious reduction of production list(step) ->
-## In state 164, spurious reduction of production side -> EQ tm SEP list(step)
+## In state 123, spurious reduction of production list(step) ->
+## In state 134, spurious reduction of production side -> EQ tm SEP list(step)
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'RHS' to start the other side of the proof, but instead I found '$0'.
+Hint: Valid proof steps should be written like:
+  LHS = expression.
+      = ...           -- BY justification.
+  ...
+  RHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP RHS WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP RHS WTS
 ##
-## Ends in an error in state: 166.
+## Ends in an error in state: 136.
 ##
 ## case -> CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP LHS side RHS . side [ QED CASE ]
 ##
@@ -1882,23 +1601,14 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP LHS side RHS
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression, but instead I found '$0'.
+Hint: Valid proof steps should be written like:
+  RHS = expression.
+      = ...           -- BY justification.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP IH COLON  EQ  SEP WITH
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP QED WTS
 ##
-## Ends in an error in state: 168.
-##
-## list(ih) -> ih . list(ih) [ WTS ]
-##
-## The known suffix of the stack is as follows:
-## ih
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP QED WTS
-##
-## Ends in an error in state: 171.
+## Ends in an error in state: 141.
 ##
 ## proof -> PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) QED . SEP [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -1906,11 +1616,11 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) QED
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' to end the proof here, but instead I found '$0'.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ  SEP WTS COLON  EQ  SEP LHS EQ  SEP RHS EQ  SEP RHS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP RHS EQ IDENT SEP RHS
 ##
-## Ends in an error in state: 173.
+## Ends in an error in state: 143.
 ##
 ## list(case) -> case . list(case) [ QED ]
 ##
@@ -1921,16 +1631,16 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP PRO
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 150, spurious reduction of production list(step) ->
-## In state 164, spurious reduction of production side -> EQ tm SEP list(step)
-## In state 167, spurious reduction of production case -> CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP LHS side RHS side
+## In state 123, spurious reduction of production list(step) ->
+## In state 134, spurious reduction of production side -> EQ tm SEP list(step)
+## In state 137, spurious reduction of production case -> CASE IDENT EQ pattern SEP list(ih) WTS COLON eqn SEP LHS side RHS side
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected another case or a 'QED.' here, but instead I found '$0'.
 
-program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP AXIOM WTS
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP AXIOM WTS
 ##
-## Ends in an error in state: 176.
+## Ends in an error in state: 146.
 ##
 ## proof -> AXIOM . SEP [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -1938,24 +1648,11 @@ program: THEOREM LPAR IDENT RPAR SEP FORALL IDENT COLON  EQ  COLON TYNAT SEP AXI
 ## AXIOM
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-program: DEFINITION SEP LET IDENT IDENT WTS
-##
-## Ends in an error in state: 179.
-##
-## nonempty_list(arg) -> arg . [ EQ COLON ]
-## nonempty_list(arg) -> arg . nonempty_list(arg) [ EQ COLON ]
-##
-## The known suffix of the stack is as follows:
-## arg
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' here, but instead I found '$0'.
 
 program: PRINT WTS
 ##
-## Ends in an error in state: 181.
+## Ends in an error in state: 149.
 ##
 ## stmt -> PRINT . tm SEP [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -1963,11 +1660,12 @@ program: PRINT WTS
 ## PRINT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
-program: PRINT  WITH
+program: PRINT IDENT WITH
 ##
-## Ends in an error in state: 182.
+## Ends in an error in state: 150.
 ##
 ## stmt -> PRINT tm . SEP [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -1978,17 +1676,17 @@ program: PRINT  WITH
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 47, spurious reduction of production key_tm -> app_tm
-## In state 49, spurious reduction of production mul_tm -> key_tm
-## In state 43, spurious reduction of production addsub_tm -> mul_tm
-## In state 50, spurious reduction of production tm -> addsub_tm
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' here, but instead I found '$0'.
 
 program: DEFINITION WTS
 ##
-## Ends in an error in state: 185.
+## Ends in an error in state: 153.
 ##
 ## stmt -> DEFINITION . SEP LET REC IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION ]
 ## stmt -> DEFINITION . SEP LET REC IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION ]
@@ -1999,11 +1697,11 @@ program: DEFINITION WTS
 ## DEFINITION
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '.' here, but instead I found '$0'.
 
 program: DEFINITION SEP WTS
 ##
-## Ends in an error in state: 186.
+## Ends in an error in state: 154.
 ##
 ## stmt -> DEFINITION SEP . LET REC IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION ]
 ## stmt -> DEFINITION SEP . LET REC IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION ]
@@ -2014,11 +1712,11 @@ program: DEFINITION SEP WTS
 ## DEFINITION SEP
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'let' here, but instead I found '$0'.
 
 program: DEFINITION SEP LET WTS
 ##
-## Ends in an error in state: 187.
+## Ends in an error in state: 155.
 ##
 ## stmt -> DEFINITION SEP LET . REC IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION ]
 ## stmt -> DEFINITION SEP LET . REC IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION ]
@@ -2029,11 +1727,11 @@ program: DEFINITION SEP LET WTS
 ## DEFINITION SEP LET
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a 'rec' or the name of the function here, but instead I found '$0'.
 
 program: DEFINITION SEP LET REC WTS
 ##
-## Ends in an error in state: 188.
+## Ends in an error in state: 156.
 ##
 ## stmt -> DEFINITION SEP LET REC . IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION ]
 ## stmt -> DEFINITION SEP LET REC . IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION ]
@@ -2042,11 +1740,15 @@ program: DEFINITION SEP LET REC WTS
 ## DEFINITION SEP LET REC
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected the name of the function you are defining here, but '$0' is not a valid name.
+Hint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':
+  x
+  y_2
+  arg_name
 
 program: DEFINITION SEP LET REC IDENT WTS
 ##
-## Ends in an error in state: 189.
+## Ends in an error in state: 157.
 ##
 ## stmt -> DEFINITION SEP LET REC IDENT . nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION ]
 ## stmt -> DEFINITION SEP LET REC IDENT . nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION ]
@@ -2055,11 +1757,15 @@ program: DEFINITION SEP LET REC IDENT WTS
 ## DEFINITION SEP LET REC IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an argument name here, but '$0' is not a valid name.
+Hint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':
+  x
+  y_2
+  arg_name
 
 program: DEFINITION SEP LET REC IDENT IDENT EQ WTS
 ##
-## Ends in an error in state: 191.
+## Ends in an error in state: 166.
 ##
 ## stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) EQ . tm [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -2067,11 +1773,12 @@ program: DEFINITION SEP LET REC IDENT IDENT EQ WTS
 ## DEFINITION SEP LET REC IDENT nonempty_list(arg) EQ
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
 program: DEFINITION SEP LET REC IDENT IDENT COLON WTS
 ##
-## Ends in an error in state: 193.
+## Ends in an error in state: 168.
 ##
 ## stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON . ty EQ tm [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -2079,26 +1786,31 @@ program: DEFINITION SEP LET REC IDENT IDENT COLON WTS
 ## DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a type here, but instead, I found '$0'. This looks like an invalid type declaration.
+Hint: Valid types are:
+  nat
+  'a
+  'a list
+  'a -> 'b
+  (where 'a and 'b are any valid types)
 
 program: DEFINITION SEP LET REC IDENT IDENT COLON TYNAT SEP
 ##
-## Ends in an error in state: 194.
+## Ends in an error in state: 169.
 ##
 ## stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty . EQ tm [ THEOREM PRINT EOF DEFINITION ]
-## ty -> ty . TYARROW ty [ TYTREE TYLST TYARROW EQ ]
-## ty -> ty . TYLST [ TYTREE TYLST TYARROW EQ ]
-## ty -> ty . TYTREE [ TYTREE TYLST TYARROW EQ ]
+## ty -> ty . TYARROW ty [ TYLST TYARROW EQ ]
+## ty -> ty . TYLST [ TYLST TYARROW EQ ]
 ##
 ## The known suffix of the stack is as follows:
 ## DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '=' here, but instead I found '$0'.
 
 program: DEFINITION SEP LET REC IDENT IDENT COLON TYNAT EQ WTS
 ##
-## Ends in an error in state: 195.
+## Ends in an error in state: 170.
 ##
 ## stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty EQ . tm [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -2106,11 +1818,25 @@ program: DEFINITION SEP LET REC IDENT IDENT COLON TYNAT EQ WTS
 ## DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty EQ
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
+
+program: DEFINITION SEP LET IDENT IDENT WTS
+##
+## Ends in an error in state: 172.
+##
+## nonempty_list(arg) -> arg . [ EQ COLON ]
+## nonempty_list(arg) -> arg . nonempty_list(arg) [ EQ COLON ]
+##
+## The known suffix of the stack is as follows:
+## arg
+##
+
+I expected a '=' or more arguments here, but instead I found '$0'.
 
 program: DEFINITION SEP LET IDENT WTS
 ##
-## Ends in an error in state: 197.
+## Ends in an error in state: 174.
 ##
 ## stmt -> DEFINITION SEP LET IDENT . nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION ]
 ## stmt -> DEFINITION SEP LET IDENT . nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION ]
@@ -2119,11 +1845,11 @@ program: DEFINITION SEP LET IDENT WTS
 ## DEFINITION SEP LET IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a list of arguments here, but instead I found '$0'.
 
 program: DEFINITION SEP LET IDENT IDENT EQ WTS
 ##
-## Ends in an error in state: 199.
+## Ends in an error in state: 176.
 ##
 ## stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) EQ . tm [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -2131,11 +1857,12 @@ program: DEFINITION SEP LET IDENT IDENT EQ WTS
 ## DEFINITION SEP LET IDENT nonempty_list(arg) EQ
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
 program: DEFINITION SEP LET IDENT IDENT COLON WTS
 ##
-## Ends in an error in state: 201.
+## Ends in an error in state: 178.
 ##
 ## stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) COLON . ty EQ tm [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -2143,26 +1870,31 @@ program: DEFINITION SEP LET IDENT IDENT COLON WTS
 ## DEFINITION SEP LET IDENT nonempty_list(arg) COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a type here, but instead, I found '$0'. This looks like an invalid type declaration.
+  Hint: Valid types are:
+    nat
+    'a
+    'a list
+    'a -> 'b
+    (where 'a and 'b are any valid types)
 
 program: DEFINITION SEP LET IDENT IDENT COLON TYNAT SEP
 ##
-## Ends in an error in state: 202.
+## Ends in an error in state: 179.
 ##
 ## stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty . EQ tm [ THEOREM PRINT EOF DEFINITION ]
-## ty -> ty . TYARROW ty [ TYTREE TYLST TYARROW EQ ]
-## ty -> ty . TYLST [ TYTREE TYLST TYARROW EQ ]
-## ty -> ty . TYTREE [ TYTREE TYLST TYARROW EQ ]
+## ty -> ty . TYARROW ty [ TYLST TYARROW EQ ]
+## ty -> ty . TYLST [ TYLST TYARROW EQ ]
 ##
 ## The known suffix of the stack is as follows:
 ## DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected a '=' here, but instead I found '$0'.
 
 program: DEFINITION SEP LET IDENT IDENT COLON TYNAT EQ WTS
 ##
-## Ends in an error in state: 203.
+## Ends in an error in state: 180.
 ##
 ## stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty EQ . tm [ THEOREM PRINT EOF DEFINITION ]
 ##
@@ -2170,16 +1902,217 @@ program: DEFINITION SEP LET IDENT IDENT COLON TYNAT EQ WTS
 ## DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty EQ
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+I expected an expression here, but instead I found '$0'.
+Hint: Valid expressions should evaluate to a value.
 
-program: PRINT  SEP WTS
+program: PRINT IDENT SEP WTS
 ##
-## Ends in an error in state: 205.
+## Ends in an error in state: 182.
 ##
 ## program -> stmt . program [ # ]
 ##
 ## The known suffix of the stack is as follows:
 ## stmt
+##
+
+I expected a statement here, but instead I found '$0'.
+Hint: Valid statememts are one of:
+  DEFINITION.
+  THEOREM ...
+  PRINT ...
+
+program: PRINT FUN IDENT ARROW IDENT END WTS
+##
+## Ends in an error in state: 37.
+##
+## addsub_tm -> mul_tm . [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+## mul_tm -> mul_tm . TIMES key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## mul_tm
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: PRINT IDENT WTS
+##
+## Ends in an error in state: 41.
+##
+## app_tm -> app_tm . atom_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+## key_tm -> app_tm . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## app_tm
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: PRINT IDENT PLUS FUN IDENT ARROW IDENT END WTS
+##
+## Ends in an error in state: 46.
+##
+## addsub_tm -> addsub_tm PLUS mul_tm . [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+## mul_tm -> mul_tm . TIMES key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## addsub_tm PLUS mul_tm
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: PRINT IDENT MINUS FUN IDENT ARROW IDENT END WTS
+##
+## Ends in an error in state: 48.
+##
+## addsub_tm -> addsub_tm MINUS mul_tm . [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+## mul_tm -> mul_tm . TIMES key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONS COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## addsub_tm MINUS mul_tm
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT WTS
+##
+## Ends in an error in state: 94.
+##
+## proof -> PROOF SEP BY INDUCTION ON IDENT . option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION ]
+##
+## The known suffix of the stack is as follows:
+## PROOF SEP BY INDUCTION ON IDENT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT COMMA WTS
+##
+## Ends in an error in state: 95.
+##
+## generalize -> COMMA . GENERALIZE nonempty_list(IDENT) [ SEP ]
+##
+## The known suffix of the stack is as follows:
+## COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT COMMA GENERALIZE WTS
+##
+## Ends in an error in state: 96.
+##
+## generalize -> COMMA GENERALIZE . nonempty_list(IDENT) [ SEP ]
+##
+## The known suffix of the stack is as follows:
+## COMMA GENERALIZE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT COMMA GENERALIZE IDENT WTS
+##
+## Ends in an error in state: 97.
+##
+## nonempty_list(IDENT) -> IDENT . [ SEP ]
+## nonempty_list(IDENT) -> IDENT . nonempty_list(IDENT) [ SEP ]
+##
+## The known suffix of the stack is as follows:
+## IDENT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP WTS
+##
+## Ends in an error in state: 101.
+##
+## proof -> PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP . list(case) QED SEP [ THEOREM PRINT EOF DEFINITION ]
+##
+## The known suffix of the stack is as follows:
+## PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP IH WTS
+##
+## Ends in an error in state: 111.
+##
+## ih -> IH . COLON eqn SEP [ WTS IH ]
+##
+## The known suffix of the stack is as follows:
+## IH
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP IH COLON WTS
+##
+## Ends in an error in state: 112.
+##
+## ih -> IH COLON . eqn SEP [ WTS IH ]
+##
+## The known suffix of the stack is as follows:
+## IH COLON
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP IH COLON IDENT EQ IDENT WITH
+##
+## Ends in an error in state: 113.
+##
+## ih -> IH COLON eqn . SEP [ WTS IH ]
+##
+## The known suffix of the stack is as follows:
+## IH COLON eqn
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 41, spurious reduction of production key_tm -> app_tm
+## In state 43, spurious reduction of production mul_tm -> key_tm
+## In state 37, spurious reduction of production addsub_tm -> mul_tm
+## In state 44, spurious reduction of production tm -> addsub_tm
+## In state 84, spurious reduction of production eqn -> tm EQ tm
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP EQ IDENT DASH BY WTS
+##
+## Ends in an error in state: 127.
+##
+## step -> EQ tm DASH BY . IDENT SEP [ RHS QED EQ CASE ]
+## step -> EQ tm DASH BY . IH SEP [ RHS QED EQ CASE ]
+##
+## The known suffix of the stack is as follows:
+## EQ tm DASH BY
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP WTS COLON IDENT EQ IDENT SEP LHS EQ IDENT SEP EQ IDENT DASH BY IH WTS
+##
+## Ends in an error in state: 128.
+##
+## step -> EQ tm DASH BY IH . SEP [ RHS QED EQ CASE ]
+##
+## The known suffix of the stack is as follows:
+## EQ tm DASH BY IH
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: THEOREM LPAR IDENT RPAR SEP FORALL LPAR IDENT COLON TYNAT RPAR COLON IDENT EQ IDENT COLON TYNAT SEP PROOF SEP BY INDUCTION ON IDENT SEP CASE IDENT EQ NIL SEP IH COLON IDENT EQ IDENT SEP WITH
+##
+## Ends in an error in state: 138.
+##
+## list(ih) -> ih . list(ih) [ WTS ]
+##
+## The known suffix of the stack is as follows:
+## ih
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>

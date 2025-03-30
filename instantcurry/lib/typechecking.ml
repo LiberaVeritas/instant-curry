@@ -150,6 +150,8 @@ let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
     | Some sch -> (instantiate sch, [])
     | None -> raise (IllTyped ("no ref " ^ x)) 
     end
+  | MRef _ -> raise NotImplemented (* shouldn't happen *)
+  | MFun _ -> raise NotImplemented (* shouldn't happen *)
   | UVar _ -> raise NotImplemented
   | Nat _ -> (Ty_Nat, [])
   | Plus (e, e') | Minus (e, e') | Times (e, e') -> 
@@ -179,6 +181,7 @@ let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
     let sub3 = unify (apply_sub fty sub2) (Ty_Arrow (argty, rty)) in
     let sub = compose_sub sub3 (compose_sub sub2 sub1) in
     (apply_sub rty sub, sub)
+  | MApp _ -> raise NotImplemented (* shouldn't happen *)
   | Fun (x, ty, e) ->
     let new_var = Ty_Var (fresh ()) in
     let (rty, sub1) = infer_tm delta sigma ((x, { qvars = []; typ = new_var }) :: gamma) e in
@@ -244,7 +247,6 @@ let typecheck_case (delta : ctx) (sigma : ctx) (c : case) : unit =
     | None -> raise (IllTyped "case on nonexistent var") end *)
   in 
   (* todo: check wts is valid *)
-  
   typecheck_eqn delta sigma c.wts;
 
   if not (tm_equal (c.wts.lhs) (c.lhs.start)) then raise (IllTyped "invalid lhs start");

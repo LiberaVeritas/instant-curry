@@ -1,37 +1,12 @@
-DEFINITION.
-let rec map (f: 'a -> 'b) (l: 'a list) : 'b list =
-    match l with
-    | [] => []
-    | x :: xs => (f x) :: (map f xs)
-    end
 
 
-DEFINITION.
-let rec app (l1 : 'a list) (l2 : 'a list) : 'a list =
-    match l1 with
-    | [] => l2
-    | x :: xs => x :: (app xs l2)
-    end
 
-DEFINITION.
-let rec rev (l : 'a list) : 'a list =
-    match l with
-    | [] => []
-    | x :: xs => app (rev xs) (x :: [])
-    end
-
-DEFINITION.
-let rec map_tr (f : 'a -> 'b) (l : 'a list) (acc : 'b list) : 'b list =
-    match l with
-    | [] => acc
-    | x :: xs => map_tr f xs (app ((f x) :: [])  acc)
-    end
 
 THEOREM (map_eq).
 FORALL (f : 'a -> 'b) (l : 'a list) (acc : 'b list) : app (rev (map f l)) acc = map_tr f l acc : 'b list.
 
 PROOF.
-BY INDUCTION ON l.
+BY INDUCTION ON l, GENERALIZE acc.
 
 CASE l = [].
 WTS: app (rev (map f [])) acc = map_tr f [] acc.
@@ -51,7 +26,7 @@ WTS: app (rev (map f (x :: xs))) acc = map_tr f (x :: xs) acc.
 LHS = app (rev (map f (x :: xs))) acc.
     = app (rev ((f x) :: (map f xs))) acc -- BY defn.
     = app (app (rev (map f xs)) ((f x) :: [])) acc -- BY defn.
-    = app (rev (map f xs)) (app ((f x) :: []) acc) -- BY commonsense.
+    = app (rev (map f xs)) (app ((f x) :: []) acc) -- BY app_assoc.
     = map_tr f xs (app ((f x) :: []) acc) -- BY IH1.
 
 RHS = map_tr f (x :: xs) acc.

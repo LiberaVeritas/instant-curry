@@ -1,7 +1,0 @@
-DEFINITION.
-let rec map (f : 'a -> 'a) (l : 'a list) : 'a list =
-    match l with
-    | [] => []
-    | x :: xs => f x :: (map f xs)
-    end
-

@@ -1,19 +1,4 @@
-DEFINITION.
-let rec len (l : 'a list) : nat =
-    match l with
-    | [] => 0
-    | x :: xs => 1 + len xs
-    end
 
-DEFINITION.
-let rec map (f : 'a -> 'b) (l : 'a list) : 'b list =
-    match l with
-    | [] => []
-    | x :: xs => f x :: (map f xs)
-    end
-
-DEFINITION.
-let id (x : 'a) : 'a = x
 
 THEOREM (map_id).
 FORALL (l : 'a list) : map id l = l : 'a list. 

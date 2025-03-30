@@ -1,0 +1,104 @@
+DEFINITION.
+let rec len (l : 'a list) : nat =
+    match l with
+    | [] => 0
+    | x :: xs => 1 + len xs
+    end
+
+DEFINITION.
+let rec map (f : 'a -> 'b) (l : 'a list) : 'b list =
+    match l with
+    | [] => []
+    | x :: xs => f x :: (map f xs)
+    end
+
+DEFINITION.
+let id (x : 'a) : 'a = x
+
+DEFINITION.
+let rec app (l1 : 'a list) (l2 : 'a list) : 'a list =
+    match l1 with
+    | [] => l2
+    | x :: xs => x :: (app xs l2)
+    end
+
+DEFINITION.
+let rec map_tr (f : 'a -> 'b) (l : 'a list) (acc : 'b list) : 'b list =
+    match l with
+    | [] => acc
+    | x :: xs => map_tr f xs (app ((f x) :: [])  acc)
+    end
+
+DEFINITION.
+let rec rev (l : 'a list) : 'a list =
+    match l with
+    | [] => []
+    | x :: xs => app (rev xs) (x :: [])
+    end
+
+DEFINITION.
+let rec sum (l : nat list) : nat =
+    match l with
+    | [] => 0
+    | x :: xs => x + sum xs
+    end
+
+DEFINITION.
+let rec sum_tr (l : nat list) (acc : nat) : nat =
+    match l with
+    | [] => acc
+    | x :: xs => sum_tr xs (x + acc)
+    end
+
+
+THEOREM (app_nil).
+FORALL (l : 'a list) : app l [] = l : 'a list.
+PROOF. BY INDUCTION ON l.
+
+CASE l = [].
+# test WTS inference
+
+LHS = app [] [].
+    = []          -- BY defn.
+RHS = [].
+
+CASE l = x :: xs.
+IH1: app xs [] = xs.
+(* test WTS generation *)
+
+LHS = app (x :: xs) [].
+    = x :: (app xs [])    -- BY defn.
+    = x :: xs             -- BY IH1.
+    
+RHS = x :: xs.
+
+QED.
+
+THEOREM (app_assoc).
+FORALL (l1 : 'a list) (l2 : 'a list) (l3 : 'a list) : app (app l1 l2) l3 = app l1 (app l2 l3) : 'a list.
+
+PROOF.
+BY INDUCTION ON l1.
+
+CASE l1 = [].
+WTS: app (app [] l2) l3 = app [] (app l2 l3).
+
+LHS = app (app [] l2) l3.
+    = app l2 l3 -- BY defn.
+
+RHS = app [] (app l2 l3).
+    = app l2 l3 -- BY defn.
+
+CASE l1 = x :: xs.
+IH1: app (app xs l2) l3 = app xs (app l2 l3).
+WTS: app (app (x :: xs) l2) l3 = app (x :: xs) (app l2 l3).
+
+LHS = app (app (x :: xs) l2) l3.
+    = app (x :: (app xs l2)) l3 -- BY defn.
+    = x :: (app (app xs l2) l3) -- BY defn.
+    = x :: (app xs (app l2 l3)) -- BY IH1.
+
+RHS = app (x :: xs) (app l2 l3).
+    = x :: (app xs (app l2 l3)) -- BY defn.
+
+QED.

@@ -1,114 +1,96 @@
 open Synint
-
-
 open Printing
 open Printf
 open List
-
-(* evaluation & associated machinery *)
-
-module VarSet = Set.Make(String)
-let mem = VarSet.mem
-let empty = VarSet.empty
-let union = VarSet.union
-let remove = VarSet.remove
-
-type stuck_reason = ListCaseNonList
-                  | ArithNonNats
-                  | IfZeroNonNat
-                  | ApplyNonFun
-                  | BadBoundVar
-                  | BadRef
-exception Stuck of stuck_reason
+open Term
 
 
-let fold_expr (f : tm -> 'a -> 'a) (init : 'a) (expr : tm) =
-  let rec fold f e acc =
+exception BadBoundVar
+exception DefMatchFail
+exception CommonsenseFail
+exception IHMatchFail
+exception TheoremMatchFail
+exception EvalMatchFail
+exception WTSMatchFail
+exception PointlessStep
+ 
+
+(* unmark MApp to App and MRef to Ref *)
+let unmark e =
+  let rec res e =
     match e with
-    | App (e1, e2) | Times (e1, e2)
-    | Minus (e1, e2) | Plus (e1, e2)
-    | Cons (e1, e2) -> 
-      fold f e1 acc |> fold f e2
-    | ListCase (_l, n, _x, _y, c) -> fold f n acc |> fold f c
-    | If0 (_z, n, y) -> fold f n acc |> fold f y
-    | Fun (_f, _typ, e') -> fold f e' acc
-    | Nil | Nat _
-    | BVar _ | Ref _ 
-    | UVar _ | MVar _ 
-      -> f e acc
+    | Nil -> Nil
+    | Cons (x, xs) -> Cons (res x, res xs)
+    | ListCase (l, n, x, xs, c) -> 
+      ListCase (l, res n, x, xs, res c)
+    | Nat n -> Nat n
+    | Plus (e, e') -> Plus (res e, res e')
+    | Minus (e, e') -> Minus (res e, res e')
+    | Times (e, e') -> Times (res e, res e')
+    | If0 (e, z, nz) -> If0 (res e, res z, res nz)
+    | App (f, e') | MApp (f, e') -> App (res f, res e')
+    | Fun (f, ty, e) | MFun (f, ty, e)  -> 
+      Fun (f, ty, res e)
+    | BVar v -> BVar v
+    | Ref v | MRef v -> Ref v
+    | UVar v -> UVar v
+    | MVar v -> MVar v
   in
-  fold f expr init
+  res e
 
-let filter_expr (f : tm -> bool) (expr : tm) =
-  let f' tm acc =
-    if f tm then tm::acc else acc
-  in
-  fold_expr f' [] expr
+(* check equality in parallel until mismatch, then apply check *)
+let rec at_mismatch (check : env -> tm -> tm -> bool) env e1 e2 : bool =
+  let eq = at_mismatch check env in
+  let ( @= ) = eq in
+
+  match e1, e2 with
+  | Nil, Nil -> true
+  | Cons (x, xs), Cons (y, ys) -> 
+    if not (x @= y) then check env x y && xs = ys
+    else xs @= ys
+  | ListCase (l, n, _, _, c), ListCase (l', n', _, _, c') -> 
+    if not (l = l') then check env l l' && n = n' && c = c'
+    else if not (n @= n') then check env n n' && c = c'
+    else c @= c'
+  | Nat n, Nat m -> n = m
+  | Plus (a1, a2), Plus (b1, b2)
+  | Minus (a1, a2), Minus (b1, b2)
+  | Times (a1, a2), Times (b1, b2) 
+  | App (a1, a2), App (b1, b2) -> 
+    if not (a1 @= b1) then check env a1 b1 && a2 = b2
+    else a2 @= b2
+  | MApp (a1, a2), MApp (b1, b2) -> 
+    if not (a1 @= b1) then check env a1 b1 && a2 = b2
+    else a2 @= b2
+  | If0 (e, z, nz), If0 (e', z', nz') ->
+    if not (e @= e') then check env e e' && z = z' && nz = nz'
+    else if not (z = z') then check env z z' && nz = nz'
+    else nz @= nz'
+  | Fun (f, _ty, e), Fun (g, _ty', e') -> 
+    String.equal f g &&
+    (if not (e @= e') then check env e e'
+    else true)
+  | MFun (f, _ty, e), MFun (g, _ty', e') -> 
+    String.equal f g &&
+    (if not (e @= e') then check env e e'
+    else true)
+  | BVar x, BVar y -> String.equal x y
+  | Ref x, Ref y -> String.equal x y
+  | MRef x, MRef y -> String.equal x y
+  | UVar x, UVar y -> String.equal x y
+  | MVar x, MVar y -> String.equal x y
+  | _ -> check env e1 e2
 
   
-let rec fvs (e : tm) : VarSet.t =
-  match e with
-  | Nil -> empty
-  | Cons (x, xs) -> union (fvs x) (fvs xs)
-  | ListCase (l, n, x, xs, c) ->  (* TODO: remove x and xs only from c *)
-    let varlist = map fvs [l; n; c] in
-    let free = fold_left union empty varlist in
-    remove x @@ remove xs @@ free
-  | Nat _ -> empty 
-  | Plus (t, t') | Minus (t, t') | Times (t, t') -> union (fvs t) (fvs t')
-  | If0 (e, z, nz) -> union (fvs e) (union (fvs z) (fvs nz))
-  | App (e, e') -> union (fvs e) (fvs e')
-  | Fun (x, _, e) -> remove x (fvs e)
-  | BVar x | Ref x  | MVar x -> VarSet.singleton x
-  | UVar _ -> raise NotImplemented
+let get_defs e : tm list =
+  filter_expr (fun x -> match x with Ref _ -> true | _ -> false) e
+  |> List.map (fun ref -> match ref with Ref r -> r | _ -> "")
+  |> VarSet.of_list
+  |> VarSet.to_list
+  |> List.map (fun r -> Ref r)
 
-let ctr = ref 0
 
-let fresh (x : name) : name =
-  ctr := !ctr + 1; 
-  x ^ (string_of_int !ctr)
-
-(* [x := s] t *)
-let rec subst (x : name) (s :tm) (e : tm) : tm = 
-  match e with
-  | Nil -> Nil
-  | Cons (y, ys) -> Cons (subst x s y, subst x s ys)
-  | ListCase (l, n, y, ys, c) -> 
-    let l' = subst x s l in
-    let n' = subst x s n in
-    if x = y || x = ys then ListCase (l', n', y, ys, c)
-    else let (y, c) = 
-      if mem y (fvs s) then rename y c else (y, c)
-    in let (ys, c) =
-      if mem ys (fvs s) then rename ys c else (ys, c)
-    in ListCase (l', n', y, ys, subst x s c)
-  | Nat i -> Nat i
-  | Plus (e, e') -> Plus (subst x s e, subst x s e')
-  | Minus (e, e') -> Minus (subst x s e, subst x s e')
-  | Times (e, e') -> Times (subst x s e, subst x s e')
-  | If0 (e, z, nz) -> If0 (subst x s e, subst x s z, subst x s nz)
-  | App (e, e') -> App (subst x s e, subst x s e')
-  | Fun (y, ty, e) -> 
-    if x = y then Fun (y, ty, e)
-    else let (y, e) = 
-      if mem y (fvs s) then rename y e else (y, e)
-    in Fun (y, ty, subst x s e)
-  | BVar y -> if x = y then s else BVar y
-  | Ref y -> if x = y then s else Ref y
-  | MVar y -> if x = y then s else MVar y
-  | UVar y -> if x = y then s else UVar y (*raise NotImplemented*)
-
-and rename (x : name) (e : tm) : (name * tm) = 
-  let x' = fresh x in
-  (x', subst x (BVar x') e)
-
-type clos = ((string * ty) list * tm)
-type env = (string * clos) list
-type thms = (string * thm_stmt) list
-type constrs = (string * tm) list
-type ihs = (string * eqn) list
-
-(* to normal form given env *)
+(* evaluate to normal form *)
 let rec eval (env : env) (e : tm) : tm =
   match e with
   | Nil -> Nil
@@ -116,93 +98,58 @@ let rec eval (env : env) (e : tm) : tm =
   | ListCase (l, n, x, xs, c) -> 
     begin match l with
     | Nil -> eval env n
-    | MVar _ -> e
-    | Cons (y, ys) -> eval env @@ subst x y (subst xs ys c)  
-    | _ -> raise (Stuck ListCaseNonList)
+    | Cons (y, ys) -> 
+      eval env @@ 
+      subst_expr (BVar x) y (subst_expr (BVar xs) ys c) 
+    | _ -> e
     end
-  | Nat _ as v -> v
+  | Nat n -> Nat n
   | Plus (e, e') -> 
     begin match eval env e, eval env e' with
     | Nat x, Nat y -> Nat (x + y)
-    | _ -> raise (Stuck ArithNonNats)
+    | _ -> Plus (eval env e, eval env e')
     end
   | Minus (e, e') -> 
     begin match eval env e, eval env e' with
     | Nat x, Nat y -> Nat (max (x - y) 0)
-    | _ -> raise (Stuck ArithNonNats)
+    | _ -> Minus (eval env e, eval env e')
     end
   | Times (e, e') -> 
     begin match eval env e, eval env e' with
     | Nat x, Nat y -> Nat (x * y)
-    | _ -> raise (Stuck ArithNonNats)
+    | _ -> Times (eval env e, eval env e')
     end
   | If0 (e, z, nz) ->
     begin match eval env e with
     | Nat 0 -> eval env z
     | Nat _ -> eval env nz
-    | _ -> raise (Stuck IfZeroNonNat)
+    | _ -> If0 (eval env e, eval env z, eval env nz)
     end
+  | MApp _ -> e
   | App (f, e') ->
-    begin match f with
-    | Fun (x, _, e) -> eval env @@ subst x e' e
-    | Ref _ -> eval env @@ eval env f
-    | MVar _ -> e
-    | App (e1, e2) -> App (eval env e1, eval env e2)
-    (*| App _ as sub -> eval env (App ((eval env sub), e'))*)
-    | _ -> raise (Stuck ApplyNonFun)
+    let left = eval env f in
+    let right = eval env e' in
+    begin match left, right with
+    | Fun (x, _, body), _ -> 
+      eval env @@ subst_expr (BVar x) right body
+    | App (_, _), App (_, _) -> eval env @@ App (left, right)
+    | _, App (_,_) -> eval env @@ App (left, right)
+    | App (_,_), _ -> eval env @@ App (left, right)
+    | _ -> MApp (left, right) (* mark to prevent repassing *)
     end
   | Fun _ as v -> v
-  | BVar _ -> raise (Stuck BadBoundVar) (* this should have been substituted by now! *)
-  | Ref fn ->
-    begin match assoc_opt fn env with
-    | Some (args, t) -> 
-      eval env @@ 
-      fold_right (fun (x, ty) acc -> Fun (x, ty, acc)) args t
-    | None -> raise (Stuck BadRef)
-    end
+  | MFun _ as v -> v
+  | BVar _ -> raise BadBoundVar (* this should have been substituted by now! *)
+  | Ref r -> Ref r
+  | MRef r -> MRef r
   | UVar _ -> raise NotImplemented (* not intotally sure what into do here *)
-  | MVar _ as v -> v (* uninterpreted metavariables left as-is *)
-
-
-let subst_eqn name s (eqn : eqn) = {
-    lhs = subst name s eqn.lhs;
-    rhs = subst name s eqn.rhs
-}
-
-(* check parallel equality until mismatch, then apply check *)
-let rec at_mismatch (check : env -> tm -> tm -> bool) env e1 e2 : bool =
-  match e1, e2 with
-  | Nil, Nil -> true
-  | Cons (x, xs), Cons (y, ys) -> 
-    if not (x = y) then check env x y && xs = ys
-    else at_mismatch check env xs ys
-  | ListCase (_l, n, _x, _xs, c), ListCase (_l', n', _y, _ys, c') -> 
-    if not (n = n') then check env n n' && c = c'
-    else at_mismatch check env c c'
-  | Nat n, Nat m -> n = m
-  | Plus (a1, a2), Plus (b1, b2)
-  | Minus (a1, a2), Minus (b1, b2)
-  | Times (a1, a2), Times (b1, b2) 
-  | App (a1, a2), App (b1, b2) -> 
-    if not (a1 = b1) then check env a1 b1 && a2 = b2
-    else at_mismatch check env a2 b2
-  | If0 (e, z, nz), If0 (e', z', nz') ->
-    if not (e = e') then check env e e' && z = z' && nz = nz'
-    else if not (z = z') then check env z z' && nz = nz'
-    else at_mismatch check env nz nz'
-  | Fun (f, _ty, e), Fun (g, _ty', e') -> 
-    String.equal f g &&
-    (if not (e = e') then check env e e'
-    else true)
-  | BVar x, BVar y -> String.equal x y
-  | Ref x, Ref y -> String.equal x y
-  | UVar x, UVar y -> String.equal x y
-  | MVar x, MVar y -> String.equal x y
-  | _ -> false
-
-
+  | MVar x -> MVar x (* uninterpreted metavariables left as-is *)
+  
+    
 let check_commonsense env prev curr : bool =
   if (prev = curr) then true else
+  (* by eval *)
+  if (curr = unmark @@ eval env prev) then true else
   match prev, curr with
   | Plus (Nat 0, e), _ -> 
     printf "(add 0)\n"; 
@@ -218,75 +165,115 @@ let check_commonsense env prev curr : bool =
   | App (App (a1, a2), a3), App (b1, App (b2, b3)) 
   | App (a1, App (a2, a3)), App (App (b1, b2), b3) ->
     printf "(assoc)\n";
-    a1 = b1 && a2 = b2 && a3 = b3
+    a1 = b1 && 
+    a2 = b2 && 
+    a3 = b3
   (* commutativity *)
   | Plus (a1, a2), Plus (b1, b2)
   | Times (a1, a2), Times (b1, b2) -> 
     printf "(commut)\n";
-    a1 = b2 && a2 = b1
-  | _ -> (curr = eval env prev)
+    a1 = b2 && 
+    a2 = b1
+  (* empty list *)
+  | Cons (Nil, Nil), Nil
+  | Nil, Cons (Nil, Nil) -> true
   
+  | Cons (xs, Nil), Cons (Nil, ys)
+  | Cons (Nil, xs), Cons (ys, Nil) 
+  | Cons (xs, Nil), ys
+  | Cons (Nil, xs), ys 
+  | ys, Cons (xs, Nil)
+  | ys, Cons (Nil, xs) ->
+    printf "(assoc)\n";
+    ys = xs
+  | _ -> false
 
 
-(*
-find all instances of `from` in `within` and 
-replace with `into`
-*)
-let subst_expr from into within =
-  if from = within then into else
-  let rec sub e =
-    match e with
-    | Nil -> if from = Nil then into else Nil
-    | Cons (x, xs) -> Cons (sub x, sub xs)
-    | ListCase (l, n, _x, _xs, c) -> 
-      ListCase (l, sub n, _x, _xs, sub c)
-    | Nat n -> if from = (Nat n) then into else (Nat n)
-    | Plus (e, e') -> Plus (sub e, sub e')
-    | Minus (e, e') -> Minus (sub e, sub e')
-    | Times (e, e') -> Times (sub e, sub e')
-    | If0 (e, z, nz) -> If0 (sub e, sub z, sub nz)
-    | App (f, e') -> App (sub f, sub e')
-    | Fun (f, ty, e) -> 
-      if from = (Fun (f, ty, e)) then into else (Fun (f, ty, e))
-    | BVar v -> if from = (BVar v) then into else (BVar v)
-    | Ref v -> if from = (Ref v) then into else (Ref v)
-    | UVar v -> if from = (UVar v) then into else (UVar v)
-    | MVar v -> if from = (MVar v) then into else (MVar v)
+(* unroll definition closure *)
+let unroll_def env def =
+  match def with
+  | Ref r ->
+    let (args, t) = List.assoc r env in
+    fold_right (fun (x, ty) acc -> Fun (x, ty, acc)) args t
+  | _ -> raise DefMatchFail
+
+
+(* assumption that defn is only evoked on one instance *)
+let try_def_match env def prev curr =
+  let fn = 
+    match def with 
+    | Ref r -> r
+    | _ -> raise DefMatchFail 
   in
-  sub within
+  let into = unroll_def env def in
+  
+  let attempt expr =
+    eval env @@ subst_first_expr def into expr
+  in
+  (* mark ref to avoid resubstituing the same node *)
+  let get_next expr = 
+    subst_first_expr (Ref fn) (MRef fn) expr
+  in
+  
+  let rec go e next : bool =
+    let res = unmark @@ attempt e in
+    let _ = get_next next in
+    if (curr $= res) then true else 
+    if (e = next) then false else (* tried all possible substitutions *)
+    go next (get_next next)
+  in
+  go prev (get_next prev)
 
-(*
-list of refs 
-*)
-let eval_step (env: env) (thms : thms) (ihs : ihs) (prev : tm) (curr : tm) (j : justification) : bool = 
+
+let check_def env defs prev curr =
+  let ls = List.map (fun def -> try_def_match env def prev curr) defs in
+  List.mem true ls
+  
+  
+let eval_step (env: env) (thms : thms) (ihs : ihs) (prev : tm) (curr : tm) (j : justification) = 
+  if prev = curr then raise PointlessStep else
   match j with
-  | ByDefinition -> 
+  | ByEval ->
+    printf "= %s  -- by eval\n" (string_of_tm curr);
+    if not (curr $= eval env prev) then
+    raise EvalMatchFail
+  | ByDefinition None -> 
     printf "= %s  -- by defn\n" (string_of_tm curr);
-    let check env e1 e2 =
-      e2 = eval env e1
-    in
-    at_mismatch check env prev curr
+    if not (check_def env (get_defs prev) prev curr) then raise DefMatchFail;
+  | ByDefinition (Some def) ->
+    printf "= %s  -- by defn of %s\n" (string_of_tm curr) def;
+    if not (check_def env [Ref def] prev curr) then raise DefMatchFail;
   | ByCommonsense -> 
     printf "= %s  -- by commonsense " (string_of_tm curr);
     (* assoc or commut can happen at higher level *)
     if not (check_commonsense env prev curr) then
-    at_mismatch check_commonsense env prev curr
-    else (printf "\n"; raise NotImplemented)
-    
+    if not (at_mismatch check_commonsense env prev curr) 
+    then raise CommonsenseFail;
   | ByIH ih -> 
+  
+  (* TODO generate and check IHs  x :: xs -> xs *)
+  
     printf "= %s  -- by %s: " (string_of_tm curr) ih;
     let ih = assoc ih ihs in
-    let res = subst_expr ih.lhs ih.rhs prev in
-    printf "/ %s -> %s /\n" (string_of_tm ih.lhs) (string_of_tm ih.rhs);
-    res = curr
+    printf "/ %s = %s /\n" (string_of_tm ih.lhs) (string_of_tm ih.rhs);
+    
+    let res = subst_first_expr ih.lhs ih.rhs prev in
+    if not (res $= curr) then
+    
+    (* try IH equation in other direction too *)
+    let res = subst_first_expr ih.rhs ih.lhs prev in
+    if not (res $= curr)
+    then raise IHMatchFail;
   | ByTheorem t -> 
     printf "= %s  -- by theorem %s\n" (string_of_tm curr) t;
     let stmt = assoc t thms in
-    let f = (fun c (x, _) -> subst x (UVar x) c) in
+    let f = (fun c (x, _) -> subst_expr (MVar x) (UVar x) c) in
     let claim_lhs = fold_left f stmt.claim.eqn.lhs stmt.quantifiers in
     let claim_rhs = fold_left f stmt.claim.eqn.rhs stmt.quantifiers in
-    (* TODO *)
-    claim_lhs = claim_rhs
+    let res = subst_first_expr claim_lhs claim_rhs prev in
+    if not (res $= curr)
+    then raise TheoremMatchFail;
+    ()
 
   
 
@@ -300,30 +287,66 @@ let eval_side side env thms ihs =
 
 
 let check_case case env thms =
-  (* TODO check induction variable is same *)
   printf "Case: %s\n" (string_of_pattern case.pattern);
   let _ = case.var in
   let _ = case.pattern in
-  (* ihs : (name * eqn) list; TOD0 *)
-  let wts = case.wts in  (* assumed into be correct into claim *)
+
+  let wts = case.wts in 
   if not (wts.lhs = case.lhs.start) then raise NotImplemented else
-  let lhs = eval_side case.lhs env thms case.ihs  in
-  let rhs = eval_side case.rhs env thms case.ihs in
-  let _ = lhs = rhs && (wts.rhs = rhs) in
+  if not (wts.rhs = case.rhs.start) then raise NotImplemented else
+  let lhs' = eval_side case.lhs env thms case.ihs in
+  let rhs' = eval_side case.rhs env thms case.ihs in
+  if not (lhs' = rhs') then raise NotImplemented else
   ()
   
 let check_proof (_(*var*), cases) _(*claim*) env thms = 
   let _ = fold_left (fun _ x -> check_case x env thms) () cases in
   ()
 
-let infer_wts (name : name) (case : case) (thm_stmt : thm_stmt) : eqn =
-  match case.pattern with
-  | Pat_nil -> subst_eqn name Nil thm_stmt.claim.eqn
-  | Pat_cons (x, xs) -> subst_eqn name (Cons (MVar x, MVar xs)) thm_stmt.claim.eqn
+
+
+let infer_wts (name : name) (pat : pattern) (wts_opt : eqn option) (thm_stmt : thm_stmt) : eqn =
+  let inferred =
+    let f e =
+      match pat with
+      | Pat_nil -> subst_expr (MVar name) Nil e
+      | Pat_cons (x, xs) -> 
+        subst_expr (MVar name) (Cons (MVar x, MVar xs)) e
+    in
+      { 
+        lhs = thm_stmt.claim.eqn.lhs |> f;
+        rhs = thm_stmt.claim.eqn.rhs |> f;
+      }
+  in
+  match wts_opt with
+  | None -> inferred
+  | Some wts -> 
+    if not (wts = inferred) then raise WTSMatchFail else wts
+
+
+let rename_in_scope stmt =
+  match stmt with
+  | Definition d ->
+    let args' = Core.List.map ~f:(fun (x, ty) -> ((fresh x), ty)) d.args in
+    let body' = 
+      Core.List.fold2_exn ~f:(fun acc (a, _) (a', _) -> 
+        subst_expr (BVar a) (BVar a') acc)
+      ~init:d.body d.args args'
+    in
+    Definition {
+      name = d.name;
+      isrec = d.isrec;
+      args = args';
+      rty = d.rty;
+      fnsig = d.fnsig;
+      body = body';
+    }
+    | _ -> stmt
 
 let exec_stmt (env : env) (thms: thms) (s : stmt) : env * thms =
   match s with
-  | Print tm -> print_endline @@ string_of_tm @@ eval env tm; (env, thms)
+  (*| Const (x, v) -> ()*)
+  | Print tm -> printf "%s\n" (string_of_tm @@ eval env tm); (env, thms)
   | Definition d -> 
     let env = (d.name, (d.args, d.body)) :: env in (* TODO: make this CBV *)
     printf "Defined %s\n" d.name;
@@ -336,9 +359,8 @@ let exec_stmt (env : env) (thms: thms) (s : stmt) : env * thms =
       (env, (name, stmt) :: thms)
     | Proof (n, c::cs) -> 
       let cases = (n, c::cs)
-      in (*TODO check generated wts against provided *)
-      (* TODO inject WTS, checked against claim so cases prove claim *)
-      let _ = map (fun c -> infer_wts (fst cases) c stmt) (snd cases) in
+      in 
+      
       let _args = stmt.quantifiers in
       let claim = stmt.claim.eqn in
       let thms = (name, stmt) :: thms in (* TODO thm -> claim? *)

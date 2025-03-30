@@ -59,7 +59,7 @@ THEOREM (map_eq).
 FORALL (f : 'a -> 'b) (l : 'a list) (acc : 'b list) : app (rev (map f l)) acc = map_tr f l acc : 'b list.
 
 PROOF.
-BY INDUCTION ON l.
+BY INDUCTION ON l, GENERALIZE acc.
 
 CASE l = [].
 WTS: app (rev (map f [])) acc = map_tr f [] acc.
@@ -79,7 +79,7 @@ WTS: app (rev (map f (x :: xs))) acc = map_tr f (x :: xs) acc.
 LHS = app (rev (map f (x :: xs))) acc.
     = app (rev ((f x) :: (map f xs))) acc -- BY defn.
     = app (app (rev (map f xs)) ((f x) :: [])) acc -- BY defn.
-    = app (rev (map f xs)) (app ((f x) :: []) acc) -- BY LEMMA assoc.
+    = app (rev (map f xs)) (app ((f x) :: []) acc) -- BY assoc.
     = map_tr f xs (app ((f x) :: []) acc) -- BY IH1.
 
 RHS = map_tr f (x :: xs) acc.

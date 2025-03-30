@@ -7,3 +7,11 @@ do
 	echo "testing file: ${target}"
 	./run ${target}
 done
+
+proofs="$(ls ./proofs/*.ic)"
+for target in ${proofs};
+do
+  echo ""
+	echo "testing file: ${target}"
+	./run ${target}
+done

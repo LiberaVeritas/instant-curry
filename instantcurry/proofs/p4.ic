@@ -1,3 +1,35 @@
+THEOREM (rev_app).
+FORALL (l1 : 'a list) (l2 : 'a list) : rev (app l1 l2) = app (rev l2) (rev l1) : 'a list.
+
+PROOF.
+BY INDUCTION ON l1.
+
+CASE l1 = [].
+WTS: rev (app [] l2) = app (rev l2) (rev []).
+
+LHS = rev (app [] l2).
+    = rev l2 -- BY defn.
+
+RHS = app (rev l2) (rev []).
+    = app (rev l2) [] -- BY defn.
+    = rev l2 -- BY app_nil.
+
+CASE l1 = x :: xs.
+IH1: rev (app xs l2) = app (rev l2) (rev xs).
+WTS: rev (app (x :: xs) l2) = app (rev l2) (rev (x :: xs)).
+
+LHS = rev (app (x :: xs) l2).
+    = rev (x :: (app xs l2)) -- BY defn.
+    = app (rev (app xs l2)) (x :: []) -- BY defn.
+    = app (app (rev l2) (rev xs)) (x :: []) -- BY IH1.
+    = app (rev l2) (app (rev xs) (x :: [])) -- BY app_assoc.
+
+RHS = app (rev l2) (rev (x :: xs)).
+    = app (rev l2) (app (rev xs) (x :: [])) -- BY defn.
+
+QED.
+
+
 THEOREM (rev_rev).
 FORALL (l : 'a list) : rev (rev l) = l : 'a list.
 
@@ -19,12 +51,13 @@ WTS: rev (rev (x :: xs)) = x :: xs.
 
 LHS = rev (rev (x :: xs)).
     = rev (app (rev xs) (x :: [])) -- BY defn.
-    = app (rev (x :: [])) (rev (rev xs)) -- BY app_rev.
+    = app (rev (x :: [])) (rev (rev xs)) -- BY rev_app.
     = app (rev (x :: [])) xs -- BY IH1.
     = app (app (rev []) (x :: [])) xs -- BY defn.
     = app (app [] (x :: [])) xs -- BY defn.
     = app (x :: []) xs -- BY defn.
-    = x :: xs -- BY app_x.
+    = x :: app [] xs   -- BY defn.
+    = x :: xs -- BY defn.
 
 RHS = x :: xs.
 

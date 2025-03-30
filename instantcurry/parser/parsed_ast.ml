@@ -30,7 +30,7 @@ let fresh : unit -> ty =
 type tm =
   | Nil
   | Cons of tm * tm
-  | Empty
+  (*| Empty*)
   (*| Node of tm * tm * tm*)
   | ListCase of tm (* scrutinee *) * tm (* nil case *) * name * name * tm (* cons case (and its two bound vars) *)
   (*| TreeCase of tm (* scrutinee *) * tm (* empty case *) * name * name * name * tm (* node case (and its three bound vars) *)*)
@@ -47,7 +47,7 @@ type tm =
 let rec string_of_tm (tm : tm) : string =
   match tm with
   | Nil -> "[]"
-  | Empty -> "⊥"
+ (*| Empty -> ""*)
   | Cons (t, t') -> "(" ^ string_of_tm t ^ " :: " ^ string_of_tm t' ^ ")"
   (*| Node _ -> "NODE"*)
   | ListCase (l, n, x, xs, c) ->
@@ -83,13 +83,13 @@ type side = tm * (tm * name) list (* steps with justification *) [@@deriving sex
 
 type case = name * pattern * 
             (name * eqn) list * 
-            eqn * 
+            eqn option * 
             side * 
             side (* variable = pattern, optional induction hypotheses, wts, lhs, rhs *)
             [@@deriving sexp]
 
 type proof = 
-  | Proof of name * name list option * case list (* Induction variable, cases *)
+  | Proof of name * name list option * case list (* Induction variable, generalize vars, cases *)
   | Axiom
   [@@deriving sexp]
 
@@ -98,6 +98,8 @@ type stmt =
   | Definition of name * isrec * (name * ty) list * ty * tm (* function name, typed args, return type, body *)
   (*TODO allow definition of vars to expressions *)
   | Print of tm (* Print result of evaluating term *)
+  | Const of name * tm
+  | NoOp (* for comments *)
   [@@deriving sexp]
 
 

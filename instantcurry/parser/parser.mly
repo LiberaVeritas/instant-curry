@@ -7,6 +7,7 @@
 
 (* proof language keywords *)
 %token DEFINITION
+%token CONST
 %token PRINT
 %token THEOREM
 %token GENERALIZE
@@ -22,6 +23,7 @@
 %token RHS
 %token QED
 %token AXIOM
+(*%token HASH*)
 (*%token LEMMA*)
 
 (* term language keywords *)
@@ -34,6 +36,8 @@
 %token ELSE
 %token FUN
 %token END
+%token DEFN
+%token OF
 //%token EMPTY
 //%token NODE
 
@@ -105,6 +109,7 @@ stmt:
   f = IDENT ps = arg+ 
   EQ tm = tm                            { Definition (f, false, ps, fresh (), tm) }
 | PRINT tm = tm SEP                     { Print tm }
+| CONST i = IDENT EQ tm = tm SEP        { Const (i, tm) }
 
 strict_arg:
 | LPAR i = IDENT COLON ty = ty RPAR     { (i, ty) }
@@ -131,7 +136,12 @@ case:
   ihs = ih*
   WTS COLON wts = eqn SEP   (*TODO make WTS optional *)
   LHS lhs = side
-  RHS rhs = side                        { (i, p, ihs, wts, lhs, rhs) }
+  RHS rhs = side                        { (i, p, ihs, Some wts, lhs, rhs) }
+| CASE
+  i = IDENT EQ p = pattern SEP
+  ihs = ih*
+  LHS lhs = side
+  RHS rhs = side                        { (i, p, ihs, None, lhs, rhs) }
 
 ih:
 | id = IH COLON e = eqn SEP             { ("IH" ^ string_of_int id, e) }
@@ -142,8 +152,10 @@ side:
 
 step:
 (*| EQ t = tm DASH BY LEMMA i = IDENT SEP	{ (t, "LEMMA " ^ i) }*)
-| EQ t = tm DASH BY i = IDENT SEP       { (t, i) }
-| EQ t = tm DASH BY ih = IH SEP         { (t, "IH" ^ string_of_int ih) }
+| EQ t = tm DASH BY i = IDENT SEP           { (t, i) }
+| EQ t = tm DASH BY DEFN SEP                { (t, "defn") }
+| EQ t = tm DASH BY DEFN OF i = IDENT SEP   { (t, "defn of " ^ i) }
+| EQ t = tm DASH BY ih = IH SEP             { (t, "IH" ^ string_of_int ih) }
 
 pattern:
 | NIL                                   { Pat_nil }

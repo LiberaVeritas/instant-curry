@@ -1,23 +1,3 @@
-DEFINITION. 
-let rec app (xs : 'a list) (ys : 'a list) : 'a list =
-    match xs with
-    | [] => ys
-    | x :: xs => x :: (app xs ys)
-    end
-
-DEFINITION.
-let rec map (f : 'a -> 'b) (xs : 'a list) : 'b list =
-    match xs with
-    | [] => []
-    | x :: xs => f x :: (map f xs)
-    end
-
-DEFINITION.
-let rec rev (xs : 'a list) : 'a list =
-    match xs with
-    | [] => []
-    | x :: xs => app (rev xs) (x :: [])
-    end
 
 DEFINITION.
 let rec map_rev_tr (f : 'a -> 'b) (xs : 'a list) (acc : 'b list) : 'b list =
@@ -54,6 +34,7 @@ RHS = app (map f (x :: xs)) (map f ys).
 
 QED.
 
+
 THEOREM (app_assoc).
 FORALL (xs : 'a list) (ys : 'a list) (zs : 'a list) :
     app (app xs ys) zs = app xs (app ys zs) : 'a list.
@@ -80,12 +61,21 @@ WTS: map_rev_tr f (x :: xs) acc = app (map f (rev (x :: xs))) acc.
 
 LHS = map_rev_tr f (x :: xs) acc.
     = map_rev_tr f xs (f x :: acc)                    -- BY defn.
-    = app (map f (rev xs)) (f x :: acc)             -- BY IH1.
+    = app (map f (rev xs)) (f x :: acc)               -- BY IH1.
 RHS = app (map f (rev (x :: xs))) acc.
     = app (map f (app (rev xs) (x :: []))) acc              -- BY defn.
     = app (app (map f (rev xs)) (map f (x :: []))) acc      -- BY map_over_app.
-    = app (app (map f (rev xs)) (f x :: [])) acc            -- BY defn.
-    = app (map f (rev xs)) (app (f x :: []) acc)            -- BY app_assoc.
+
+    = app (app (map f (rev xs)) (f x :: map f [])) acc      -- BY defn of map.
+    = app (app (map f (rev xs)) 
+               (f x :: [])) 
+          acc                                          -- BY defn.
+          
+    = app (map f (rev xs)) 
+          (app (f x :: []) 
+               acc)                                    -- BY app_assoc.
+               
+    = app (map f (rev xs)) (f x :: app [] acc)              -- BY defn.
     = app (map f (rev xs)) (f x :: acc)                     -- BY defn.
 
 QED.

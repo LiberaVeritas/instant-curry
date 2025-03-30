@@ -26,11 +26,12 @@ let rec string_of_tm (t : tm) : string =
   | Times (t, t') -> "(" ^ string_of_tm t ^ " * " ^ string_of_tm t' ^ ")"
   | If0 (t, z, s) -> "(if0 " ^ string_of_tm t ^ 
     " then " ^ string_of_tm z ^ " else " ^ string_of_tm s ^ ")"
-  | App (t, t') -> "(" ^ string_of_tm t ^ " " ^ string_of_tm t' ^ ")"
-  | Fun (x, ty, t) -> "(fun (" ^ x ^ " : " ^ string_of_ty ty ^ 
-    ") -> " ^ string_of_tm t ^ ")"
+  | App (t, t') | MApp (t, t') -> 
+    "(" ^ string_of_tm t ^ " " ^ string_of_tm t' ^ ")"
+  | Fun (x, ty, t) | MFun (x, ty, t) -> 
+    "(fun (" ^ x ^ " : " ^ string_of_ty ty ^ ") -> " ^ string_of_tm t ^ ")"
   | BVar x -> "B_" ^ x
-  | Ref x -> "R_" ^ x
+  | Ref x | MRef x -> "R_" ^ x
   | MVar x -> "M_" ^ x
   | UVar x -> "U_" ^ x
 

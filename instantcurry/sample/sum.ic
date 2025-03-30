@@ -1,16 +1,3 @@
-DEFINITION.
-let rec sum (l : nat list) : nat =
-    match l with
-    | [] => 0
-    | x :: xs => x + sum xs
-    end
-
-DEFINITION.
-let rec sum_tr (l : nat list) (acc : nat) : nat =
-    match l with
-    | [] => acc
-    | x :: xs => sum_tr xs (x + acc)
-    end
 
 
 THEOREM (sum_is_sum_tr_gen).
@@ -36,7 +23,7 @@ WTS: sum (x :: xs) + acc = sum_tr (x :: xs) acc.
 LHS = sum (x :: xs) + acc.
     = x + sum xs + acc      -- BY defn.
     = sum xs + x + acc      -- BY commonsense.
-    = sum xs + (x + acc)    -- BY commonsense.
+    = sum xs + (x + acc)      -- BY commonsense.
 
 RHS = sum_tr (x :: xs) acc.
     = sum_tr xs (x + acc)   -- BY defn.

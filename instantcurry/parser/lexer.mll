@@ -20,14 +20,33 @@ let nat = digit+
 let alpha = [ 'a'-'z' 'A'-'Z' ]
 let ident = [ 'a'-'z' ] ( alpha | digit | '_' | '\'' )*
 let ih = "IH" (digit as d)
+let comment_start = "(*"
+let comment_end = "*)"
+let comment_line = "#"
 
-rule read_token = parse
+rule comment = parse
+| comment_end               { read_token lexbuf }
+| _                         { comment lexbuf }
+| eof                       { EOF }
+
+and comment_line = parse
+| newline                   { read_token lexbuf }
+| _                         { comment_line lexbuf }
+| eof                       { EOF }
+
+and read_token = parse
 | ws                        { read_token lexbuf }
+| comment_start             { comment lexbuf }
+| comment_line              { comment_line lexbuf }
 | newline                   { next_line lexbuf ; read_token lexbuf }
 | eof                       { EOF }
 
+
+
+
 (* proof language keywords *)
 | "DEFINITION"              { DEFINITION }
+| "CONST"                   { CONST }
 | "PRINT"                   { PRINT }
 | "THEOREM"                 { THEOREM }
 | "GENERALIZE"              { GENERALIZE }
@@ -55,6 +74,8 @@ rule read_token = parse
 | "else"                    { ELSE }
 | "fun"                     { FUN }
 | "end"                     { END }
+| "defn"                    { DEFN }
+| "of"                      { OF }
 (*| "Empty"                   { EMPTY }*)
 (*| "Node"                    { NODE }*)
 

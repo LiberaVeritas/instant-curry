@@ -1,19 +1,4 @@
-DEFINITION.
-let rec map (f : 'a -> 'b) (l : 'a list) : 'b list =
-    match l with
-    | [] => []
-    | x :: xs => f x :: (map f xs)
-    end
 
-DEFINITION.
-let rec len (l : 'a list) : nat =
-    match l with
-    | [] => 0
-    | x :: xs => 1 + len xs
-    end
-
-DEFINITION.
-let id (x : 'a) : 'a = x
 
 THEOREM (map_id).
 FORALL (l : 'a list) : map id l = l : 'a list. 
@@ -62,11 +47,11 @@ WTS: len (map f (x :: xs)) = len (x :: xs).
 
 LHS = len (map f (x :: xs)).
     = len (f x :: map f xs)         -- BY defn.
-    = len (map f xs) + 1            -- BY defn.
-    = len xs + 1                    -- BY IH1.
+    = 1 + len (map f xs)            -- BY defn.
+    = 1 + len xs                    -- BY IH1.
 
 RHS = len (x :: xs).
-    = len xs + 1                    -- BY defn.
+    = 1 + len xs                    -- BY defn.
 
 QED.
 

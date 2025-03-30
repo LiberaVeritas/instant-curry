@@ -11,6 +11,7 @@ message: error message
 state: internal parser state that led to the error
 advice: advice for fixing error
 ```
+Note: a start position of 0 could mean the error happened at the end of the last line
 
 Note: the error token range can be 0 (start = stop)
 
