@@ -6,11 +6,34 @@ Allows for stating and proving inductive and arithmetic statements, with polymor
 ## Syntax
 An InstantCurry program is a list of statements.
 ```
-<program> ::= <statement> <program> | EOF
+<program> ::= <statement> <program> 
+            | EOF
 ```
 Statements consist of definitions and theorems.
 ```
-<statement> ::= <definition> | <theorem> | <print>
+<statement> ::= <definition> 
+              | <theorem> 
+```
+Each of these are built up from terms.
+```
+<term> ::= <constant> 
+         | <term> <binop> <term>
+         | <variable>
+         | <function> 
+         | <application> 
+         | <if_expression>
+         | <match_expression>
+
+<constant> ::= [] | [0-9]+
+<variable> ::= [letter] ( [letter] | [digit] | "_" )*
+<binop> ::= + | * | - | ::
+<function> ::= fun <variable> => <term> end
+<application> ::= <term> <term>
+<if_expression> ::= if0 <term> then <term> else <term> end
+<match_expression> ::= match <term> with
+                       | [] => <term>
+                       | <variable> :: <variable> => <term>
+                       end
 ```
 
 #### Comments
@@ -22,6 +45,10 @@ Comments may be written like in OCaml, or as a line comment starting with `#` un
 ## Operational (Big Step) Semantics
 Evaluation follows standard arithmetic on the naturals, along with function applications, or β-reductions.
 
+There are if expressions `if0 <scrutinee> then <true_case> else <false_case> end` where `if0` is used to avoid collision with the OCaml keyword. The expression evaluates to `<true_case>` if the `<scrutinee>` evaluates to a value of 1, and `<false_case>` otherwise.
+
+Likewise, match expressions evaluate the term on the matching list patternbranch.
+
 ## Types
 InstantCurry has 2 basic computational types, natural numbers and functions, as well as an inductive list type.
 ```
@@ -30,6 +57,22 @@ type 'a list := [] | 'a :: 'a list
 type 'a -> 'b := <function>
 ```
 Type variables are denoted by a single quote followed by a variable name, like `'a`. This can stand for any InstantCurry type, thus giving a type schemes parametrized over types.
+
+Type annotations following a term are optional (except in theorems).
+```
+<term> : type
+```
+
+If expressions and match expressions have the typical type constraints.
+```
+if0 s then t else f end : {s : nat, t, f : 'a}
+
+match s with
+| [] => e
+| x::xs = e'
+end
+: {s, xs : a' list, x : 'a, e, e' : 'b}
+```
 
 #### Functions
 Functions in InstantCurry are pure functions, or mappings from one type to another.
@@ -40,6 +83,12 @@ f 5 : 'b -> nat
 ```
 
 ## Definitions
+```
+<definition> ::= 
+DEFINITION.
+let rec? <variable> <variable>+ 
+<term> = <term>
+```
 Definitions basically represent named lambda abstractions.
 They can be used to define functions, using definition declaration header and a basic syntax similar to that of OCaml.
 ```
@@ -68,8 +117,17 @@ let rec len (l : 'a list) : nat =
 Note the double arrow `=>` instead of `->` in the match expression, and the mandatory `end`.
 
 ## Theorems
+```
+<theorem> ::=
+THEOREM (<variable>).
+FORALL <variable>+ : <term> = <term>
+
+<proof>
+```
 Theorems in InstantCurry are inductive and universally quantified.
 They are stated along with a name, which can later be referred to in a proof, along with a list of variables to quantify over and the statement of the theorem (equation). 
+
+Type annotations are required for theorem statements and variables.
 ```
 THEOREM (map_id).
 FORALL (l : 'a list) : 
@@ -86,9 +144,18 @@ len (map f l) = len l : nat.
 PROOF.
 ...
 ```
-Type annotations are required for theorem statements and variables.
 
 ## Proofs
+```
+<proof> ::=
+PROOF.
+AXIOM. |
+BY INDUCTION ON <variable>. |
+BY INDUCTION ON <variable>, GENERALIZE <variable>+.
+<case>
+<case>
+QED.
+```
 The simplest proof is to assume the theorem by axiom.
 ```
 THEOREM (map_id).
@@ -119,10 +186,24 @@ RHS = [].                 # right hand side of WTS
 ```
 For each case, there is a 'want to show' statement `WTS`, which is the statement to prove.
 This can be omitted and inferred by InstantCurry.
+```
+<case> ::=
+CASE <variable> = []. 
+                | <variable>::<variable>.
+(IH[0-9]: <term> = <term>.)?*
+(WTS: <term> = <term>.)?
 
+LHS = <term>.
+      <step>+
+RHS = <term>.
+      <step>+
+```
 Each side of the `WTS` is stated, followed by deductive steps to make them equal.
 Every step is justified by a deductive rule, stated like `-- BY <justification>`.
 ```
+<step> ::= = <term> <justification>.
+
+
 CASE l = y :: ys.
 IH1: map id ys = ys.                # inductive hypothesis
 WTS: map id (y :: ys) = y :: ys.
@@ -137,11 +218,18 @@ RHS = y :: ys.
 QED.
 ```
 List cases are accompanied by inductive hypotheses. (`IH` followed by a number) These hypotheses assume the statement of the theorem for list of length one less than the list of consideration. That is, given a list `x::xs`, the hypothesis takes as granted the theorem statement for `xs`.
-Proofs by induction come down to demonstrating how to integrate the next element `x` under this assumption.
+Proofs by induction come down to demonstrating how to integrate the next element `x` into the statement under this assumption.
 
 The end of proofs are marked by `QED.`.
 
 ## Justifications
+```
+<justification> ::= -- BY defn.
+                        | defn of <variable>.
+                        | IH[0-9].
+                        | <variable>.
+                        | commonsense.
+```
 There are several ways to justify a deductive proof step.
 ```
 THEOREM (map_len).
@@ -263,7 +351,7 @@ RHS = sum_tr (x :: xs) 0.
     = ???
 ...
 ```
-Instead, we can generalize `0` to a more general `acc` which can be any natural number:
+Instead, we can generalize the statement to a more general one, in which instead of `0` we use `acc` which can stand for any expression evaluating to a natural number:
 ```
 THEOREM (sum_is_sum_tr).
 FORALL (l : nat list) (acc : nat) :         # <----
@@ -286,6 +374,8 @@ RHS = sum_tr (x :: xs) acc.
 ...
 ```
 Note the comma after `BY INDUCTION ON l,` followed by `GENERALIZE <vars>...`.
+In the last step (`IH1`), the `acc` in the inductive hypothesis can be substituted by `x + acc`, as this evaluates to a natural number.
+This can be done for lists as well.
 
 
 ## TODO
