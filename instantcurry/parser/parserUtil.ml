@@ -87,7 +87,10 @@ let get text checkpoint i =
 (* gets the line in the text corresponding to the line number in positions *)
 let get_line text (pos1, _) =
   let start = pos1.pos_bol in
-  let last = String.index_from_exn text start '\n' in
+  let last = 
+    try String.index_from_exn text start '\n'
+    with _ -> start 
+  in
   let res = 
     if (pos1.pos_cnum = pos1.pos_bol) then 
       "... " ^ String.sub ~pos:(start-5) ~len:(last - (start-5)) text 

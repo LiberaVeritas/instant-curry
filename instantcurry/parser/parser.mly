@@ -75,7 +75,7 @@
 %left PLUS MINUS
 %left TIMES
 
-// %nonassoc NIL EMPTY NODE NATLIT IDENT LPAR MATCH IF0 FUN
+// %nonassoc NIL NATLIT IDENT LPAR MATCH IF0 FUN
 // %right CONS
 // %left PLUS MINUS
 // %left TIMES

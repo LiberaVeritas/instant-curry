@@ -11,10 +11,10 @@ LHS = rev (app [] l2).
     = rev l2 -- BY defn.
 
 RHS = app (rev l2) (rev []).
-    = app (rev l2) [] -- BY LEMMA app_nil.
-    = rev l2 -- BY defn.
+    = app (rev l2) [] -- BY defn.
+    = rev l2 -- BY app_nil.
 
-CASE l = x :: xs.
+CASE l1 = x :: xs.
 IH1: rev (app xs l2) = app (rev l2) (rev xs).
 WTS: rev (app (x :: xs) l2) = app (rev l2) (rev (x :: xs)).
 
@@ -22,7 +22,7 @@ LHS = rev (app (x :: xs) l2).
     = rev (x :: (app xs l2)) -- BY defn.
     = app (rev (app xs l2)) (x :: []) -- BY defn.
     = app (app (rev l2) (rev xs)) (x :: []) -- BY IH1.
-    = app (rev l2) (app (rev xs) (x :: [])) -- BY LEMMA assoc.
+    = app (rev l2) (app (rev xs) (x :: [])) -- BY app_assoc.
 
 RHS = app (rev l2) (rev (x :: xs)).
     = app (rev l2) (app (rev xs) (x :: [])) -- BY defn.

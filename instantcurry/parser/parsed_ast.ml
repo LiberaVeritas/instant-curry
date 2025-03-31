@@ -9,7 +9,7 @@ type ty =
   | Ty_Nat
   | Ty_Arrow of ty * ty
   | Ty_List of ty
-  | Ty_Tree of ty
+  (*| Ty_Tree of ty*)
   | Ty_Var of string
   [@@deriving sexp]
 
@@ -18,7 +18,7 @@ let rec string_of_ty (ty : ty) : string =
   | Ty_Arrow (ty, ty') -> "(" ^ string_of_ty ty ^ " -> " ^ string_of_ty ty' ^ ")"
   | Ty_List ty -> "(" ^ string_of_ty ty ^ " list)" 
   | Ty_Nat -> "nat"
-  | Ty_Tree ty -> "(" ^ string_of_ty ty ^ " tree)"
+  (*| Ty_Tree ty -> "(" ^ string_of_ty ty ^ " tree)"*)
   | Ty_Var _ -> "var"
 
 let fresh : unit -> ty =
@@ -99,7 +99,7 @@ type stmt =
   (*TODO allow definition of vars to expressions *)
   | Print of tm (* Print result of evaluating term *)
   | Const of name * tm
-  | NoOp (* for comments *)
+  (*| NoOp (* for comments *)*)
   [@@deriving sexp]
 
 

@@ -156,7 +156,7 @@ let lift_proof (thms : name list) (ctx : scope_ctx) (stmt : thm_stmt) (prf : P.p
 let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : P.stmt) : name list * scope_ctx * stmt =
   match stmt with
   | Theorem (name, args, claim, prf) -> 
-    if mem_assoc ctx name then raise (ScopeError ("theorem " ^ name ^ " already stated")) else
+    if List.exists ~f:(String.equal name) thms then raise (ScopeError ("theorem " ^ name ^ " already stated")) else
     let ctx' = List.fold
                 ~f:(fun ctx (x, _) -> (x, Meta) :: ctx)
                 ~init:ctx
@@ -194,8 +194,8 @@ let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : P.stmt) : name list *
                   fnsig = fnsig ; 
                   body = t })
   | Print t -> (thms, ctx, Print (lift_tm ctx t))
-  | Const (_,_) -> raise NotImplemented (*(thms, (x, Stmt) :: ctx, Const (x, v))*)
-  | NoOp -> (thms, ctx, Print Nil)
+  | Const (_,_) -> raise NotImplemented (*(thms, (x, Stmt) :: ctx, Const (x, v))
+  (*| NoOp -> (thms, ctx, Print Nil)*)*)
 
 let lift_program (p : P.program) : program =
   let rec go thms ctx p =

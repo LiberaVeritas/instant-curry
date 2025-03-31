@@ -50,6 +50,12 @@ let rec sum_tr (l : nat list) (acc : nat) : nat =
     | x :: xs => sum_tr xs (x + acc)
     end
 
+DEFINITION.
+let rec filter (f : 'a -> nat) (l : 'a list) : 'a list =
+    match l with
+    | [] => []
+    | x :: xs => if0 (f x) then (x :: filter f xs) else (filter f xs) end
+    end
 
 THEOREM (app_nil).
 FORALL (l : 'a list) : 

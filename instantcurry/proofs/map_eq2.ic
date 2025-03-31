@@ -1,5 +1,6 @@
 
 
+
 THEOREM (map_eq).
 FORALL (f : 'a -> 'b) (l : 'a list) (acc : 'b list) : app (rev (map f l)) acc = map_tr f l acc : 'b list.
 

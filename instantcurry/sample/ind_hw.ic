@@ -35,11 +35,6 @@ RHS = app (map f (x :: xs)) (map f ys).
 QED.
 
 
-THEOREM (app_assoc).
-FORALL (xs : 'a list) (ys : 'a list) (zs : 'a list) :
-    app (app xs ys) zs = app xs (app ys zs) : 'a list.
-AXIOM.
-
 THEOREM (map_rev_tr_gen).
 FORALL (f : 'a -> 'b) (xs : 'a list) (acc : 'b list) :
     map_rev_tr f xs acc = app (map f (rev xs)) acc : 'b list.
