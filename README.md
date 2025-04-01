@@ -387,6 +387,7 @@ This can be done for lists as well.
 * check IHs are valid.
 * check there are two cases, one of base and list each. (are there any situations where this isn't the case?) 
 * add booleans for if expressions? allow `assume` when proving if cases?
+* type annotation requirements in theorem statements?
 * automated theorem prover.
 
 
