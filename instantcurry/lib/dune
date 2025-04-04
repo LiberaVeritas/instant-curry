@@ -2,4 +2,4 @@
  (name instantcurry)
  (libraries icparser core stdio yojson)
  (preprocess (pps ppx_sexp_conv))
- (modules proof printing typechecking lifting synint term))
+ (modules proof printing typechecking lifting synint term logger))

@@ -19,7 +19,7 @@ let digit = [ '0'-'9' ]
 let nat = digit+
 let alpha = [ 'a'-'z' 'A'-'Z' ]
 let ident = [ 'a'-'z' ] ( alpha | digit | '_' | '\'' )*
-let ih = "IH" (digit as d)
+(*let ih = "IH" (digit as d)*)
 let comment_start = "(*"
 let comment_end = "*)"
 let comment_line = "#"
@@ -57,7 +57,8 @@ and read_token = parse
 | "FORALL"                  { FORALL }
 | "CASE"                    { CASE }
 | "WTS"                     { WTS }
-| "IH" (nat as n)           { IH (int_of_string n) }
+(*| "IH" (nat as n)           { IH (int_of_string n) }*)
+| "IH"                      { IH }
 | "LHS"                     { LHS }
 | "RHS"                     { RHS }
 | "QED"                     { QED }

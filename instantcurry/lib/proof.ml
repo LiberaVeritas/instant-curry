@@ -12,31 +12,32 @@ exception IHMatchFail
 exception TheoremMatchFail
 exception EvalMatchFail
 exception WTSMatchFail
+exception SideMatchFail
 exception PointlessStep
  
 
 (* unmark MApp to App and MRef to Ref *)
 let unmark e =
-  let rec res e =
+  let rec go e =
     match e with
     | Nil -> Nil
-    | Cons (x, xs) -> Cons (res x, res xs)
+    | Cons (x, xs) -> Cons (go x, go xs)
     | ListCase (l, n, x, xs, c) -> 
-      ListCase (l, res n, x, xs, res c)
+      ListCase (go l, go n, x, xs, go c)
     | Nat n -> Nat n
-    | Plus (e, e') -> Plus (res e, res e')
-    | Minus (e, e') -> Minus (res e, res e')
-    | Times (e, e') -> Times (res e, res e')
-    | If0 (e, z, nz) -> If0 (res e, res z, res nz)
-    | App (f, e') | MApp (f, e') -> App (res f, res e')
+    | Plus (e, e') -> Plus (go e, go e')
+    | Minus (e, e') -> Minus (go e, go e')
+    | Times (e, e') -> Times (go e, go e')
+    | If0 (e, z, nz) -> If0 (go e, go z, go nz)
+    | App (f, e') | MApp (f, e') -> App (go f, go e')
     | Fun (f, ty, e) | MFun (f, ty, e)  -> 
-      Fun (f, ty, res e)
+      Fun (f, ty, go e)
     | BVar v -> BVar v
     | Ref v | MRef v -> Ref v
     | UVar v -> UVar v
     | MVar v -> MVar v
   in
-  res e
+  go e
 
 (* check equality in parallel until mismatch, then apply check *)
 let rec at_mismatch (check : env -> tm -> tm -> bool) env e1 e2 : bool =
@@ -96,7 +97,7 @@ let rec eval (env : env) (e : tm) : tm =
   | Nil -> Nil
   | Cons (x, xs) -> Cons (eval env x, eval env xs)
   | ListCase (l, n, x, xs, c) -> 
-    begin match l with
+    begin match eval env l with
     | Nil -> eval env n
     | Cons (y, ys) -> 
       eval env @@ 
@@ -135,6 +136,7 @@ let rec eval (env : env) (e : tm) : tm =
     | App (_, _), App (_, _) -> eval env @@ App (left, right)
     | _, App (_,_) -> eval env @@ App (left, right)
     | App (_,_), _ -> eval env @@ App (left, right)
+    | MFun _, _ -> MApp (left, right) (* don't apply MFun *)
     | _ -> MApp (left, right) (* mark to prevent repassing *)
     end
   | Fun _ as v -> v
@@ -142,7 +144,7 @@ let rec eval (env : env) (e : tm) : tm =
   | BVar _ -> raise BadBoundVar (* this should have been substituted by now! *)
   | Ref r -> Ref r
   | MRef r -> MRef r
-  | UVar _ -> raise NotImplemented (* not intotally sure what into do here *)
+  | UVar _ -> e
   | MVar x -> MVar x (* uninterpreted metavariables left as-is *)
   
     
@@ -209,9 +211,8 @@ let try_def_match env def prev curr =
   in
   
   let rec go e next : bool =
-    let res = unmark @@ attempt e in
-    let _ = get_next next in
-    if (curr $= res) then true else 
+    let res = attempt e in
+    if (curr $= res) then true else
     if (e = next) then false else (* tried all possible substitutions *)
     go next (get_next next)
   in
@@ -223,12 +224,12 @@ let check_def env defs prev curr =
   List.mem true ls
   
   
-let eval_step (env: env) (thms : thms) (ihs : ihs) (prev : tm) (curr : tm) (j : justification) = 
+let eval_step (env: env) (thms : thms) (ih : eqn) (prev : tm) (curr : tm) (j : justification) = 
   if prev = curr then raise PointlessStep else
   match j with
   | ByEval ->
     printf "= %s  -- by eval\n" (string_of_tm curr);
-    if not (curr $= eval env prev) then
+    if not (curr $= eval env (unmark prev)) then
     raise EvalMatchFail
   | ByDefinition None -> 
     printf "= %s  -- by defn\n" (string_of_tm curr);
@@ -242,39 +243,35 @@ let eval_step (env: env) (thms : thms) (ihs : ihs) (prev : tm) (curr : tm) (j : 
     if not (check_commonsense env prev curr) then
     if not (at_mismatch check_commonsense env prev curr) 
     then raise CommonsenseFail;
-  | ByIH ih -> 
+  | ByIH -> 
   
-  (* TODO generate and check IHs  x :: xs -> xs *)
-  
-    printf "= %s  -- by %s: " (string_of_tm curr) ih;
-    let ih = assoc ih ihs in
+    printf "= %s  -- by IH: " (string_of_tm curr);
     printf "/ %s = %s /\n" (string_of_tm ih.lhs) (string_of_tm ih.rhs);
     
-    let res = subst_first_expr ih.lhs ih.rhs prev in
+    let res = eval env @@ subst_first_expr ih.lhs ih.rhs prev in
     if not (res $= curr) then
-    
-    (* try IH equation in other direction too *)
-    let res = subst_first_expr ih.rhs ih.lhs prev in
-    if not (res $= curr)
-    then raise IHMatchFail;
+      (
+      (* try IH equation in other direction too *)
+      let res = eval env @@ subst_first_expr ih.rhs ih.lhs prev in
+      if not (res $= curr) then raise IHMatchFail;)
   | ByTheorem t -> 
     printf "= %s  -- by theorem %s\n" (string_of_tm curr) t;
     let stmt = assoc t thms in
     let f = (fun c (x, _) -> subst_expr (MVar x) (UVar x) c) in
     let claim_lhs = fold_left f stmt.claim.eqn.lhs stmt.quantifiers in
     let claim_rhs = fold_left f stmt.claim.eqn.rhs stmt.quantifiers in
-    let res = subst_first_expr claim_lhs claim_rhs prev in
+    let res = eval env @@ subst_first_expr claim_lhs claim_rhs prev in
     if not (res $= curr)
     then raise TheoremMatchFail;
     ()
 
   
 
-let eval_side side env thms ihs =
+let eval_side side env thms ih =
   printf "Side: %s\n" (string_of_tm side.start);
   let start = side.start in
   let res = 
-    fold_left (fun prev step -> let _ = (eval_step env thms ihs prev (fst step) (snd step)) in (fst step)) start side.steps
+    fold_left (fun prev step -> let _ = (eval_step env thms ih prev (fst step) (snd step)) in (fst step)) start side.steps
   in
   res
 
@@ -285,11 +282,11 @@ let check_case case env thms =
   let _ = case.pattern in
 
   let wts = case.wts in 
-  if not (wts.lhs = case.lhs.start) then raise NotImplemented else
-  if not (wts.rhs = case.rhs.start) then raise NotImplemented else
-  let lhs' = eval_side case.lhs env thms case.ihs in
-  let rhs' = eval_side case.rhs env thms case.ihs in
-  if not (lhs' = rhs') then raise NotImplemented else
+  if not (wts.lhs $= case.lhs.start) then raise WTSMatchFail else
+  if not (wts.rhs $= case.rhs.start) then raise WTSMatchFail else
+  let lhs' = eval_side case.lhs env thms case.ih in
+  let rhs' = eval_side case.rhs env thms case.ih in
+  if not (lhs' = rhs') then raise SideMatchFail else
   ()
   
 let check_proof (_(*var*), cases) _(*claim*) env thms = 
@@ -314,7 +311,30 @@ let infer_wts (name : name) (pat : pattern) (wts_opt : eqn option) (thm_stmt : t
   match wts_opt with
   | None -> inferred
   | Some wts -> 
-    if not (wts = inferred) then raise WTSMatchFail else wts
+    if not (wts.lhs $= inferred.lhs) || 
+     not (wts.rhs $= inferred.rhs)
+     then raise WTSMatchFail else wts
+     
+     
+(* list -> xs *)
+let infer_ih (name : name) (pat : pattern) (ih_opt : eqn option) (thm_stmt : thm_stmt) : eqn =
+  let inferred =
+    let f e =
+      match pat with
+      | Pat_nil -> e
+      | Pat_cons (_, xs) -> 
+        subst_expr (MVar name) (MVar xs) e
+    in
+      { 
+        lhs = thm_stmt.claim.eqn.lhs |> f;
+        rhs = thm_stmt.claim.eqn.rhs |> f;
+      }
+  in
+  match ih_opt with
+  | None -> inferred
+  | Some ih -> 
+    if not (ih.lhs $= inferred.lhs) || not (ih.rhs $= inferred.rhs)
+     then raise IHMatchFail else ih
 
 
 let rename_in_scope stmt =
@@ -356,8 +376,8 @@ let exec_stmt (env : env) (thms: thms) (s : stmt) : env * thms =
       
       let _args = stmt.quantifiers in
       let claim = stmt.claim.eqn in
-      let thms = (name, stmt) :: thms in (* TODO thm -> claim? *)
       let () = check_proof cases claim env thms in
+      let thms = (name, stmt) :: thms in (* TODO thm -> claim? *)
       printf "\n%s □\n" name;
       (env, thms)
     | _ -> raise NotImplemented

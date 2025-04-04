@@ -26,14 +26,17 @@ let rec lift_tm (ctx : scope_ctx) (t : P.tm) : tm =
   | P.Nil -> Nil
   | P.Cons (t, t') -> Cons (lft t, lft t')
   | P.ListCase (l, n, x, xs, c) -> 
-    ListCase (lft l, lft n, x, xs, lift_tm ((x, Term) :: (xs, Term) :: ctx) c)
+      ListCase (lft l, lft n, x, xs, lift_tm ((x, Term) :: (xs, Term) :: ctx) c)
+    
   | P.Nat n -> Nat n
   | P.Plus (t, t') -> Plus (lft t, lft t')
   | P.Minus (t, t') -> Minus (lft t, lft t')
   | P.Times (t, t') -> Times (lft t, lft t')
   | P.If0 (t, z, s) -> If0 (lft t, lft z, lft s)
   | P.App (t, t') -> App (lft t, lft t')
-  | P.Fun (x, ty, t) -> Fun (x, (lift_ty ctx ty), lift_tm ((x, Term) :: ctx) t)
+  (* mark lambda abstractions for non-application. 
+  they are only applied when using eval step explicitly. *)
+  | P.Fun (x, ty, t) -> MFun (x, (lift_ty ctx ty), lift_tm ((x, Term) :: ctx) t)
   (*| P.Empty -> Nil*)
   (*| P.Node (_, _, _) -> raise NotImplemented 
   | P.TreeCase _ -> raise NotImplemented*)
@@ -48,8 +51,11 @@ let rec lift_tm (ctx : scope_ctx) (t : P.tm) : tm =
     | None -> raise (ScopeError x) 
     end
   (*| P.Empty -> raise NotImplemented*)
+  
+  
 
-    (* TODO *)
+
+
 let lift_eqn (ctx : scope_ctx) (eqn : P.eqn) : eqn =
   let (lhs, rhs) = eqn in
   { lhs = lift_tm ctx lhs; rhs = lift_tm ctx rhs }
@@ -73,7 +79,7 @@ let lift_just (thms : name list) (just : P.name) : justification =
   
   if String.equal just "eval" then ByEval else
   
-  if String.is_prefix just ~prefix:"IH" then ByIH just else
+  if String.is_prefix just ~prefix:"IH" then ByIH else
   if List.mem ~equal:String.equal thms just then ByTheorem just 
   
   else raise (ScopeError ("theorem " ^ just ^ " not found"))
@@ -86,41 +92,52 @@ let lift_side (thms : name list) (ctx : scope_ctx) (side : P.side) : side =
     steps = List.map ~f:f steps }
 
 (* generalized variables *)
-let lift_ih ctx gen_vars ih =
-  let generalize_var gvar (var, scope) =
-    if String.equal gvar var then (var, Gen)
-    else (var, scope)
+let lift_ih ctx gen_vars name pat (ih : P.eqn option) stmt =
+  let generalize_ih ih gvar =
+    Term.subst_eqn (MVar gvar) (UVar gvar) ih
   in
-  let gen_helper gvar ctx =
-    if mem_assoc ctx gvar then List.map ~f:(generalize_var gvar) ctx 
-    else
-    (gvar, Gen) :: ctx
+  
+  let ih = Option.map ~f:(fun x -> lift_eqn ctx x) ih in
+  
+  let ih =
+    match ih with
+    | Some ih -> ih
+    | None -> Proof.infer_ih name pat ih stmt
   in
-  let ih_ctx = List.fold ~f:(fun ctx gvar -> gen_helper gvar ctx) ~init:ctx gen_vars in
-  lift_eqn ih_ctx ih
+  (* generalize ih on gen_vars *)
+  List.fold ~f:generalize_ih ~init:ih gen_vars
 
 let lift_case (thms : name list) (ctx : scope_ctx) (stmt : thm_stmt) gen_vars (case : P.case) : case =
-  let (name, pat, ihs, wts, lhs, rhs) = case in
-    if not (match List.Assoc.find ~equal:String.equal ctx name with
+  let (ivar, pat, ih, wts, lhs, rhs) = case in
+    if not 
+      (match List.Assoc.find ~equal:String.equal ctx ivar with
       | Some Meta -> true
       | _ -> false
       )
-    then raise (ScopeError name) else
+    then raise (ScopeError ivar) else
   let ctx = match pat with
     | Pat_cons (x, xs) -> 
       (x, Meta) :: (xs, Meta) :: ctx  (* patterns introduce metavars *)
-     (*| Pat_empty -> ctx*)
-     (*| Pat_node (l, x, r) -> (l, Meta) :: (x, Meta) :: (r, Meta) :: ctx*)
      | Pat_nil -> ctx 
      in
   (*printf "\n%s\n\n" (Printing.string_of_eqn wts);*)
-  let thms = List.fold ~f:(fun thms (n, _) -> n :: thms) ~init:thms ihs in  (* ihs introduce new thms *)
-  let pat = lift_pat pat in
+    
+    let pat = lift_pat pat in
+    
+    let ih = lift_ih ctx gen_vars ivar pat ih stmt in
+    
+    let thms = 
+      match pat with
+      | Pat_cons _ -> "IH" :: thms (* IH introduces new theorem *)
+      | Pat_nil -> thms
+    in
+  
   let wts = (Option.map ~f:(lift_eqn ctx) wts) in
-  let wts = Proof.infer_wts name pat wts stmt in
-  { var = name;
+  let wts = Proof.infer_wts ivar pat wts stmt in
+  
+  { var = ivar;
     pattern = pat;
-    ihs = List.map ~f:(function (name, ih) -> (name, lift_ih ctx gen_vars ih)) ihs; 
+    ih = ih; 
     wts = wts;
     lhs = lift_side thms ctx lhs;
     rhs = lift_side thms ctx rhs 
@@ -194,8 +211,8 @@ let lift_stmt (thms : name list) (ctx : scope_ctx) (stmt : P.stmt) : name list *
                   fnsig = fnsig ; 
                   body = t })
   | Print t -> (thms, ctx, Print (lift_tm ctx t))
-  | Const (_,_) -> raise NotImplemented (*(thms, (x, Stmt) :: ctx, Const (x, v))
-  (*| NoOp -> (thms, ctx, Print Nil)*)*)
+  | Const (_,_) -> raise NotImplemented 
+  
 
 let lift_program (p : P.program) : program =
   let rec go thms ctx p =
@@ -204,5 +221,5 @@ let lift_program (p : P.program) : program =
       let thms, ctx, stmt = lift_stmt thms ctx stmt in
       stmt :: go thms ctx p
     | [] -> []
-  in go ["defn"] [] p
+  in go [] [] p
 

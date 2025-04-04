@@ -18,7 +18,8 @@
 %token FORALL
 %token CASE
 %token WTS
-%token <int> IH
+(*%token <int> IH*)
+%token IH
 %token LHS
 %token RHS
 %token QED
@@ -133,18 +134,19 @@ generalize:
 case:
 | CASE
   i = IDENT EQ p = pattern SEP
-  ihs = ih*
+  ih = ih?
   WTS COLON wts = eqn SEP   (*TODO make WTS optional *)
   LHS lhs = side
-  RHS rhs = side                        { (i, p, ihs, Some wts, lhs, rhs) }
+  RHS rhs = side                        { (i, p, ih, Some wts, lhs, rhs) }
 | CASE
   i = IDENT EQ p = pattern SEP
-  ihs = ih*
+  ih = ih?
   LHS lhs = side
-  RHS rhs = side                        { (i, p, ihs, None, lhs, rhs) }
+  RHS rhs = side                        { (i, p, ih, None, lhs, rhs) }
 
 ih:
-| id = IH COLON e = eqn SEP             { ("IH" ^ string_of_int id, e) }
+(*| id = IH COLON e = eqn SEP             { Some ("IH" ^ string_of_int id, e) }*)
+| IH COLON e = eqn SEP                  { (e) }
 
 side:
 | EQ t = tm SEP 
@@ -155,7 +157,7 @@ step:
 | EQ t = tm DASH BY i = IDENT SEP           { (t, i) }
 | EQ t = tm DASH BY DEFN SEP                { (t, "defn") }
 | EQ t = tm DASH BY DEFN OF i = IDENT SEP   { (t, "defn of " ^ i) }
-| EQ t = tm DASH BY ih = IH SEP             { (t, "IH" ^ string_of_int ih) }
+| EQ t = tm DASH BY IH SEP                  { (t, "IH") }
 
 pattern:
 | NIL                                   { Pat_nil }

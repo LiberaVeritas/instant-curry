@@ -7,7 +7,7 @@ PROOF.
 BY INDUCTION ON l.
 
 CASE l = [].
-WTS: map id [] = [].
+# WTS map id [] = [].
 
 LHS = map id [].
     = []                            -- BY defn.
@@ -15,13 +15,13 @@ LHS = map id [].
 RHS = [].
 
 CASE l = y :: ys.
-IH1: map id ys = ys.
-WTS: map id (y :: ys) = y :: ys.
+# IH: map id ys = ys.
+# WTS map id (y :: ys) = y :: ys.
 
 LHS = map id (y :: ys).
     = id y :: map id ys             -- BY defn.
     = y :: map id ys                -- BY defn.
-    = y :: ys                       -- BY IH1.
+    = y :: ys                       -- BY IH.
 
 RHS = y :: ys.
 
@@ -34,7 +34,7 @@ PROOF.
 BY INDUCTION ON l.
 
 CASE l = [].
-WTS: len (map f []) = len [].
+# WTS len (map f []) = len [].
 
 LHS = len (map f []).
     = len []                        -- BY defn.
@@ -42,13 +42,13 @@ LHS = len (map f []).
 RHS = len [].
 
 CASE l = x :: xs.
-IH1: len (map f xs) = len xs.
-WTS: len (map f (x :: xs)) = len (x :: xs).
+# IH: len (map f xs) = len xs.
+# WTS len (map f (x :: xs)) = len (x :: xs).
 
 LHS = len (map f (x :: xs)).
     = len (f x :: map f xs)         -- BY defn.
     = 1 + len (map f xs)            -- BY defn.
-    = 1 + len xs                    -- BY IH1.
+    = 1 + len xs                    -- BY IH.
 
 RHS = len (x :: xs).
     = 1 + len xs                    -- BY defn.

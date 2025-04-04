@@ -1,3 +1,4 @@
+PRINT 5.
 
 
 THEOREM (map_id).
@@ -7,16 +8,16 @@ PROOF.
 BY INDUCTION ON l.
 
 CASE l = [].
-# WTS map id [] = [].
-
+WTS: map id [] = [].
 LHS = map id [].
     = []                            -- BY defn.
 
 RHS = [].
 
 CASE l = y :: ys.
+# infer ih test
 # IH: map id ys = ys.
-# WTS map id (y :: ys) = y :: ys.
+# WTS: map id (y :: ys) = y :: ys.    # optional
 
 LHS = map id (y :: ys).
     = id y :: map id ys             -- BY defn.
@@ -27,6 +28,7 @@ RHS = y :: ys.
 
 QED.
 
+
 THEOREM (map_fusion). 
 FORALL (f : 'b -> 'c) (g : 'a -> 'b) (l : 'a list) :
     map (fun (x : 'a) => f (g x) end) l = map f (map g l) : 'c list.
@@ -34,7 +36,7 @@ FORALL (f : 'b -> 'c) (g : 'a -> 'b) (l : 'a list) :
 PROOF. BY INDUCTION ON l.
 
 CASE l = [].
-# WTS map (fun (x : 'a) => f (g x) end) [] = map f (map g []).
+# WTS: map (fun (x : 'a) => f (g x) end) [] = map f (map g []).
 
 LHS = map (fun (x : 'a) => f (g x) end) [].
     = []                        -- BY defn.
@@ -44,13 +46,15 @@ RHS = map f (map g []).
     = []                        -- BY defn.
 
 CASE l = x :: xs.
-# IH: map (fun (x : 'a) => f (g x) end) xs = map f (map g xs).
-# WTS map (fun (x : 'a) => f (g x) end) (x :: xs) = map f (map g (x :: xs)).
+IH: map (fun (x : 'a) => f (g x) end) xs = map f (map g xs).
+WTS: map (fun (x : 'a) => f (g x) end) (x :: xs) = map f (map g (x :: xs)).
 
 LHS = map (fun (x : 'a) => f (g x) end) (x :: xs).
-    = (fun (x : 'a) => f (g x) end) x :: map (fun (x : 'a) => f (g x) end) xs   -- BY defn.
-    = f (g x) :: map (fun (x : 'a) => f (g x) end) xs                           -- BY eval.
-    = f (g x) :: map f (map g xs)                                               -- BY IH.
+    = (fun (x : 'a) => f (g x) end) x :: 
+  map (fun (x : 'a) => f (g x) end) xs   -- BY defn.
+      
+    = f (g x) :: map (fun (x : 'a) => f (g x) end) xs    -- BY eval.
+    = f (g x) :: map f (map g xs)   -- BY IH.
 
 RHS = map f (map g (x :: xs)).
     = map f (g x :: map g xs)                   -- BY defn.

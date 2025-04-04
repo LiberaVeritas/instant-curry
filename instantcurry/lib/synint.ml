@@ -33,34 +33,17 @@ type tm =
   | Times of tm * tm
   | If0 of tm (* scrutinee *) * tm (* zero case *) * tm (* successor case *)
   | App of tm * tm
-  | MApp of tm * tm (* meta apply block, for recursive proof checking *)
+  | MApp of tm * tm (* marked apply block, for recursive proof checking *)
   | Fun of name * ty * tm (* anonymous function *)
-  | MFun of name * ty * tm (* meta fun block, prevent evaluation *)
+  | MFun of name * ty * tm (* marked fun block, prevent evaluation *)
   | BVar of name (* A bound variable *)
   | Ref of name (* A free variable, e.g. a self-reference in a recursive function. *)
-  | MRef of name (* meta ref block, for recursive proof checking *)
+  | MRef of name (* marked ref block, for recursive proof checking *)
   | UVar of uv_name (* A unification variable *)
   | MVar of name
     (* A meta variable, referring to a quantified variable in the metalanguage. *)
   [@@deriving sexp]
 
-let rec tm_equal tm1 tm2 =
-  match (tm1, tm2) with
-  | Nil, Nil -> true
-  | Cons (a1, a2), Cons (b1, b2) -> tm_equal a1 b1 && tm_equal a2 b2
-  | Nat a, Nat b -> a = b
-  | Plus (a1, a2), Plus (b1, b2) -> tm_equal a1 b1 && tm_equal a2 b2
-  | Minus (a1, a2), Minus (b1, b2) -> tm_equal a1 b1 && tm_equal a2 b2
-  | Times (a1, a2), Times (b1, b2) -> tm_equal a1 b1 && tm_equal a2 b2
-  | App (a1, a2), App (b1, b2) -> tm_equal a1 b1 && tm_equal a2 b2
-  | If0 (a1, a2, a3), If0 (b1, b2, b3) -> tm_equal a1 b1 && tm_equal a2 b2 && tm_equal a3 b3
-  | Fun (a1, a2, a3), Fun (b1, b2, b3) -> String.equal a1 b1 && ty_equal a2 b2 && tm_equal a3 b3
-  | BVar a, BVar b -> String.equal a b (* A bound variable *)
-  | Ref a, Ref b -> String.equal a b (* A free variable, e.g. a self-reference in a recursive function. *)
-  | UVar a, UVar b -> String.equal a b (* A unification variable *)
-  | MVar a, MVar b -> String.equal a b
-    (* A meta variable, referring to a quantified variable in the metalanguage. *)
-  | _ -> false
 
 type pattern = 
   | Pat_nil (* [] *)
@@ -93,7 +76,7 @@ type thm_stmt =
 type justification =
     | ByDefinition of name option
     | ByTheorem of name
-    | ByIH of name
+    | ByIH
     | ByCommonsense
     | ByEval
     [@@deriving sexp]
@@ -109,7 +92,7 @@ type side = {
 type case = {
     var : name;
     pattern : pattern;
-    ihs : (name * eqn) list;
+    ih : eqn;
     wts : eqn;
     lhs : side;
     rhs : side;
@@ -145,3 +128,4 @@ type stmt =
 
 type program = stmt list [@@deriving sexp]
 
+let show_prog p = Sexp.to_string @@ sexp_of_list sexp_of_stmt p

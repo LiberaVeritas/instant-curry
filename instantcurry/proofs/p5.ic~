@@ -14,13 +14,13 @@ RHS = app [] (app l2 l3).
     = app l2 l3 -- BY defn.
 
 CASE l1 = x :: xs.
-IH1: app (app xs l2) l3 = app xs (app l2 l3).
+IH: app (app xs l2) l3 = app xs (app l2 l3).
 WTS: app (app (x :: xs) l2) l3 = app (x :: xs) (app l2 l3).
 
 LHS = app (app (x :: xs) l2) l3.
     = app (x :: (app xs l2)) l3 -- BY defn.
     = x :: (app (app xs l2) l3) -- BY defn.
-    = x :: (app xs (app l2 l3)) -- BY IH1.
+    = x :: (app xs (app l2 l3)) -- BY IH.
 
 RHS = app (x :: xs) (app l2 l3).
     = x :: (app xs (app l2 l3)) -- BY defn.

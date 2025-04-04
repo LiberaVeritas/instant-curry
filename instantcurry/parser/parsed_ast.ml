@@ -82,11 +82,13 @@ type pattern =
 type side = tm * (tm * name) list (* steps with justification *) [@@deriving sexp]
 
 type case = name * pattern * 
-            (name * eqn) list * 
+            eqn option * 
             eqn option * 
             side * 
-            side (* variable = pattern, optional induction hypotheses, wts, lhs, rhs *)
+            side (* variable = pattern, optional induction hypothesis, optional wts, lhs, rhs *)
             [@@deriving sexp]
+
+
 
 type proof = 
   | Proof of name * name list option * case list (* Induction variable, generalize vars, cases *)
@@ -105,3 +107,5 @@ type stmt =
 
 
 type program = stmt list [@@deriving sexp]
+
+let show_prog p = Sexp.to_string @@ sexp_of_list sexp_of_stmt p

@@ -5,7 +5,7 @@ PROOF.
 BY INDUCTION ON l1.
 
 CASE l1 = [].
-WTS: map f (app [] l2) = app (map f []) (map f l2).
+# WTS map f (app [] l2) = app (map f []) (map f l2).
 
 LHS = map f (app [] l2).
     = map f l2 -- BY defn.
@@ -15,13 +15,13 @@ RHS = app (map f []) (map f l2).
     = map f l2 -- BY defn.
 
 CASE l1 = x :: xs.
-IH1: map f (app xs l2) = app (map f xs) (map f l2).
-WTS: map f (app (x :: xs) l2) = app (map f (x :: xs)) (map f l2).
+# IH: map f (app xs l2) = app (map f xs) (map f l2).
+# WTS map f (app (x :: xs) l2) = app (map f (x :: xs)) (map f l2).
 
 LHS = map f (app (x :: xs) l2).
     = map f (x :: (app xs l2)) -- BY defn.
     = (f x) :: (map f (app xs l2)) -- BY defn.
-    = (f x) :: (app (map f xs) (map f l2)) -- BY IH1.
+    = (f x) :: (app (map f xs) (map f l2)) -- BY IH.
 
 RHS = app (map f (x :: xs)) (map f l2).
     = app ((f x) :: (map f xs)) (map f l2) -- BY defn.
@@ -37,7 +37,7 @@ PROOF.
 BY INDUCTION ON l.
 
 CASE l = [].
-WTS: rev (map f []) = map f (rev []).
+# WTS rev (map f []) = map f (rev []).
 
 LHS = rev (map f []).
     = rev [] -- BY defn.
@@ -48,13 +48,13 @@ RHS = map f (rev []).
     = [] -- BY defn.
 
 CASE l = x :: xs.
-IH1: rev (map f xs) = map f (rev xs).
-WTS: rev (map f (x :: xs)) = map f (rev (x :: xs)).
+# IH: rev (map f xs) = map f (rev xs).
+# WTS rev (map f (x :: xs)) = map f (rev (x :: xs)).
 
 LHS = rev (map f (x :: xs)).
     = rev ((f x) :: (map f xs)) -- BY defn.
     = app (rev (map f xs)) ((f x) :: []) -- BY defn.
-    = app (map f (rev xs)) ((f x) :: []) -- BY IH1.
+    = app (map f (rev xs)) ((f x) :: []) -- BY IH.
 
 RHS = map f (rev (x :: xs)).
     = map f (app (rev xs) (x :: [])) -- BY defn.

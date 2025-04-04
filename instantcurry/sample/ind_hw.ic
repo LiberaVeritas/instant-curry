@@ -12,7 +12,7 @@ FORALL (f : 'a -> 'b) (xs : 'a list) (ys : 'a list) :
 PROOF. BY INDUCTION ON xs.
 
 CASE xs = [].
-WTS: map f (app [] ys) = app (map f []) (map f ys).
+# WTS map f (app [] ys) = app (map f []) (map f ys).
 
 LHS = map f (app [] ys).
     = map f ys                      -- BY defn.
@@ -21,13 +21,13 @@ RHS = app (map f []) (map f ys).
     = map f ys                      -- BY defn.
 
 CASE xs = x :: xs.
-IH1: map f (app xs ys) = app (map f xs) (map f ys).
-WTS: map f (app (x :: xs) ys) = app (map f (x :: xs)) (map f ys).
+# IH: map f (app xs ys) = app (map f xs) (map f ys).
+# WTS map f (app (x :: xs) ys) = app (map f (x :: xs)) (map f ys).
 
 LHS = map f (app (x :: xs) ys).
     = map f (x :: (app xs ys))              -- BY defn.
     = f x :: map f (app xs ys)              -- BY defn.
-    = f x :: app (map f xs) (map f ys)      -- BY IH1.
+    = f x :: app (map f xs) (map f ys)      -- BY IH.
 RHS = app (map f (x :: xs)) (map f ys).
     = app (f x :: (map f xs)) (map f ys)    -- BY defn.
     = f x :: app (map f xs) (map f ys)      -- BY defn.
@@ -41,7 +41,7 @@ FORALL (f : 'a -> 'b) (xs : 'a list) (acc : 'b list) :
 PROOF. BY INDUCTION ON xs, GENERALIZE acc.
 
 CASE xs = [].
-WTS: map_rev_tr f [] acc = app (map f (rev [])) acc.
+# WTS map_rev_tr f [] acc = app (map f (rev [])) acc.
 
 LHS = map_rev_tr f [] acc.
     = acc                       -- BY defn.
@@ -51,12 +51,12 @@ RHS = app (map f (rev [])) acc.
     = acc                       -- BY defn.
 
 CASE xs = x :: xs.
-IH1: map_rev_tr f xs acc = app (map f (rev xs)) acc.
-WTS: map_rev_tr f (x :: xs) acc = app (map f (rev (x :: xs))) acc.
+# IH: map_rev_tr f xs acc = app (map f (rev xs)) acc.
+# WTS map_rev_tr f (x :: xs) acc = app (map f (rev (x :: xs))) acc.
 
 LHS = map_rev_tr f (x :: xs) acc.
     = map_rev_tr f xs (f x :: acc)                    -- BY defn.
-    = app (map f (rev xs)) (f x :: acc)               -- BY IH1.
+    = app (map f (rev xs)) (f x :: acc)               -- BY IH.
 RHS = app (map f (rev (x :: xs))) acc.
     = app (map f (app (rev xs) (x :: []))) acc              -- BY defn.
     = app (app (map f (rev xs)) (map f (x :: []))) acc      -- BY map_over_app.

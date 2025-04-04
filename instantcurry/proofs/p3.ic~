@@ -17,7 +17,7 @@ RHS = filter f (rev []).
     = [] -- BY defn.
 
 CASE l = x :: xs.
-IH1: rev (filter f xs) = filter f (rev xs).
+IH: rev (filter f xs) = filter f (rev xs).
 WTS: rev (filter f (x :: xs)) = filter f (rev (x :: xs)).
 
 LHS = rev (filter f (x :: xs)).
@@ -25,7 +25,7 @@ LHS = rev (filter f (x :: xs)).
     = rev (if0 1 then (x :: filter f xs) else (filter f xs) end) -- BY defn.
     = rev (x :: filter f xs) -- BY eval.
     = app (rev (filter f xs)) (x :: []) -- BY defn.
-    = app (filter f (rev xs)) (x :: []) -- BY IH1.
+    = app (filter f (rev xs)) (x :: []) -- BY IH.
 
 RHS = filter f (rev (x :: xs)).
     = filter f (app (rev xs) (x :: [])) -- BY defn.

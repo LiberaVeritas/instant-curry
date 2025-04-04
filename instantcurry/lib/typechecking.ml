@@ -2,7 +2,7 @@ open Synint
 open Core
 open Sexp
 open Stdio
-
+open Term
 
 let stdout = Out_channel.stdout
 let print s = output_hum stdout s; printf "\n"
@@ -150,9 +150,12 @@ let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
     | Some sch -> (instantiate sch, [])
     | None -> raise (IllTyped ("no ref " ^ x)) 
     end
-  | MRef _ -> raise NotImplemented (* shouldn't happen *)
-  | MFun _ -> raise NotImplemented (* shouldn't happen *)
-  | UVar _ -> raise NotImplemented
+  | MRef _ ->  raise NotImplemented (* shouldn't happen *)
+  | UVar x -> 
+    begin match lookup delta x with
+    | Some sch -> (instantiate sch, [])
+    | None -> raise (IllTyped ("no uvar " ^ x)) 
+    end
   | Nat _ -> (Ty_Nat, [])
   | Plus (e, e') | Minus (e, e') | Times (e, e') -> 
     let sub1 = unify (fst (inf e)) Ty_Nat in
@@ -182,7 +185,7 @@ let rec infer_tm (delta : ctx) (sigma : ctx) (gamma : ctx) (e : tm) : ty * sub =
     let sub = compose_sub sub3 (compose_sub sub2 sub1) in
     (apply_sub rty sub, sub)
   | MApp _ -> raise NotImplemented (* shouldn't happen *)
-  | Fun (x, ty, e) ->
+  | Fun (x, ty, e) | MFun (x, ty, e) ->
     let new_var = Ty_Var (fresh ()) in
     let (rty, sub1) = infer_tm delta sigma ((x, { qvars = []; typ = new_var }) :: gamma) e in
     let sub2 = unify ty (apply_sub new_var sub1) in
@@ -227,7 +230,7 @@ let typecheck_steps (delta : ctx) (sigma : ctx) (s : side) : unit =
     typecheck_step delta sigma prev next j; next)
   in ()
 
-let typecheck_case (delta : ctx) (sigma : ctx) (c : case) : unit =
+let typecheck_case (delta : ctx) (sigma : ctx) (c : case) (thm_stmt : eqn) : unit =
   let delta = match c.pattern with (* todo: what if they induct on l but case is k = [] *)
   | Pat_cons (x, xs) -> 
     begin match lookup delta c.var with
@@ -248,16 +251,24 @@ let typecheck_case (delta : ctx) (sigma : ctx) (c : case) : unit =
   in 
   (* todo: check wts is valid *)
   typecheck_eqn delta sigma c.wts;
+  typecheck_eqn delta sigma thm_stmt;
+  let inf e = fst @@ infer_tm delta sigma [] e in
 
-  if not (tm_equal (c.wts.lhs) (c.lhs.start)) then raise (IllTyped "invalid lhs start");
+  let _ = unify (inf c.wts.lhs) (inf thm_stmt.lhs) in
+  let _ = unify (inf c.wts.rhs) (inf thm_stmt.rhs) in
+  
+  let _ = unify (inf c.ih.lhs) (inf thm_stmt.lhs) in
+  let _ = unify (inf c.ih.rhs) (inf thm_stmt.rhs) in
+  
+  if not (tm_eq (c.wts.lhs) (c.lhs.start)) then raise (IllTyped "invalid lhs start");
   typecheck_steps delta sigma c.lhs;
-  if not (tm_equal (c.wts.rhs) (c.rhs.start)) then raise (IllTyped "invalid rhs start");
+  if not (tm_eq (c.wts.rhs) (c.rhs.start)) then raise (IllTyped "invalid rhs start");
   typecheck_steps delta sigma c.rhs
   
 
-let typecheck_proof (delta : ctx) (sigma : ctx) (p : proof) : unit =
+let typecheck_proof (delta : ctx) (sigma : ctx) (p : proof) (thm_stmt : eqn) : unit =
   let _ = match p with (* todo: surely there is a nicer way to do this? *)
-  | Proof (_, cases) -> List.map cases ~f:(typecheck_case delta sigma)
+  | Proof (_, cases) -> List.map ~f:(fun c -> typecheck_case delta sigma c thm_stmt) cases
   | Axiom -> []
   in ()
 
@@ -278,18 +289,9 @@ let infer_stmt (delta : ctx) (sigma : ctx) (s : stmt) : ctx =
   | Thm t ->  (* todo: add to context of theorems *)
     let delta = List.map t.stmt.quantifiers ~f:schemify in
     typecheck_claim delta sigma t.stmt.claim;
-    typecheck_proof delta sigma t.proof;
+    typecheck_proof delta sigma t.proof t.stmt.claim.eqn;
     sigma
 
 let typecheck_prog (p : program) =
   List.fold ~f:(fun sigma stmt -> infer_stmt [] sigma stmt) ~init:[] p
-
-(* TODO LIST
-   
-1. case analysis, get that [] and x :: xs are constructors of l
-2. substitution of induction variables
-3. generate IH
-4. apply IH with congruence
-    a. congruence over function application? is it needed?
-*)
 

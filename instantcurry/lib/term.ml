@@ -19,7 +19,6 @@ type clos = ((string * ty) list * tm) [@@deriving sexp]
 type env = (string * clos) list [@@deriving sexp]
 type thms = (string * thm_stmt) list [@@deriving sexp]
 type constrs = (string * tm) list [@@deriving sexp]
-type ihs = (string * eqn) list [@@deriving sexp]
 
 
 (* get all free variables *)
@@ -102,13 +101,14 @@ let rec subst_expr from into within =
     | ListCase (l, n, x, xs, c) -> 
       let l' = sub l in
       let n' = sub n in
+      (* blocked by bound var of same name *)
       if has_name from x || has_name from xs 
         then ListCase (l', n', x, xs, c)
       else let (x', c') =
         if mem x (fvs into) then rename (BVar x) c else (x, c)
-      in let (xs', c') =
+      in let (xs', c'') =
         if mem xs (fvs into) then rename (BVar xs) c' else (xs, c')
-      in ListCase (l', n', x', xs', sub c')
+      in ListCase (l', n', x', xs', sub c'')
     | Nat n -> if from = (Nat n) then into else (Nat n)
     | Plus (e, e') -> Plus (sub e, sub e')
     | Minus (e, e') -> Minus (sub e, sub e')
@@ -117,7 +117,8 @@ let rec subst_expr from into within =
     | App (f, e') -> App (sub f, sub e')
     | MApp (f, e') -> MApp (sub f, sub e')
     | Fun (x, ty, e) -> 
-      if has_name from x then MFun (x, ty, e)
+      (* blocked by bound var of same name *)
+      if has_name from x then Fun (x, ty, e)
       else let (x', e') =
         if mem x (fvs into) then rename (BVar x) e else (x, e)
       in Fun (x', ty, sub e')
@@ -132,7 +133,9 @@ let rec subst_expr from into within =
     | MRef v -> if from = (MRef v) then into else (MRef v)
     | MVar v -> if from = (MVar v) then into else (MVar v)
   in
-  unrename @@ sub within
+  (*unrename @@ sub within*)
+  let res = sub within in
+  res
 
 (* replace x with fresh var *)
 and rename x e =
@@ -140,146 +143,216 @@ and rename x e =
     match x with
     | BVar v -> let v' = fresh v in (v', BVar v, BVar v')
     (*| UVar v -> let v' = fresh v in (v', UVar v, UVar v')*)
-    | MVar v -> let v' = fresh v in (v', MVar v, MVar v')
+    (*| MVar v -> let v' = fresh v in (v', MVar v, MVar v')*)
     | _ -> raise NotImplemented
   in
   (x', subst_expr from into e)
+  
+  
+let was_renamed x =
+  String.contains x '~'
+  
+  
+let subst_eqn from into (within : eqn) =
+  {
+    lhs = subst_expr from into within.lhs;
+    rhs = subst_expr from into within.rhs;
+  }
 
-(* restore original variable name *)
-and unrename e =
-  let func x = 
-    try fst @@ Core.String.lsplit2_exn ~on:'~' x
-    with _ -> x
-  in
-  match e with
-  | Nil -> e
-  | Cons (x, xs) -> Cons (unrename x, unrename xs)
-  | ListCase (l, n, x, xs, c) -> 
-    ListCase (unrename l, unrename n, func x, func xs, unrename c)
-  | Nat n -> Nat n
-  | Plus (e, e') -> Plus (unrename e, unrename e')
-  | Minus (e, e') -> Minus (unrename e, unrename e')
-  | Times (e, e') -> Times (unrename e, unrename e')
-  | If0 (e, z, nz) -> If0 (unrename e, unrename z, unrename nz)
-  | App (f, e') -> App (unrename f, unrename e')
-  | MApp (f, e') -> MApp (unrename f, unrename e')
-  | Fun (f, ty, e) -> Fun (func f, ty, unrename e)
-  | MFun (f, ty, e) -> MFun (func f, ty, unrename e)
-  | BVar v -> BVar (func v)
-  | UVar v -> UVar (func v)
-  | Ref v -> Ref (func v)
-  | MRef v -> MRef (func v)
-  | MVar v -> MVar (func v)
-
-
-  (* equality of terms, up to generalized variables, marked nodes, renamed vars *)
-  let rec tm_eq e1 e2 =
-    let e1 = unrename e1 in
-    let e2 = unrename e2 in
-    let ( $= ) = tm_eq in
-    match e1, e2 with
-    | Nil, Nil -> true
-    | Cons (x, xs), Cons (y, ys) -> 
-      x $= y && xs $= ys
-    | ListCase (l, n, x, xs, c), ListCase (l', n', y, ys, c') -> 
+(* equality of terms, up to generalized variables, marked nodes, renamed vars *)
+let rec tm_eq e1 e2 =
+  let ( $= ) = tm_eq in
+  match e1, e2 with
+  | Nil, Nil -> true
+  | Cons (x, xs), Cons (y, ys) -> 
+    x $= y && xs $= ys
+  | ListCase (l, n, x, xs, c), ListCase (l', n', y, ys, c') -> 
       String.equal x y &&
       String.equal xs ys &&
       (l  $=  l') &&
       (n  $=  n') &&
       (c  $=  c')
-    | Nat n, Nat m -> n = m
-    | Plus (a1, a2), Plus (b1, b2)
-    | Minus (a1, a2), Minus (b1, b2)
-    | Times (a1, a2), Times (b1, b2) 
-    | App (a1, a2), App (b1, b2)
-    | MApp (a1, a2), MApp (b1, b2)
-    | App (a1, a2), MApp (b1, b2)
-    | MApp (a1, a2), App (b1, b2) ->
-      a1 $= b1 && 
-      a2 $= b2
-    | If0 (e, z, nz), If0 (e', z', nz') ->
-      e $= e' && 
-      z $= z' && 
-      nz $= nz'
-    | Fun (f, _ty, e), Fun (g, _ty', e') 
-    | MFun (f, _ty, e), Fun (g, _ty', e') 
-    | Fun (f, _ty, e), MFun (g, _ty', e') 
-    | MFun (f, _ty, e), MFun (g, _ty', e') -> 
-      String.equal f g &&
-      e $= e'
-    | BVar _, BVar _ | MVar _, MVar _ -> same_name e1 e2
-    | Ref x, Ref y -> String.equal x y
-    | MRef x, MRef y -> String.equal x y
-    | Ref x, MRef y -> not (String.equal x y)  (* Not equal! for definition substitutions *)
-    | MRef x, Ref y -> not (String.equal x y)
-    | UVar _, _ -> true
-    | _, UVar _ -> true
-    | _ -> false
-  
-  let ( $= ) = tm_eq
+  | Nat n, Nat m -> n = m
+  | Plus (a1, a2), Plus (b1, b2)
+  | Minus (a1, a2), Minus (b1, b2)
+  | Times (a1, a2), Times (b1, b2) 
+  | App (a1, a2), App (b1, b2)
+  | MApp (a1, a2), MApp (b1, b2)
+  | App (a1, a2), MApp (b1, b2)
+  | MApp (a1, a2), App (b1, b2) ->
+    a1 $= b1 && 
+    a2 $= b2
+  | If0 (e, z, nz), If0 (e', z', nz') ->
+    e $= e' && 
+    z $= z' && 
+    nz $= nz'
+  | Fun (f, _ty, e1), Fun (g, _ty', e2) 
+  | MFun (f, _ty, e1), Fun (g, _ty', e2) 
+  | Fun (f, _ty, e1), MFun (g, _ty', e2) 
+  | MFun (f, _ty, e1), MFun (g, _ty', e2) -> 
+    (String.equal f g && e1 $= e2) ||
+    (* match renamed variables *)
+    if was_renamed f then
+      let e2' = subst_expr (BVar g) (BVar f) e2 in
+      e1 $= e2'
+    else
+      let e1' = subst_expr (BVar f) (BVar g) e1 in
+      e1' $= e2
+  | BVar x, BVar y -> 
+    same_name e1 e2 || 
+    (* match renamed variables *)
+    if was_renamed x then
+      let e2' = subst_expr (BVar y) (BVar x) e2 in
+      e1 $= e2'
+    else
+      let e1' = subst_expr (BVar x) (BVar y) e1 in
+      e1' $= e2
+  | MVar _, MVar _ -> same_name e1 e2
+  | Ref x, Ref y -> String.equal x y
+  | MRef x, MRef y -> String.equal x y
+  | Ref x, MRef y -> (String.equal x y) 
+  | MRef x, Ref y -> (String.equal x y)
+  | UVar _, _ -> true
+  | _, UVar _ -> true
+  | _ -> false
+
+let ( $= ) = tm_eq
+
+let unif_eq e1 e2 =
+  let ( ^= ) = tm_eq in
+  match e1, e2 with
+  | Nil, Nil -> true
+  | Cons (x, xs), Cons (y, ys) -> 
+    x ^= y && xs ^= ys
+  | ListCase (l, n, x, xs, c), ListCase (l', n', y, ys, c') -> 
+      String.equal x y &&
+      String.equal xs ys &&
+      (l  ^=  l') &&
+      (n  ^=  n') &&
+      (c  ^=  c')
+  | Nat n, Nat m -> n = m
+  | Plus (a1, a2), Plus (b1, b2)
+  | Minus (a1, a2), Minus (b1, b2)
+  | Times (a1, a2), Times (b1, b2) 
+  | App (a1, a2), App (b1, b2)
+  | MApp (a1, a2), MApp (b1, b2) ->
+    a1 ^= b1 && 
+    a2 ^= b2
+  | If0 (e, z, nz), If0 (e', z', nz') ->
+    e ^= e' && 
+    z ^= z' && 
+    nz ^= nz'
+  | Fun (f, _ty, e1), Fun (g, _ty', e2) 
+  | MFun (f, _ty, e1), MFun (g, _ty', e2) -> 
+    (String.equal f g && e1 ^= e2) ||
+    (* match renamed variables *)
+    if was_renamed f then
+      let e2' = subst_expr (BVar g) (BVar f) e2 in
+      e1 ^= e2'
+    else
+      let e1' = subst_expr (BVar f) (BVar g) e1 in
+      e1' ^= e2
+  | BVar x, BVar y -> 
+    same_name e1 e2 || 
+    (* match renamed variables *)
+    if was_renamed x then
+      let e2' = subst_expr (BVar y) (BVar x) e2 in
+      e1 ^= e2'
+    else
+      let e1' = subst_expr (BVar x) (BVar y) e1 in
+      e1' ^= e2
+  | MVar _, MVar _ -> same_name e1 e2
+  | Ref x, Ref y -> String.equal x y
+  | MRef x, MRef y -> String.equal x y
+  | Ref _, MRef _ -> false
+  | MRef _, Ref _ -> false
+  | UVar _, _ -> true
+  | _, UVar _ -> true
+  | _ -> false
+
+let ( ^= ) = unif_eq
  
 (* only substitutes the first matching subtree found *)
 let subst_first_expr from into within : tm =
-  if from $= within then into else
-  let rec sub e =
+  if from ^= within then into else
+  let rec sub e : tm =
     match e with
-    | Nil -> if from $= Nil then into else Nil
+    | Nil -> if from = Nil then into else Nil
     | Cons (x, xs) -> 
-      if from $= x then Cons (into, xs) else
-      if from $= xs then Cons (x, into) else
+      if from ^= x then Cons (into, xs) else
+      if from ^= xs then Cons (x, into) else
       let res = sub x in
-      if not (res $= x) then Cons (res, xs) else
+      if not (res = x) then Cons (res, xs) else
       Cons (x, sub xs)
     | ListCase (l, n, x, xs, c) -> 
-      if from $= n then ListCase (l, into, x, xs, c) else
-      if from $= c then ListCase (l, n, x, xs, into) else
+      if from ^= n then ListCase (l, into, x, xs, c) else
+      (* blocked by bound var of same name *)
+      if has_name from x || has_name from xs 
+        then ListCase (l, n, x, xs, c)
+      else let (x', c') =
+        if mem x (fvs into) then rename (BVar x) c else (x, c)
+      in let (xs', c'') =
+        if mem xs (fvs into) then rename (BVar xs) c' else (xs, c')
+      in
+      if from ^= c then ListCase (l, n, x', xs', into) else
       let res = sub n in
-      if not (res $= n) then ListCase (l, res, x, xs, c) else
-      ListCase (l, sub n, x, xs, sub c)
-    | Nat n -> if from $= (Nat n) then into else (Nat n)
+      if not (res = n) then ListCase (l, res, x', xs', c'') else
+      ListCase (l, n, x', xs', sub c'')
+    | Nat n -> if from ^= (Nat n) then into else (Nat n)
     | Plus (e, e') -> 
-      if from $= e then Plus (into, e') else
-      if from $= e' then Plus (e, into) else
+      if from ^= e then Plus (into, e') else
+      if from ^= e' then Plus (e, into) else
       let res = sub e in
-      if not (res $= e) then Plus (res, e') else
+      if not (res = e) then Plus (res, e') else
       Plus (e, sub e')
     | Minus (e, e') -> 
-      if from $= e then Minus (into, e') else
-      if from $= e' then Minus (e, into) else
+      if from ^= e then Minus (into, e') else
+      if from ^= e' then Minus (e, into) else
       let res = sub e in
-      if not (res $= e) then Minus (res, e') else
+      if not (res = e) then Minus (res, e') else
       Minus (sub e, sub e')
     | Times (e, e') -> 
-      if from $= e then Times (into, e') else
-      if from $= e' then Times (e, into) else
+      if from ^= e then Times (into, e') else
+      if from ^= e' then Times (e, into) else
       let res = sub e in
-      if not (res $= e) then Times (res, e') else
+      if not (res = e) then Times (res, e') else
       Times (sub e, sub e')
     | If0 (e, z, nz) -> 
-      if from $= e then If0 (into, z, nz) else
-      if from $= z then If0 (e, into, nz) else
-      if from $= nz then If0 (e, z, into) else
+      if from ^= e then If0 (into, z, nz) else
+      if from ^= z then If0 (e, into, nz) else
+      if from ^= nz then If0 (e, z, into) else
       let res = sub e in
-      if not (res $= e) then If0 (res, z, nz) else
+      if not (res = e) then If0 (res, z, nz) else
       let res = sub z in 
-      if not (res $= z) then If0 (e, res, nz) else
+      if not (res = z) then If0 (e, res, nz) else
       If0 (e, z, sub nz)
     | App (f, e') -> 
-      if from $= f then App (into, e') else
-      if from $= e' then App (f, into) else
+      if from ^= f then App (into, e') else
+      if from ^= e' then App (f, into) else
       let res = sub f in
-      if not (res $= f) then App (res, e') else
+      if not (res = f) then App (res, e') else
       App (f, sub e')
-    | MApp (a, b) -> MApp (a, b)
-    | Fun (f, ty, e) | MFun (f ,ty, e) -> 
-      Fun (f, ty, sub e)
+    | MApp (f, e') -> 
+      if from ^= f then MApp (into, e') else
+      if from ^= e' then MApp (f, into) else
+      let res = sub f in
+      if not (res = f) then MApp (res, e') else
+      MApp (f, sub e')
+    | Fun (x, ty, e) ->
+      (* blocked by bound var of same name *)
+      if has_name from x then Fun (x, ty, e)
+      else let (x', e') =
+        if mem x (fvs into) then rename (BVar x) e else (x, e)
+      in 
+      if from ^= e then Fun (x', ty, into) else Fun (x', ty, sub e')
+    | MFun (x ,ty, e) -> 
+      if has_name from x then MFun (x, ty, e)
+      else let (x', e') =
+        if mem x (fvs into) then rename (BVar x) e else (x, e)
+      in 
+      if from ^= e then MFun (x', ty, into) else MFun (x', ty, sub e')
     | BVar v -> if from = (BVar v) then into else (BVar v)
-    | MRef r -> 
-      begin match from with
-      | MRef r' -> 
-      if String.equal r r' then into else (MRef r) (* not equality up to MRef! *)
-      | _ -> MRef r
-      end
+    | MRef r -> MRef r  (* don't substitute marked ref *)
     | Ref v -> 
       begin match from with
       | Ref v' -> 
@@ -289,6 +362,10 @@ let subst_first_expr from into within : tm =
     | UVar x -> UVar x
     | MVar v -> if from = (MVar v) then into else (MVar v)
   in
-  unrename @@ sub within
+  (* unrename @@ sub within *)
+
+  let res = sub within in
+
+  res
   
 
