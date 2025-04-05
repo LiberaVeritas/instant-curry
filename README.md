@@ -149,9 +149,7 @@ PROOF.
 ```
 <proof> ::=
 PROOF.
-AXIOM. |
-BY INDUCTION ON <variable>. |
-BY INDUCTION ON <variable>, GENERALIZE <variable>+.
+AXIOM. | BY INDUCTION ON <variable>. | BY INDUCTION ON <variable>, GENERALIZE <variable>+.
 <case>
 <case>
 QED.
@@ -186,11 +184,12 @@ RHS = [].                 # right hand side of WTS
 ```
 For each case, there is a 'want to show' statement `WTS`, which is the statement to prove.
 This can be omitted and inferred by InstantCurry.
+Likewise, explicitly stating the inductive hypothesis is unnecessary, as InstantCurry can automatically generate it for the list case. 
 ```
 <case> ::=
 CASE <variable> = []. 
                 | <variable>::<variable>.
-(IH[0-9]: <term> = <term>.)?*
+(IH:  <term> = <term>.)?
 (WTS: <term> = <term>.)?
 
 LHS = <term>.
@@ -205,7 +204,7 @@ Every step is justified by a deductive rule, stated like `-- BY <justification>`
 
 
 CASE l = y :: ys.
-IH1: map id ys = ys.                # inductive hypothesis
+IH: map id ys = ys.             # inductive hypothesis
 WTS: map id (y :: ys) = y :: ys.
 
 LHS = map id (y :: ys).
@@ -217,7 +216,7 @@ RHS = y :: ys.
 
 QED.
 ```
-List cases are accompanied by inductive hypotheses. (`IH` followed by a number) These hypotheses assume the statement of the theorem for list of length one less than the list of consideration. That is, given a list `x::xs`, the hypothesis takes as granted the theorem statement for `xs`.
+List cases are accompanied by an inductive hypothesis. (`IH`) This hypotheis assumes the statement of the theorem for list of length one less than the list of consideration. That is, given a list `x::xs`, the hypothesis takes as granted the theorem statement for `xs`.
 Proofs by induction come down to demonstrating how to integrate the next element `x` into the statement under this assumption.
 
 The end of proofs are marked by `QED.`.
@@ -226,9 +225,10 @@ The end of proofs are marked by `QED.`.
 ```
 <justification> ::= -- BY defn.
                         | defn of <variable>.
-                        | IH[0-9].
-                        | <variable>.
+                        | IH.
+                        | <variable>.  # theorem name
                         | commonsense.
+                        | eval.
 ```
 There are several ways to justify a deductive proof step.
 ```
@@ -270,13 +270,13 @@ Note that only one instance of applying a function definition will be considered
 ```
 ...
 CASE l = x :: xs.
-IH1: len (map f xs) = len xs.
+IH:  len (map f xs) = len xs.
 WTS: len (map f (x :: xs)) = len (x :: xs).
 
 LHS = len (map f (x :: xs)).
     = len (f x :: map f xs)         -- BY defn.
     = 1 + len (map f xs)            -- BY defn.
-    = 1 + len xs                    -- BY IH1.
+    = 1 + len xs                    -- BY IH.
 ...
 ```
 This applies the statement of the hypothesis.
@@ -327,6 +327,21 @@ LHS = sum (x :: xs) + acc.
 
     = sum xs + (x + acc)      -- BY commonsense.
 ```
+
+#### By Eval
+Use this to apply an anonymous function to an argument. These may appear for example as part of theorem statements.
+```
+CASE l = x :: xs.
+IH: map (fun (x : 'a) => f (g x) end) xs = map f (map g xs).
+WTS: map (fun (x : 'a) => f (g x) end) (x :: xs) = map f (map g (x :: xs)).
+
+LHS = map (fun (x : 'a) => f (g x) end) (x :: xs).
+    = (fun (x : 'a) => f (g x) end) x :: 
+  map (fun (x : 'a) => f (g x) end) xs   -- BY defn.
+      
+    = f (g x) :: map (fun (x : 'a) => f (g x) end) xs    -- BY eval.
+```
+
 ## Generalization
 Some proofs require a generalization of the statement.
 For example, the proof that the `sum` function is equivalent to the tail recursive version `sum_tr`.
@@ -338,7 +353,7 @@ FORALL (l : nat list) :
 PROOF. BY INDUCTION ON l.       # attempt
 
 CASE l = x :: xs.
-IH1: sum xs = sum_tr xs 0.
+IH:  sum xs = sum_tr xs 0.
 WTS: sum (x :: xs) = sum_tr (x :: xs) 0.
 
 LHS = sum (x :: xs).
@@ -360,7 +375,7 @@ FORALL (l : nat list) (acc : nat) :         # <----
 PROOF. BY INDUCTION ON l, GENERALIZE acc.   # <----
 
 CASE l = x :: xs.
-IH1: sum xs + acc = sum_tr xs acc.
+IH:  sum xs + acc = sum_tr xs acc.
 WTS: sum (x :: xs) + acc = sum_tr (x :: xs) acc.
 
 LHS = sum (x :: xs) + acc.
@@ -370,7 +385,7 @@ LHS = sum (x :: xs) + acc.
 
 RHS = sum_tr (x :: xs) acc.
     = sum_tr xs (x + acc)   -- BY defn.
-    = sum xs + (x + acc)    -- BY IH1.
+    = sum xs + (x + acc)    -- BY IH.
 ...
 ```
 Note the comma after `BY INDUCTION ON l,` followed by `GENERALIZE <vars>...`.
@@ -383,11 +398,7 @@ This can be done for lists as well.
 * distributivity for commonsense?
 * induction over naturals?
 * tree type?
-* remove requirement for a number after `IH`. are multiple IHs ever needed?
-* check IHs are valid.
-* check there are two cases, one of base and list each. (are there any situations where this isn't the case?) 
 * add booleans for if expressions? allow `assume` when proving if cases?
-* type annotation requirements in theorem statements?
 * automated theorem prover.
 
 
