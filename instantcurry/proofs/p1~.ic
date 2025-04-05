@@ -5,7 +5,7 @@ PROOF.
 BY INDUCTION ON l1.
 
 CASE l1 = [].
-# WTS rev (app [] l2) = app (rev l2) (rev []).
+# WTS: rev (app [] l2) = app (rev l2) (rev []).
 
 LHS = rev (app [] l2).
     = rev l2 -- BY defn.
@@ -16,7 +16,7 @@ RHS = app (rev l2) (rev []).
 
 CASE l1 = x :: xs.
 # IH: rev (app xs l2) = app (rev l2) (rev xs).
-# WTS rev (app (x :: xs) l2) = app (rev l2) (rev (x :: xs)).
+# WTS: rev (app (x :: xs) l2) = app (rev l2) (rev (x :: xs)).
 
 LHS = rev (app (x :: xs) l2).
     = rev (x :: (app xs l2)) -- BY defn.

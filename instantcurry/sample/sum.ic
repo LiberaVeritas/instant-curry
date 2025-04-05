@@ -7,7 +7,7 @@ FORALL (l : nat list) (acc : nat) :
 PROOF. BY INDUCTION ON l, GENERALIZE acc.
 
 CASE l = [].
-# WTS sum [] + acc = sum_tr [] acc.
+# WTS: sum [] + acc = sum_tr [] acc.
 
 LHS = sum [] + acc.
     = 0 + acc           -- BY defn.
@@ -18,7 +18,7 @@ RHS = sum_tr [] acc.
 
 CASE l = x :: xs.
 # IH: sum xs + acc = sum_tr xs acc.
-# WTS sum (x :: xs) + acc = sum_tr (x :: xs) acc.
+# WTS: sum (x :: xs) + acc = sum_tr (x :: xs) acc.
 
 LHS = sum (x :: xs) + acc.
     = x + sum xs + acc      -- BY defn.

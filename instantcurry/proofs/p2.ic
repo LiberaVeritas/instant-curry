@@ -5,7 +5,7 @@ PROOF.
 BY INDUCTION ON l1.
 
 CASE l1 = [].
-# WTS map f (app [] l2) = app (map f []) (map f l2).
+# WTS: map f (app [] l2) = app (map f []) (map f l2).
 
 LHS = map f (app [] l2).
     = map f l2 -- BY defn.
@@ -16,7 +16,7 @@ RHS = app (map f []) (map f l2).
 
 CASE l1 = x :: xs.
 # IH: map f (app xs l2) = app (map f xs) (map f l2).
-# WTS map f (app (x :: xs) l2) = app (map f (x :: xs)) (map f l2).
+# WTS: map f (app (x :: xs) l2) = app (map f (x :: xs)) (map f l2).
 
 LHS = map f (app (x :: xs) l2).
     = map f (x :: (app xs l2)) -- BY defn.
