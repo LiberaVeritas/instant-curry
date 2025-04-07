@@ -253,7 +253,8 @@ let eval_step (env: env) (thms : thms) (ih : eqn) (prev : tm) (curr : tm) (j : j
       (
       (* try IH equation in other direction too *)
       let res = eval env @@ subst_first_expr ih.rhs ih.lhs prev in
-      if not (res $= curr) then raise IHMatchFail;)
+      if not (res $= curr) then raise IHMatchFail;
+      )
   | ByTheorem t -> 
     printf "= %s  -- by theorem %s\n" (string_of_tm curr) t;
     let stmt = assoc t thms in
@@ -261,9 +262,12 @@ let eval_step (env: env) (thms : thms) (ih : eqn) (prev : tm) (curr : tm) (j : j
     let claim_lhs = fold_left f stmt.claim.eqn.lhs stmt.quantifiers in
     let claim_rhs = fold_left f stmt.claim.eqn.rhs stmt.quantifiers in
     let res = eval env @@ subst_first_expr claim_lhs claim_rhs prev in
-    if not (res $= curr)
-    then raise TheoremMatchFail;
-    ()
+    if not (res $= curr) then
+      (
+      let res = eval env @@ subst_first_expr claim_rhs claim_lhs prev in
+      if not (res $= curr) then raise TheoremMatchFail;
+      )
+
 
   
 

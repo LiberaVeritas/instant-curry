@@ -8,7 +8,7 @@ PROOF.
 BY INDUCTION ON l.
 
 CASE l = [].
-WTS:: map id [] = [].
+WTS: map id [] = [].
 LHS = map id [].
     = []                            -- BY defn.
 
@@ -17,7 +17,7 @@ RHS = [].
 CASE l = y :: ys.
 # infer ih test
 # IH: map id ys = ys.
-# WTS:: map id (y :: ys) = y :: ys.    # optional
+# WTS: map id (y :: ys) = y :: ys.    # optional
 
 LHS = map id (y :: ys).
     = id y :: map id ys             -- BY defn.
@@ -36,7 +36,7 @@ FORALL (f : 'b -> 'c) (g : 'a -> 'b) (l : 'a list) :
 PROOF. BY INDUCTION ON l.
 
 CASE l = [].
-# WTS:: map (fun (x : 'a) => f (g x) end) [] = map f (map g []).
+# WTS: map (fun (x : 'a) => f (g x) end) [] = map f (map g []).
 
 LHS = map (fun (x : 'a) => f (g x) end) [].
     = []                        -- BY defn.
@@ -47,7 +47,7 @@ RHS = map f (map g []).
 
 CASE l = x :: xs.
 IH: map (fun (x : 'a) => f (g x) end) xs = map f (map g xs).
-WTS:: map (fun (x : 'a) => f (g x) end) (x :: xs) = map f (map g (x :: xs)).
+WTS: map (fun (x : 'a) => f (g x) end) (x :: xs) = map f (map g (x :: xs)).
 
 LHS = map (fun (x : 'a) => f (g x) end) (x :: xs).
     = (fun (x : 'a) => f (g x) end) x :: 
