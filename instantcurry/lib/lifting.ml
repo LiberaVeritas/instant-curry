@@ -151,7 +151,7 @@ let lift_proof (thms : name list) (ctx : scope_ctx) (stmt : thm_stmt) (prf : P.p
   match prf with 
   | Proof (var, gen_vars, cases) -> 
     if not (List.length cases = 2) then raise (ScopeError "there should be 2 cases")
-    else (* TODO check there are 2 cases, one base and one list *)
+    else (* TODO check there are 2 cases, one base and one inductive *)
 
     let gen_vars =
       match gen_vars with
