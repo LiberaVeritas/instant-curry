@@ -1,5 +1,5 @@
 
-(* This file was auto-generated based on "merged". *)
+(* This file was auto-generated based on "parser/messages.messages". *)
 
 (* Please note that the function [message] can raise [Not_found]. *)
 
@@ -275,13 +275,13 @@ let message =
     | 5 ->
         "I expected a 'FORALL' here, but instead I found '$0'.\nHint: Theorems should be stated like this:\n  THEOREM (theorem_name).\n  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.\n  PROOF.\n  ...\n"
     | 4 ->
-        "I expected '.' here, but instead I found '$0'.\nHint: Theorems should be stated like this:\n  THEOREM (theorem_name).\n  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.\n  PROOF.\n  ...\n"
+        "I expected a '.' here, but instead I found '$0'.\nHint: Theorems should be stated like this:\n  THEOREM (theorem_name).\n  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.\n  PROOF.\n  ...\n"
     | 3 ->
-        "I expected ')' here, but instead I found '$0'. Did you forget to close the parenthesis?\nHint: Theorems should be stated like this:\n  THEOREM (theorem_name).\n  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.\n  PROOF.\n  ...\n"
+        "I expected a ')' here, but instead I found '$0'. Did you forget to close the parenthesis?\nHint: Theorems should be stated like this:\n  THEOREM (theorem_name).\n  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.\n  PROOF.\n  ...\n"
     | 2 ->
         "I expected a theorem name here, but '$0' is not a valid theorem name.\nHint: Valid names start with a lowercase letter, followed by alphanumeric characters including '_':\n  x\n  theorem2\n  erringtons_2nd_Theorem_of_Greatness\n"
     | 1 ->
-        "I expected '(' here, but instead I found '$0'.\nHint: Theorems should be stated like this:\n  THEOREM (theorem_name).\n  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.\n  PROOF.\n  ...\n"
+        "I expected a '(' here, but instead I found '$0'. Did you forget the theorem name?\nHint: Theorems should be stated like this:\n  THEOREM (theorem_name).\n  FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.\n  PROOF.\n  ...\n"
     | 0 ->
         "I expected a statement here, but I got '$0'.\nHint: Valid statements are theorem, definition, and print statements.\n"
     | _ ->

@@ -21,7 +21,7 @@ program: THEOREM WTS
 ## THEOREM
 ##
 
-I expected '(' here, but instead I found '$0'.
+I expected a '(' here, but instead I found '$0'. Did you forget the theorem name?
 Hint: Theorems should be stated like this:
   THEOREM (theorem_name).
   FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.
@@ -54,7 +54,7 @@ program: THEOREM LPAR IDENT WTS
 ## THEOREM LPAR IDENT
 ##
 
-I expected ')' here, but instead I found '$0'. Did you forget to close the parenthesis?
+I expected a ')' here, but instead I found '$0'. Did you forget to close the parenthesis?
 Hint: Theorems should be stated like this:
   THEOREM (theorem_name).
   FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.
@@ -71,7 +71,7 @@ program: THEOREM LPAR IDENT RPAR WTS
 ## THEOREM LPAR IDENT RPAR
 ##
 
-I expected '.' here, but instead I found '$0'.
+I expected a '.' here, but instead I found '$0'.
 Hint: Theorems should be stated like this:
   THEOREM (theorem_name).
   FORALL (arg_1 : type_1) ... (arg_n : type_n) : lhs = rhs : expr_type.

@@ -1,5 +1,6 @@
 THEOREM (rev_app).
-FORALL (l1 : 'a list) (l2 : 'a list) : rev (app l1 l2) = app (rev l2) (rev l1) : 'a list.
+FORALL (l1 : 'a list) (l2 : 'a list) : 
+rev (app l1 l2) = app (rev l2) (rev l1) : 'a list.
 
 PROOF.
 BY INDUCTION ON l1.

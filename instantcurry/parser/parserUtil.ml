@@ -109,8 +109,8 @@ let fail text buffer (checkpoint : _ I.checkpoint) =
   let location = L.range positions in
   (* Show the tokens just before and just after the error. *)
   let indication = "> " ^ (get_line text positions) ^ "\n" in
-  let indication = indication ^ ((E.show (show text) buffer) ^ "\n") in
-  let indication = indication ^ Int.to_string (state checkpoint) ^ "\n" in
+  let indication = indication ^ (E.show (show text) buffer) in
+  (*let indication = indication ^ Int.to_string (state checkpoint) ^ "\n" in*)
   (* Fetch an error message from the .messages database. *)
   let message = Messages.message (state checkpoint) in
   (* Expand away the $i keywords that might appear in the message. *)
@@ -130,7 +130,7 @@ let fail text buffer (checkpoint : _ I.checkpoint) =
   let start = (pos1.pos_cnum - pos1.pos_bol) in
   let stop = (pos2.pos_cnum - pos2.pos_bol) in
   (* Show these three components. *)
-  let () = Stdio.printf "%s%s%s%!" location indication message in
+  let () = Stdio.printf "%s\n%s\n%s\n%s" location indication message advice in
   raise (SyntaxError (jsonify (line_num positions) start stop message advice (state checkpoint)))
   (* required to typecheck -> Parsed_ast.program *)
   

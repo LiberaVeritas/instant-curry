@@ -23,7 +23,7 @@ let add_common ptree =
       try
         ParserUtil.parse_loop buf t
       with ParserUtil.SyntaxError s ->
-        printf "\n%s\n" s;
+        printf "%s\n" s;
       raise @@ ParserUtil.SyntaxError "common.ic";
     in
     printf "Imported common.ic\n";
@@ -43,7 +43,7 @@ let () =
   try
     ParserUtil.parse_loop lexbuf text
   with ParserUtil.SyntaxError s ->
-    printf "\n%s\n" s;
+    printf "%s\n" s;
     raise @@ ParserUtil.SyntaxError "";
   in
   let ptree = add_common ptree in
