@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for f in "$0"/*.ic; do
+  sed -i .bak 's/WTS:/# WTS/' "$f"
+done
+

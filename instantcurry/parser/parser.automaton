@@ -1,0 +1,2340 @@
+State 0:
+## Known stack suffix:
+##
+## LR(1) items:
+program' -> . program [ # ]
+## Transitions:
+-- On THEOREM shift to state 1
+-- On PRINT shift to state 157
+-- On EOF shift to state 160
+-- On DEFINITION shift to state 161
+-- On CONST shift to state 190
+-- On stmt shift to state 195
+-- On program shift to state 197
+## Reductions:
+
+State 1:
+## Known stack suffix:
+## THEOREM
+## LR(1) items:
+stmt -> THEOREM . LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On LPAR shift to state 2
+## Reductions:
+
+State 2:
+## Known stack suffix:
+## THEOREM LPAR
+## LR(1) items:
+stmt -> THEOREM LPAR . IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On IDENT shift to state 3
+## Reductions:
+
+State 3:
+## Known stack suffix:
+## THEOREM LPAR IDENT
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT . RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On RPAR shift to state 4
+## Reductions:
+
+State 4:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR . SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On SEP shift to state 5
+## Reductions:
+
+State 5:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR SEP
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR SEP . FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On FORALL shift to state 6
+## Reductions:
+
+State 6:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR SEP FORALL
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR SEP FORALL . nonempty_list(strict_arg) COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On LPAR shift to state 7
+-- On strict_arg shift to state 20
+-- On nonempty_list(strict_arg) shift to state 22
+## Reductions:
+
+State 7:
+## Known stack suffix:
+## LPAR
+## LR(1) items:
+strict_arg -> LPAR . IDENT COLON ty RPAR [ LPAR COLON ]
+## Transitions:
+-- On IDENT shift to state 8
+## Reductions:
+
+State 8:
+## Known stack suffix:
+## LPAR IDENT
+## LR(1) items:
+strict_arg -> LPAR IDENT . COLON ty RPAR [ LPAR COLON ]
+## Transitions:
+-- On COLON shift to state 9
+## Reductions:
+
+State 9:
+## Known stack suffix:
+## LPAR IDENT COLON
+## LR(1) items:
+strict_arg -> LPAR IDENT COLON . ty RPAR [ LPAR COLON ]
+## Transitions:
+-- On TYVAR shift to state 10
+-- On TYNAT shift to state 11
+-- On LPAR shift to state 12
+-- On ty shift to state 18
+## Reductions:
+
+State 10:
+## Known stack suffix:
+## TYVAR
+## LR(1) items:
+ty -> TYVAR . [ TYLST TYARROW SEP RPAR EQ ]
+## Transitions:
+## Reductions:
+-- On TYLST TYARROW SEP RPAR EQ
+--   reduce production ty -> TYVAR
+
+State 11:
+## Known stack suffix:
+## TYNAT
+## LR(1) items:
+ty -> TYNAT . [ TYLST TYARROW SEP RPAR EQ ]
+## Transitions:
+## Reductions:
+-- On TYLST TYARROW SEP RPAR EQ
+--   reduce production ty -> TYNAT
+
+State 12:
+## Known stack suffix:
+## LPAR
+## LR(1) items:
+ty -> LPAR . ty RPAR [ TYLST TYARROW SEP RPAR EQ ]
+## Transitions:
+-- On TYVAR shift to state 10
+-- On TYNAT shift to state 11
+-- On LPAR shift to state 12
+-- On ty shift to state 13
+## Reductions:
+
+State 13:
+## Known stack suffix:
+## LPAR ty
+## LR(1) items:
+ty -> ty . TYARROW ty [ TYLST TYARROW RPAR ]
+ty -> ty . TYLST [ TYLST TYARROW RPAR ]
+ty -> LPAR ty . RPAR [ TYLST TYARROW SEP RPAR EQ ]
+## Transitions:
+-- On TYLST shift to state 14
+-- On TYARROW shift to state 15
+-- On RPAR shift to state 17
+## Reductions:
+
+State 14:
+## Known stack suffix:
+## ty TYLST
+## LR(1) items:
+ty -> ty TYLST . [ TYLST TYARROW SEP RPAR EQ ]
+## Transitions:
+## Reductions:
+-- On TYLST TYARROW SEP RPAR EQ
+--   reduce production ty -> ty TYLST
+
+State 15:
+## Known stack suffix:
+## ty TYARROW
+## LR(1) items:
+ty -> ty TYARROW . ty [ TYLST TYARROW SEP RPAR EQ ]
+## Transitions:
+-- On TYVAR shift to state 10
+-- On TYNAT shift to state 11
+-- On LPAR shift to state 12
+-- On ty shift to state 16
+## Reductions:
+
+State 16:
+## Known stack suffix:
+## ty TYARROW ty
+## LR(1) items:
+ty -> ty . TYARROW ty [ TYLST TYARROW SEP RPAR EQ ]
+ty -> ty TYARROW ty . [ TYLST TYARROW SEP RPAR EQ ]
+ty -> ty . TYLST [ TYLST TYARROW SEP RPAR EQ ]
+## Transitions:
+-- On TYLST shift to state 14
+-- On TYARROW shift to state 15
+## Reductions:
+-- On SEP RPAR EQ
+--   reduce production ty -> ty TYARROW ty
+
+State 17:
+## Known stack suffix:
+## LPAR ty RPAR
+## LR(1) items:
+ty -> LPAR ty RPAR . [ TYLST TYARROW SEP RPAR EQ ]
+## Transitions:
+## Reductions:
+-- On TYLST TYARROW SEP RPAR EQ
+--   reduce production ty -> LPAR ty RPAR
+
+State 18:
+## Known stack suffix:
+## LPAR IDENT COLON ty
+## LR(1) items:
+strict_arg -> LPAR IDENT COLON ty . RPAR [ LPAR COLON ]
+ty -> ty . TYARROW ty [ TYLST TYARROW RPAR ]
+ty -> ty . TYLST [ TYLST TYARROW RPAR ]
+## Transitions:
+-- On TYLST shift to state 14
+-- On TYARROW shift to state 15
+-- On RPAR shift to state 19
+## Reductions:
+
+State 19:
+## Known stack suffix:
+## LPAR IDENT COLON ty RPAR
+## LR(1) items:
+strict_arg -> LPAR IDENT COLON ty RPAR . [ LPAR COLON ]
+## Transitions:
+## Reductions:
+-- On LPAR COLON
+--   reduce production strict_arg -> LPAR IDENT COLON ty RPAR
+
+State 20:
+## Known stack suffix:
+## strict_arg
+## LR(1) items:
+nonempty_list(strict_arg) -> strict_arg . [ COLON ]
+nonempty_list(strict_arg) -> strict_arg . nonempty_list(strict_arg) [ COLON ]
+## Transitions:
+-- On LPAR shift to state 7
+-- On strict_arg shift to state 20
+-- On nonempty_list(strict_arg) shift to state 21
+## Reductions:
+-- On COLON
+--   reduce production nonempty_list(strict_arg) -> strict_arg
+
+State 21:
+## Known stack suffix:
+## strict_arg nonempty_list(strict_arg)
+## LR(1) items:
+nonempty_list(strict_arg) -> strict_arg nonempty_list(strict_arg) . [ COLON ]
+## Transitions:
+## Reductions:
+-- On COLON
+--   reduce production nonempty_list(strict_arg) -> strict_arg nonempty_list(strict_arg)
+
+State 22:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg)
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) . COLON eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On COLON shift to state 23
+## Reductions:
+
+State 23:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON . eqn COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 82
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On eqn shift to state 85
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 24:
+## Known stack suffix:
+## NIL
+## LR(1) items:
+atom_tm -> NIL . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production atom_tm -> NIL
+
+State 25:
+## Known stack suffix:
+## NATLIT
+## LR(1) items:
+atom_tm -> NATLIT . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production atom_tm -> NATLIT
+
+State 26:
+## Known stack suffix:
+## MATCH
+## LR(1) items:
+key_tm -> MATCH . tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 69
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 27:
+## Known stack suffix:
+## LPAR
+## LR(1) items:
+atom_tm -> LPAR . tm RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 67
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 28:
+## Known stack suffix:
+## IF0
+## LR(1) items:
+key_tm -> IF0 . tm THEN tm ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 61
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 29:
+## Known stack suffix:
+## IDENT
+## LR(1) items:
+atom_tm -> IDENT . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production atom_tm -> IDENT
+
+State 30:
+## Known stack suffix:
+## FUN
+## LR(1) items:
+key_tm -> FUN . IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+key_tm -> FUN . LPAR IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+key_tm -> FUN . LPAR IDENT COLON ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On LPAR shift to state 31
+-- On IDENT shift to state 57
+## Reductions:
+
+State 31:
+## Known stack suffix:
+## FUN LPAR
+## LR(1) items:
+key_tm -> FUN LPAR . IDENT RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+key_tm -> FUN LPAR . IDENT COLON ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On IDENT shift to state 32
+## Reductions:
+
+State 32:
+## Known stack suffix:
+## FUN LPAR IDENT
+## LR(1) items:
+key_tm -> FUN LPAR IDENT . RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+key_tm -> FUN LPAR IDENT . COLON ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On RPAR shift to state 33
+-- On COLON shift to state 51
+## Reductions:
+
+State 33:
+## Known stack suffix:
+## FUN LPAR IDENT RPAR
+## LR(1) items:
+key_tm -> FUN LPAR IDENT RPAR . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On ARROW shift to state 34
+## Reductions:
+
+State 34:
+## Known stack suffix:
+## FUN LPAR IDENT RPAR ARROW
+## LR(1) items:
+key_tm -> FUN LPAR IDENT RPAR ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 35
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 35:
+## Known stack suffix:
+## FUN LPAR IDENT RPAR ARROW tm
+## LR(1) items:
+key_tm -> FUN LPAR IDENT RPAR ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On END shift to state 36
+## Reductions:
+
+State 36:
+## Known stack suffix:
+## FUN LPAR IDENT RPAR ARROW tm END
+## LR(1) items:
+key_tm -> FUN LPAR IDENT RPAR ARROW tm END . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production key_tm -> FUN LPAR IDENT RPAR ARROW tm END
+
+State 37:
+## Known stack suffix:
+## mul_tm
+## LR(1) items:
+addsub_tm -> mul_tm . [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+mul_tm -> mul_tm . TIMES key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On TIMES shift to state 38
+## Reductions:
+-- On WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production addsub_tm -> mul_tm
+
+State 38:
+## Known stack suffix:
+## mul_tm TIMES
+## LR(1) items:
+mul_tm -> mul_tm TIMES . key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On key_tm shift to state 39
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+## Reductions:
+
+State 39:
+## Known stack suffix:
+## mul_tm TIMES key_tm
+## LR(1) items:
+mul_tm -> mul_tm TIMES key_tm . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production mul_tm -> mul_tm TIMES key_tm
+
+State 40:
+## Known stack suffix:
+## atom_tm
+## LR(1) items:
+app_tm -> atom_tm . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production app_tm -> atom_tm
+
+State 41:
+## Known stack suffix:
+## app_tm
+## LR(1) items:
+app_tm -> app_tm . atom_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+key_tm -> app_tm . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On LPAR shift to state 27
+-- On IDENT shift to state 29
+-- On atom_tm shift to state 42
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production key_tm -> app_tm
+
+State 42:
+## Known stack suffix:
+## app_tm atom_tm
+## LR(1) items:
+app_tm -> app_tm atom_tm . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production app_tm -> app_tm atom_tm
+
+State 43:
+## Known stack suffix:
+## key_tm
+## LR(1) items:
+mul_tm -> key_tm . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production mul_tm -> key_tm
+
+State 44:
+## Known stack suffix:
+## addsub_tm
+## LR(1) items:
+addsub_tm -> addsub_tm . PLUS mul_tm [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+addsub_tm -> addsub_tm . MINUS mul_tm [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+tm -> addsub_tm . CONS tm [ WITH THEOREM THEN SEP RPAR PRINT EQ EOF END ELSE DEFINITION DASH CONST COLON BAR ]
+tm -> addsub_tm . [ WITH THEOREM THEN SEP RPAR PRINT EQ EOF END ELSE DEFINITION DASH CONST COLON BAR ]
+## Transitions:
+-- On PLUS shift to state 45
+-- On MINUS shift to state 47
+-- On CONS shift to state 49
+## Reductions:
+-- On WITH THEOREM THEN SEP RPAR PRINT EQ EOF END ELSE DEFINITION DASH CONST COLON BAR
+--   reduce production tm -> addsub_tm
+
+State 45:
+## Known stack suffix:
+## addsub_tm PLUS
+## LR(1) items:
+addsub_tm -> addsub_tm PLUS . mul_tm [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On mul_tm shift to state 46
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+## Reductions:
+
+State 46:
+## Known stack suffix:
+## addsub_tm PLUS mul_tm
+## LR(1) items:
+addsub_tm -> addsub_tm PLUS mul_tm . [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+mul_tm -> mul_tm . TIMES key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On TIMES shift to state 38
+## Reductions:
+-- On WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production addsub_tm -> addsub_tm PLUS mul_tm
+
+State 47:
+## Known stack suffix:
+## addsub_tm MINUS
+## LR(1) items:
+addsub_tm -> addsub_tm MINUS . mul_tm [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On mul_tm shift to state 48
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+## Reductions:
+
+State 48:
+## Known stack suffix:
+## addsub_tm MINUS mul_tm
+## LR(1) items:
+addsub_tm -> addsub_tm MINUS mul_tm . [ WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+mul_tm -> mul_tm . TIMES key_tm [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On TIMES shift to state 38
+## Reductions:
+-- On WITH THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production addsub_tm -> addsub_tm MINUS mul_tm
+
+State 49:
+## Known stack suffix:
+## addsub_tm CONS
+## LR(1) items:
+tm -> addsub_tm CONS . tm [ WITH THEOREM THEN SEP RPAR PRINT EQ EOF END ELSE DEFINITION DASH CONST COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 50
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 50:
+## Known stack suffix:
+## addsub_tm CONS tm
+## LR(1) items:
+tm -> addsub_tm CONS tm . [ WITH THEOREM THEN SEP RPAR PRINT EQ EOF END ELSE DEFINITION DASH CONST COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH THEOREM THEN SEP RPAR PRINT EQ EOF END ELSE DEFINITION DASH CONST COLON BAR
+--   reduce production tm -> addsub_tm CONS tm
+
+State 51:
+## Known stack suffix:
+## FUN LPAR IDENT COLON
+## LR(1) items:
+key_tm -> FUN LPAR IDENT COLON . ty RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On TYVAR shift to state 10
+-- On TYNAT shift to state 11
+-- On LPAR shift to state 12
+-- On ty shift to state 52
+## Reductions:
+
+State 52:
+## Known stack suffix:
+## FUN LPAR IDENT COLON ty
+## LR(1) items:
+key_tm -> FUN LPAR IDENT COLON ty . RPAR ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+ty -> ty . TYARROW ty [ TYLST TYARROW RPAR ]
+ty -> ty . TYLST [ TYLST TYARROW RPAR ]
+## Transitions:
+-- On TYLST shift to state 14
+-- On TYARROW shift to state 15
+-- On RPAR shift to state 53
+## Reductions:
+
+State 53:
+## Known stack suffix:
+## FUN LPAR IDENT COLON ty RPAR
+## LR(1) items:
+key_tm -> FUN LPAR IDENT COLON ty RPAR . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On ARROW shift to state 54
+## Reductions:
+
+State 54:
+## Known stack suffix:
+## FUN LPAR IDENT COLON ty RPAR ARROW
+## LR(1) items:
+key_tm -> FUN LPAR IDENT COLON ty RPAR ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 55
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 55:
+## Known stack suffix:
+## FUN LPAR IDENT COLON ty RPAR ARROW tm
+## LR(1) items:
+key_tm -> FUN LPAR IDENT COLON ty RPAR ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On END shift to state 56
+## Reductions:
+
+State 56:
+## Known stack suffix:
+## FUN LPAR IDENT COLON ty RPAR ARROW tm END
+## LR(1) items:
+key_tm -> FUN LPAR IDENT COLON ty RPAR ARROW tm END . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production key_tm -> FUN LPAR IDENT COLON ty RPAR ARROW tm END
+
+State 57:
+## Known stack suffix:
+## FUN IDENT
+## LR(1) items:
+key_tm -> FUN IDENT . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On ARROW shift to state 58
+## Reductions:
+
+State 58:
+## Known stack suffix:
+## FUN IDENT ARROW
+## LR(1) items:
+key_tm -> FUN IDENT ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 59
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 59:
+## Known stack suffix:
+## FUN IDENT ARROW tm
+## LR(1) items:
+key_tm -> FUN IDENT ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On END shift to state 60
+## Reductions:
+
+State 60:
+## Known stack suffix:
+## FUN IDENT ARROW tm END
+## LR(1) items:
+key_tm -> FUN IDENT ARROW tm END . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production key_tm -> FUN IDENT ARROW tm END
+
+State 61:
+## Known stack suffix:
+## IF0 tm
+## LR(1) items:
+key_tm -> IF0 tm . THEN tm ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On THEN shift to state 62
+## Reductions:
+
+State 62:
+## Known stack suffix:
+## IF0 tm THEN
+## LR(1) items:
+key_tm -> IF0 tm THEN . tm ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 63
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 63:
+## Known stack suffix:
+## IF0 tm THEN tm
+## LR(1) items:
+key_tm -> IF0 tm THEN tm . ELSE tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On ELSE shift to state 64
+## Reductions:
+
+State 64:
+## Known stack suffix:
+## IF0 tm THEN tm ELSE
+## LR(1) items:
+key_tm -> IF0 tm THEN tm ELSE . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 65
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 65:
+## Known stack suffix:
+## IF0 tm THEN tm ELSE tm
+## LR(1) items:
+key_tm -> IF0 tm THEN tm ELSE tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On END shift to state 66
+## Reductions:
+
+State 66:
+## Known stack suffix:
+## IF0 tm THEN tm ELSE tm END
+## LR(1) items:
+key_tm -> IF0 tm THEN tm ELSE tm END . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production key_tm -> IF0 tm THEN tm ELSE tm END
+
+State 67:
+## Known stack suffix:
+## LPAR tm
+## LR(1) items:
+atom_tm -> LPAR tm . RPAR [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On RPAR shift to state 68
+## Reductions:
+
+State 68:
+## Known stack suffix:
+## LPAR tm RPAR
+## LR(1) items:
+atom_tm -> LPAR tm RPAR . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS NIL NATLIT MINUS LPAR IDENT EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production atom_tm -> LPAR tm RPAR
+
+State 69:
+## Known stack suffix:
+## MATCH tm
+## LR(1) items:
+key_tm -> MATCH tm . WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On WITH shift to state 70
+## Reductions:
+
+State 70:
+## Known stack suffix:
+## MATCH tm WITH
+## LR(1) items:
+key_tm -> MATCH tm WITH . BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On BAR shift to state 71
+## Reductions:
+
+State 71:
+## Known stack suffix:
+## MATCH tm WITH BAR
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR . NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 72
+## Reductions:
+
+State 72:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL . ARROW tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On ARROW shift to state 73
+## Reductions:
+
+State 73:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL ARROW
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL ARROW . tm BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 74
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 74:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL ARROW tm
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL ARROW tm . BAR IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On BAR shift to state 75
+## Reductions:
+
+State 75:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL ARROW tm BAR
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR . IDENT CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On IDENT shift to state 76
+## Reductions:
+
+State 76:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT . CONS IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On CONS shift to state 77
+## Reductions:
+
+State 77:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS . IDENT ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On IDENT shift to state 78
+## Reductions:
+
+State 78:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT . ARROW tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On ARROW shift to state 79
+## Reductions:
+
+State 79:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW . tm END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 80
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 80:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm . END [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+-- On END shift to state 81
+## Reductions:
+
+State 81:
+## Known stack suffix:
+## MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END
+## LR(1) items:
+key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END . [ WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR ]
+## Transitions:
+## Reductions:
+-- On WITH TIMES THEOREM THEN SEP RPAR PRINT PLUS MINUS EQ EOF END ELSE DEFINITION DASH CONST CONS COLON BAR
+--   reduce production key_tm -> MATCH tm WITH BAR NIL ARROW tm BAR IDENT CONS IDENT ARROW tm END
+
+State 82:
+## Known stack suffix:
+## tm
+## LR(1) items:
+eqn -> tm . EQ tm [ SEP COLON ]
+## Transitions:
+-- On EQ shift to state 83
+## Reductions:
+
+State 83:
+## Known stack suffix:
+## tm EQ
+## LR(1) items:
+eqn -> tm EQ . tm [ SEP COLON ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 84
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 84:
+## Known stack suffix:
+## tm EQ tm
+## LR(1) items:
+eqn -> tm EQ tm . [ SEP COLON ]
+## Transitions:
+## Reductions:
+-- On SEP COLON
+--   reduce production eqn -> tm EQ tm
+
+State 85:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn . COLON ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On COLON shift to state 86
+## Reductions:
+
+State 86:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON . ty SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On TYVAR shift to state 10
+-- On TYNAT shift to state 11
+-- On LPAR shift to state 12
+-- On ty shift to state 87
+## Reductions:
+
+State 87:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty . SEP proof [ THEOREM PRINT EOF DEFINITION CONST ]
+ty -> ty . TYARROW ty [ TYLST TYARROW SEP ]
+ty -> ty . TYLST [ TYLST TYARROW SEP ]
+## Transitions:
+-- On TYLST shift to state 14
+-- On TYARROW shift to state 15
+-- On SEP shift to state 88
+## Reductions:
+
+State 88:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP . proof [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On PROOF shift to state 89
+-- On AXIOM shift to state 154
+-- On proof shift to state 156
+## Reductions:
+
+State 89:
+## Known stack suffix:
+## PROOF
+## LR(1) items:
+proof -> PROOF . SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On SEP shift to state 90
+## Reductions:
+
+State 90:
+## Known stack suffix:
+## PROOF SEP
+## LR(1) items:
+proof -> PROOF SEP . BY INDUCTION ON IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On BY shift to state 91
+## Reductions:
+
+State 91:
+## Known stack suffix:
+## PROOF SEP BY
+## LR(1) items:
+proof -> PROOF SEP BY . INDUCTION ON IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On INDUCTION shift to state 92
+## Reductions:
+
+State 92:
+## Known stack suffix:
+## PROOF SEP BY INDUCTION
+## LR(1) items:
+proof -> PROOF SEP BY INDUCTION . ON IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On ON shift to state 93
+## Reductions:
+
+State 93:
+## Known stack suffix:
+## PROOF SEP BY INDUCTION ON
+## LR(1) items:
+proof -> PROOF SEP BY INDUCTION ON . IDENT option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On IDENT shift to state 94
+## Reductions:
+
+State 94:
+## Known stack suffix:
+## PROOF SEP BY INDUCTION ON IDENT
+## LR(1) items:
+proof -> PROOF SEP BY INDUCTION ON IDENT . option(generalize) SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On COMMA shift to state 95
+-- On option(generalize) shift to state 100
+-- On generalize shift to state 153
+## Reductions:
+-- On SEP
+--   reduce production option(generalize) ->
+
+State 95:
+## Known stack suffix:
+## COMMA
+## LR(1) items:
+generalize -> COMMA . GENERALIZE nonempty_list(IDENT) [ SEP ]
+## Transitions:
+-- On GENERALIZE shift to state 96
+## Reductions:
+
+State 96:
+## Known stack suffix:
+## COMMA GENERALIZE
+## LR(1) items:
+generalize -> COMMA GENERALIZE . nonempty_list(IDENT) [ SEP ]
+## Transitions:
+-- On IDENT shift to state 97
+-- On nonempty_list(IDENT) shift to state 99
+## Reductions:
+
+State 97:
+## Known stack suffix:
+## IDENT
+## LR(1) items:
+nonempty_list(IDENT) -> IDENT . [ SEP ]
+nonempty_list(IDENT) -> IDENT . nonempty_list(IDENT) [ SEP ]
+## Transitions:
+-- On IDENT shift to state 97
+-- On nonempty_list(IDENT) shift to state 98
+## Reductions:
+-- On SEP
+--   reduce production nonempty_list(IDENT) -> IDENT
+
+State 98:
+## Known stack suffix:
+## IDENT nonempty_list(IDENT)
+## LR(1) items:
+nonempty_list(IDENT) -> IDENT nonempty_list(IDENT) . [ SEP ]
+## Transitions:
+## Reductions:
+-- On SEP
+--   reduce production nonempty_list(IDENT) -> IDENT nonempty_list(IDENT)
+
+State 99:
+## Known stack suffix:
+## COMMA GENERALIZE nonempty_list(IDENT)
+## LR(1) items:
+generalize -> COMMA GENERALIZE nonempty_list(IDENT) . [ SEP ]
+## Transitions:
+## Reductions:
+-- On SEP
+--   reduce production generalize -> COMMA GENERALIZE nonempty_list(IDENT)
+
+State 100:
+## Known stack suffix:
+## PROOF SEP BY INDUCTION ON IDENT option(generalize)
+## LR(1) items:
+proof -> PROOF SEP BY INDUCTION ON IDENT option(generalize) . SEP list(case) QED SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On SEP shift to state 101
+## Reductions:
+
+State 101:
+## Known stack suffix:
+## PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP
+## LR(1) items:
+proof -> PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP . list(case) QED SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On CASE shift to state 102
+-- On list(case) shift to state 148
+-- On case shift to state 151
+## Reductions:
+-- On QED
+--   reduce production list(case) ->
+
+State 102:
+## Known stack suffix:
+## CASE
+## LR(1) items:
+case -> CASE . IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
+case -> CASE . IDENT EQ pattern SEP option(ih) LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On IDENT shift to state 103
+## Reductions:
+
+State 103:
+## Known stack suffix:
+## CASE IDENT
+## LR(1) items:
+case -> CASE IDENT . EQ pattern SEP option(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
+case -> CASE IDENT . EQ pattern SEP option(ih) LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On EQ shift to state 104
+## Reductions:
+
+State 104:
+## Known stack suffix:
+## CASE IDENT EQ
+## LR(1) items:
+case -> CASE IDENT EQ . pattern SEP option(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
+case -> CASE IDENT EQ . pattern SEP option(ih) LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On NIL shift to state 105
+-- On IDENT shift to state 106
+-- On pattern shift to state 109
+## Reductions:
+
+State 105:
+## Known stack suffix:
+## NIL
+## LR(1) items:
+pattern -> NIL . [ SEP ]
+## Transitions:
+## Reductions:
+-- On SEP
+--   reduce production pattern -> NIL
+
+State 106:
+## Known stack suffix:
+## IDENT
+## LR(1) items:
+pattern -> IDENT . CONS IDENT [ SEP ]
+## Transitions:
+-- On CONS shift to state 107
+## Reductions:
+
+State 107:
+## Known stack suffix:
+## IDENT CONS
+## LR(1) items:
+pattern -> IDENT CONS . IDENT [ SEP ]
+## Transitions:
+-- On IDENT shift to state 108
+## Reductions:
+
+State 108:
+## Known stack suffix:
+## IDENT CONS IDENT
+## LR(1) items:
+pattern -> IDENT CONS IDENT . [ SEP ]
+## Transitions:
+## Reductions:
+-- On SEP
+--   reduce production pattern -> IDENT CONS IDENT
+
+State 109:
+## Known stack suffix:
+## CASE IDENT EQ pattern
+## LR(1) items:
+case -> CASE IDENT EQ pattern . SEP option(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
+case -> CASE IDENT EQ pattern . SEP option(ih) LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On SEP shift to state 110
+## Reductions:
+
+State 110:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP . option(ih) WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
+case -> CASE IDENT EQ pattern SEP . option(ih) LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On IH shift to state 111
+-- On option(ih) shift to state 115
+-- On ih shift to state 147
+## Reductions:
+-- On WTS LHS
+--   reduce production option(ih) ->
+
+State 111:
+## Known stack suffix:
+## IH
+## LR(1) items:
+ih -> IH . COLON eqn SEP [ WTS LHS ]
+## Transitions:
+-- On COLON shift to state 112
+## Reductions:
+
+State 112:
+## Known stack suffix:
+## IH COLON
+## LR(1) items:
+ih -> IH COLON . eqn SEP [ WTS LHS ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 82
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On eqn shift to state 113
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 113:
+## Known stack suffix:
+## IH COLON eqn
+## LR(1) items:
+ih -> IH COLON eqn . SEP [ WTS LHS ]
+## Transitions:
+-- On SEP shift to state 114
+## Reductions:
+
+State 114:
+## Known stack suffix:
+## IH COLON eqn SEP
+## LR(1) items:
+ih -> IH COLON eqn SEP . [ WTS LHS ]
+## Transitions:
+## Reductions:
+-- On WTS LHS
+--   reduce production ih -> IH COLON eqn SEP
+
+State 115:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih)
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) . WTS COLON eqn SEP LHS side RHS side [ QED CASE ]
+case -> CASE IDENT EQ pattern SEP option(ih) . LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On WTS shift to state 116
+-- On LHS shift to state 143
+## Reductions:
+
+State 116:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) WTS
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) WTS . COLON eqn SEP LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On COLON shift to state 117
+## Reductions:
+
+State 117:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) WTS COLON
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) WTS COLON . eqn SEP LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 82
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On eqn shift to state 118
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 118:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn . SEP LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On SEP shift to state 119
+## Reductions:
+
+State 119:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP . LHS side RHS side [ QED CASE ]
+## Transitions:
+-- On LHS shift to state 120
+## Reductions:
+
+State 120:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS . side RHS side [ QED CASE ]
+## Transitions:
+-- On EQ shift to state 121
+-- On side shift to state 140
+## Reductions:
+
+State 121:
+## Known stack suffix:
+## EQ
+## LR(1) items:
+side -> EQ . tm SEP list(step) [ RHS QED CASE ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 122
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 122:
+## Known stack suffix:
+## EQ tm
+## LR(1) items:
+side -> EQ tm . SEP list(step) [ RHS QED CASE ]
+## Transitions:
+-- On SEP shift to state 123
+## Reductions:
+
+State 123:
+## Known stack suffix:
+## EQ tm SEP
+## LR(1) items:
+side -> EQ tm SEP . list(step) [ RHS QED CASE ]
+## Transitions:
+-- On EQ shift to state 124
+-- On step shift to state 137
+-- On list(step) shift to state 139
+## Reductions:
+-- On RHS QED CASE
+--   reduce production list(step) ->
+
+State 124:
+## Known stack suffix:
+## EQ
+## LR(1) items:
+step -> EQ . tm DASH BY IDENT SEP [ RHS QED EQ CASE ]
+step -> EQ . tm DASH BY DEFN SEP [ RHS QED EQ CASE ]
+step -> EQ . tm DASH BY DEFN OF IDENT SEP [ RHS QED EQ CASE ]
+step -> EQ . tm DASH BY IH SEP [ RHS QED EQ CASE ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 125
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 125:
+## Known stack suffix:
+## EQ tm
+## LR(1) items:
+step -> EQ tm . DASH BY IDENT SEP [ RHS QED EQ CASE ]
+step -> EQ tm . DASH BY DEFN SEP [ RHS QED EQ CASE ]
+step -> EQ tm . DASH BY DEFN OF IDENT SEP [ RHS QED EQ CASE ]
+step -> EQ tm . DASH BY IH SEP [ RHS QED EQ CASE ]
+## Transitions:
+-- On DASH shift to state 126
+## Reductions:
+
+State 126:
+## Known stack suffix:
+## EQ tm DASH
+## LR(1) items:
+step -> EQ tm DASH . BY IDENT SEP [ RHS QED EQ CASE ]
+step -> EQ tm DASH . BY DEFN SEP [ RHS QED EQ CASE ]
+step -> EQ tm DASH . BY DEFN OF IDENT SEP [ RHS QED EQ CASE ]
+step -> EQ tm DASH . BY IH SEP [ RHS QED EQ CASE ]
+## Transitions:
+-- On BY shift to state 127
+## Reductions:
+
+State 127:
+## Known stack suffix:
+## EQ tm DASH BY
+## LR(1) items:
+step -> EQ tm DASH BY . IDENT SEP [ RHS QED EQ CASE ]
+step -> EQ tm DASH BY . DEFN SEP [ RHS QED EQ CASE ]
+step -> EQ tm DASH BY . DEFN OF IDENT SEP [ RHS QED EQ CASE ]
+step -> EQ tm DASH BY . IH SEP [ RHS QED EQ CASE ]
+## Transitions:
+-- On IH shift to state 128
+-- On IDENT shift to state 130
+-- On DEFN shift to state 132
+## Reductions:
+
+State 128:
+## Known stack suffix:
+## EQ tm DASH BY IH
+## LR(1) items:
+step -> EQ tm DASH BY IH . SEP [ RHS QED EQ CASE ]
+## Transitions:
+-- On SEP shift to state 129
+## Reductions:
+
+State 129:
+## Known stack suffix:
+## EQ tm DASH BY IH SEP
+## LR(1) items:
+step -> EQ tm DASH BY IH SEP . [ RHS QED EQ CASE ]
+## Transitions:
+## Reductions:
+-- On RHS QED EQ CASE
+--   reduce production step -> EQ tm DASH BY IH SEP
+
+State 130:
+## Known stack suffix:
+## EQ tm DASH BY IDENT
+## LR(1) items:
+step -> EQ tm DASH BY IDENT . SEP [ RHS QED EQ CASE ]
+## Transitions:
+-- On SEP shift to state 131
+## Reductions:
+
+State 131:
+## Known stack suffix:
+## EQ tm DASH BY IDENT SEP
+## LR(1) items:
+step -> EQ tm DASH BY IDENT SEP . [ RHS QED EQ CASE ]
+## Transitions:
+## Reductions:
+-- On RHS QED EQ CASE
+--   reduce production step -> EQ tm DASH BY IDENT SEP
+
+State 132:
+## Known stack suffix:
+## EQ tm DASH BY DEFN
+## LR(1) items:
+step -> EQ tm DASH BY DEFN . SEP [ RHS QED EQ CASE ]
+step -> EQ tm DASH BY DEFN . OF IDENT SEP [ RHS QED EQ CASE ]
+## Transitions:
+-- On SEP shift to state 133
+-- On OF shift to state 134
+## Reductions:
+
+State 133:
+## Known stack suffix:
+## EQ tm DASH BY DEFN SEP
+## LR(1) items:
+step -> EQ tm DASH BY DEFN SEP . [ RHS QED EQ CASE ]
+## Transitions:
+## Reductions:
+-- On RHS QED EQ CASE
+--   reduce production step -> EQ tm DASH BY DEFN SEP
+
+State 134:
+## Known stack suffix:
+## EQ tm DASH BY DEFN OF
+## LR(1) items:
+step -> EQ tm DASH BY DEFN OF . IDENT SEP [ RHS QED EQ CASE ]
+## Transitions:
+-- On IDENT shift to state 135
+## Reductions:
+
+State 135:
+## Known stack suffix:
+## EQ tm DASH BY DEFN OF IDENT
+## LR(1) items:
+step -> EQ tm DASH BY DEFN OF IDENT . SEP [ RHS QED EQ CASE ]
+## Transitions:
+-- On SEP shift to state 136
+## Reductions:
+
+State 136:
+## Known stack suffix:
+## EQ tm DASH BY DEFN OF IDENT SEP
+## LR(1) items:
+step -> EQ tm DASH BY DEFN OF IDENT SEP . [ RHS QED EQ CASE ]
+## Transitions:
+## Reductions:
+-- On RHS QED EQ CASE
+--   reduce production step -> EQ tm DASH BY DEFN OF IDENT SEP
+
+State 137:
+## Known stack suffix:
+## step
+## LR(1) items:
+list(step) -> step . list(step) [ RHS QED CASE ]
+## Transitions:
+-- On EQ shift to state 124
+-- On step shift to state 137
+-- On list(step) shift to state 138
+## Reductions:
+-- On RHS QED CASE
+--   reduce production list(step) ->
+
+State 138:
+## Known stack suffix:
+## step list(step)
+## LR(1) items:
+list(step) -> step list(step) . [ RHS QED CASE ]
+## Transitions:
+## Reductions:
+-- On RHS QED CASE
+--   reduce production list(step) -> step list(step)
+
+State 139:
+## Known stack suffix:
+## EQ tm SEP list(step)
+## LR(1) items:
+side -> EQ tm SEP list(step) . [ RHS QED CASE ]
+## Transitions:
+## Reductions:
+-- On RHS QED CASE
+--   reduce production side -> EQ tm SEP list(step)
+
+State 140:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS side
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS side . RHS side [ QED CASE ]
+## Transitions:
+-- On RHS shift to state 141
+## Reductions:
+
+State 141:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS side RHS
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS side RHS . side [ QED CASE ]
+## Transitions:
+-- On EQ shift to state 121
+-- On side shift to state 142
+## Reductions:
+
+State 142:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS side RHS side
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS side RHS side . [ QED CASE ]
+## Transitions:
+## Reductions:
+-- On QED CASE
+--   reduce production case -> CASE IDENT EQ pattern SEP option(ih) WTS COLON eqn SEP LHS side RHS side
+
+State 143:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) LHS
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) LHS . side RHS side [ QED CASE ]
+## Transitions:
+-- On EQ shift to state 121
+-- On side shift to state 144
+## Reductions:
+
+State 144:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) LHS side
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) LHS side . RHS side [ QED CASE ]
+## Transitions:
+-- On RHS shift to state 145
+## Reductions:
+
+State 145:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) LHS side RHS
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) LHS side RHS . side [ QED CASE ]
+## Transitions:
+-- On EQ shift to state 121
+-- On side shift to state 146
+## Reductions:
+
+State 146:
+## Known stack suffix:
+## CASE IDENT EQ pattern SEP option(ih) LHS side RHS side
+## LR(1) items:
+case -> CASE IDENT EQ pattern SEP option(ih) LHS side RHS side . [ QED CASE ]
+## Transitions:
+## Reductions:
+-- On QED CASE
+--   reduce production case -> CASE IDENT EQ pattern SEP option(ih) LHS side RHS side
+
+State 147:
+## Known stack suffix:
+## ih
+## LR(1) items:
+option(ih) -> ih . [ WTS LHS ]
+## Transitions:
+## Reductions:
+-- On WTS LHS
+--   reduce production option(ih) -> ih
+
+State 148:
+## Known stack suffix:
+## PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP list(case)
+## LR(1) items:
+proof -> PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) . QED SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On QED shift to state 149
+## Reductions:
+
+State 149:
+## Known stack suffix:
+## PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) QED
+## LR(1) items:
+proof -> PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) QED . SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On SEP shift to state 150
+## Reductions:
+
+State 150:
+## Known stack suffix:
+## PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) QED SEP
+## LR(1) items:
+proof -> PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) QED SEP . [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+## Reductions:
+-- On THEOREM PRINT EOF DEFINITION CONST
+--   reduce production proof -> PROOF SEP BY INDUCTION ON IDENT option(generalize) SEP list(case) QED SEP
+
+State 151:
+## Known stack suffix:
+## case
+## LR(1) items:
+list(case) -> case . list(case) [ QED ]
+## Transitions:
+-- On CASE shift to state 102
+-- On list(case) shift to state 152
+-- On case shift to state 151
+## Reductions:
+-- On QED
+--   reduce production list(case) ->
+
+State 152:
+## Known stack suffix:
+## case list(case)
+## LR(1) items:
+list(case) -> case list(case) . [ QED ]
+## Transitions:
+## Reductions:
+-- On QED
+--   reduce production list(case) -> case list(case)
+
+State 153:
+## Known stack suffix:
+## generalize
+## LR(1) items:
+option(generalize) -> generalize . [ SEP ]
+## Transitions:
+## Reductions:
+-- On SEP
+--   reduce production option(generalize) -> generalize
+
+State 154:
+## Known stack suffix:
+## AXIOM
+## LR(1) items:
+proof -> AXIOM . SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On SEP shift to state 155
+## Reductions:
+
+State 155:
+## Known stack suffix:
+## AXIOM SEP
+## LR(1) items:
+proof -> AXIOM SEP . [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+## Reductions:
+-- On THEOREM PRINT EOF DEFINITION CONST
+--   reduce production proof -> AXIOM SEP
+
+State 156:
+## Known stack suffix:
+## THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof
+## LR(1) items:
+stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof . [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+## Reductions:
+-- On THEOREM PRINT EOF DEFINITION CONST
+--   reduce production stmt -> THEOREM LPAR IDENT RPAR SEP FORALL nonempty_list(strict_arg) COLON eqn COLON ty SEP proof
+
+State 157:
+## Known stack suffix:
+## PRINT
+## LR(1) items:
+stmt -> PRINT . tm SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 158
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 158:
+## Known stack suffix:
+## PRINT tm
+## LR(1) items:
+stmt -> PRINT tm . SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On SEP shift to state 159
+## Reductions:
+
+State 159:
+## Known stack suffix:
+## PRINT tm SEP
+## LR(1) items:
+stmt -> PRINT tm SEP . [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+## Reductions:
+-- On THEOREM PRINT EOF DEFINITION CONST
+--   reduce production stmt -> PRINT tm SEP
+
+State 160:
+## Known stack suffix:
+## EOF
+## LR(1) items:
+program -> EOF . [ # ]
+## Transitions:
+## Reductions:
+-- On #
+--   reduce production program -> EOF
+
+State 161:
+## Known stack suffix:
+## DEFINITION
+## LR(1) items:
+stmt -> DEFINITION . SEP LET REC IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION . SEP LET REC IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION . SEP LET IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION . SEP LET IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On SEP shift to state 162
+## Reductions:
+
+State 162:
+## Known stack suffix:
+## DEFINITION SEP
+## LR(1) items:
+stmt -> DEFINITION SEP . LET REC IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP . LET REC IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP . LET IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP . LET IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On LET shift to state 163
+## Reductions:
+
+State 163:
+## Known stack suffix:
+## DEFINITION SEP LET
+## LR(1) items:
+stmt -> DEFINITION SEP LET . REC IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP LET . REC IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP LET . IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP LET . IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On REC shift to state 164
+-- On IDENT shift to state 182
+## Reductions:
+
+State 164:
+## Known stack suffix:
+## DEFINITION SEP LET REC
+## LR(1) items:
+stmt -> DEFINITION SEP LET REC . IDENT nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP LET REC . IDENT nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On IDENT shift to state 165
+## Reductions:
+
+State 165:
+## Known stack suffix:
+## DEFINITION SEP LET REC IDENT
+## LR(1) items:
+stmt -> DEFINITION SEP LET REC IDENT . nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP LET REC IDENT . nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On LPAR shift to state 166
+-- On IDENT shift to state 172
+-- On nonempty_list(arg) shift to state 173
+-- On arg shift to state 180
+## Reductions:
+
+State 166:
+## Known stack suffix:
+## LPAR
+## LR(1) items:
+arg -> LPAR . IDENT COLON ty RPAR [ LPAR IDENT EQ COLON ]
+arg -> LPAR . IDENT RPAR [ LPAR IDENT EQ COLON ]
+## Transitions:
+-- On IDENT shift to state 167
+## Reductions:
+
+State 167:
+## Known stack suffix:
+## LPAR IDENT
+## LR(1) items:
+arg -> LPAR IDENT . COLON ty RPAR [ LPAR IDENT EQ COLON ]
+arg -> LPAR IDENT . RPAR [ LPAR IDENT EQ COLON ]
+## Transitions:
+-- On RPAR shift to state 168
+-- On COLON shift to state 169
+## Reductions:
+
+State 168:
+## Known stack suffix:
+## LPAR IDENT RPAR
+## LR(1) items:
+arg -> LPAR IDENT RPAR . [ LPAR IDENT EQ COLON ]
+## Transitions:
+## Reductions:
+-- On LPAR IDENT EQ COLON
+--   reduce production arg -> LPAR IDENT RPAR
+
+State 169:
+## Known stack suffix:
+## LPAR IDENT COLON
+## LR(1) items:
+arg -> LPAR IDENT COLON . ty RPAR [ LPAR IDENT EQ COLON ]
+## Transitions:
+-- On TYVAR shift to state 10
+-- On TYNAT shift to state 11
+-- On LPAR shift to state 12
+-- On ty shift to state 170
+## Reductions:
+
+State 170:
+## Known stack suffix:
+## LPAR IDENT COLON ty
+## LR(1) items:
+arg -> LPAR IDENT COLON ty . RPAR [ LPAR IDENT EQ COLON ]
+ty -> ty . TYARROW ty [ TYLST TYARROW RPAR ]
+ty -> ty . TYLST [ TYLST TYARROW RPAR ]
+## Transitions:
+-- On TYLST shift to state 14
+-- On TYARROW shift to state 15
+-- On RPAR shift to state 171
+## Reductions:
+
+State 171:
+## Known stack suffix:
+## LPAR IDENT COLON ty RPAR
+## LR(1) items:
+arg -> LPAR IDENT COLON ty RPAR . [ LPAR IDENT EQ COLON ]
+## Transitions:
+## Reductions:
+-- On LPAR IDENT EQ COLON
+--   reduce production arg -> LPAR IDENT COLON ty RPAR
+
+State 172:
+## Known stack suffix:
+## IDENT
+## LR(1) items:
+arg -> IDENT . [ LPAR IDENT EQ COLON ]
+## Transitions:
+## Reductions:
+-- On LPAR IDENT EQ COLON
+--   reduce production arg -> IDENT
+
+State 173:
+## Known stack suffix:
+## DEFINITION SEP LET REC IDENT nonempty_list(arg)
+## LR(1) items:
+stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) . COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) . EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On EQ shift to state 174
+-- On COLON shift to state 176
+## Reductions:
+
+State 174:
+## Known stack suffix:
+## DEFINITION SEP LET REC IDENT nonempty_list(arg) EQ
+## LR(1) items:
+stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) EQ . tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 175
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 175:
+## Known stack suffix:
+## DEFINITION SEP LET REC IDENT nonempty_list(arg) EQ tm
+## LR(1) items:
+stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) EQ tm . [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+## Reductions:
+-- On THEOREM PRINT EOF DEFINITION CONST
+--   reduce production stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) EQ tm
+
+State 176:
+## Known stack suffix:
+## DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON
+## LR(1) items:
+stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON . ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On TYVAR shift to state 10
+-- On TYNAT shift to state 11
+-- On LPAR shift to state 12
+-- On ty shift to state 177
+## Reductions:
+
+State 177:
+## Known stack suffix:
+## DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty
+## LR(1) items:
+stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty . EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+ty -> ty . TYARROW ty [ TYLST TYARROW EQ ]
+ty -> ty . TYLST [ TYLST TYARROW EQ ]
+## Transitions:
+-- On TYLST shift to state 14
+-- On TYARROW shift to state 15
+-- On EQ shift to state 178
+## Reductions:
+
+State 178:
+## Known stack suffix:
+## DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty EQ
+## LR(1) items:
+stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty EQ . tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 179
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 179:
+## Known stack suffix:
+## DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty EQ tm
+## LR(1) items:
+stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty EQ tm . [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+## Reductions:
+-- On THEOREM PRINT EOF DEFINITION CONST
+--   reduce production stmt -> DEFINITION SEP LET REC IDENT nonempty_list(arg) COLON ty EQ tm
+
+State 180:
+## Known stack suffix:
+## arg
+## LR(1) items:
+nonempty_list(arg) -> arg . [ EQ COLON ]
+nonempty_list(arg) -> arg . nonempty_list(arg) [ EQ COLON ]
+## Transitions:
+-- On LPAR shift to state 166
+-- On IDENT shift to state 172
+-- On nonempty_list(arg) shift to state 181
+-- On arg shift to state 180
+## Reductions:
+-- On EQ COLON
+--   reduce production nonempty_list(arg) -> arg
+
+State 181:
+## Known stack suffix:
+## arg nonempty_list(arg)
+## LR(1) items:
+nonempty_list(arg) -> arg nonempty_list(arg) . [ EQ COLON ]
+## Transitions:
+## Reductions:
+-- On EQ COLON
+--   reduce production nonempty_list(arg) -> arg nonempty_list(arg)
+
+State 182:
+## Known stack suffix:
+## DEFINITION SEP LET IDENT
+## LR(1) items:
+stmt -> DEFINITION SEP LET IDENT . nonempty_list(arg) COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP LET IDENT . nonempty_list(arg) EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On LPAR shift to state 166
+-- On IDENT shift to state 172
+-- On nonempty_list(arg) shift to state 183
+-- On arg shift to state 180
+## Reductions:
+
+State 183:
+## Known stack suffix:
+## DEFINITION SEP LET IDENT nonempty_list(arg)
+## LR(1) items:
+stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) . COLON ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) . EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On EQ shift to state 184
+-- On COLON shift to state 186
+## Reductions:
+
+State 184:
+## Known stack suffix:
+## DEFINITION SEP LET IDENT nonempty_list(arg) EQ
+## LR(1) items:
+stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) EQ . tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 185
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 185:
+## Known stack suffix:
+## DEFINITION SEP LET IDENT nonempty_list(arg) EQ tm
+## LR(1) items:
+stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) EQ tm . [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+## Reductions:
+-- On THEOREM PRINT EOF DEFINITION CONST
+--   reduce production stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) EQ tm
+
+State 186:
+## Known stack suffix:
+## DEFINITION SEP LET IDENT nonempty_list(arg) COLON
+## LR(1) items:
+stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) COLON . ty EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On TYVAR shift to state 10
+-- On TYNAT shift to state 11
+-- On LPAR shift to state 12
+-- On ty shift to state 187
+## Reductions:
+
+State 187:
+## Known stack suffix:
+## DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty
+## LR(1) items:
+stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty . EQ tm [ THEOREM PRINT EOF DEFINITION CONST ]
+ty -> ty . TYARROW ty [ TYLST TYARROW EQ ]
+ty -> ty . TYLST [ TYLST TYARROW EQ ]
+## Transitions:
+-- On TYLST shift to state 14
+-- On TYARROW shift to state 15
+-- On EQ shift to state 188
+## Reductions:
+
+State 188:
+## Known stack suffix:
+## DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty EQ
+## LR(1) items:
+stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty EQ . tm [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 189
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 189:
+## Known stack suffix:
+## DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty EQ tm
+## LR(1) items:
+stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty EQ tm . [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+## Reductions:
+-- On THEOREM PRINT EOF DEFINITION CONST
+--   reduce production stmt -> DEFINITION SEP LET IDENT nonempty_list(arg) COLON ty EQ tm
+
+State 190:
+## Known stack suffix:
+## CONST
+## LR(1) items:
+stmt -> CONST . IDENT EQ tm SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On IDENT shift to state 191
+## Reductions:
+
+State 191:
+## Known stack suffix:
+## CONST IDENT
+## LR(1) items:
+stmt -> CONST IDENT . EQ tm SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On EQ shift to state 192
+## Reductions:
+
+State 192:
+## Known stack suffix:
+## CONST IDENT EQ
+## LR(1) items:
+stmt -> CONST IDENT EQ . tm SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On NIL shift to state 24
+-- On NATLIT shift to state 25
+-- On MATCH shift to state 26
+-- On LPAR shift to state 27
+-- On IF0 shift to state 28
+-- On IDENT shift to state 29
+-- On FUN shift to state 30
+-- On tm shift to state 193
+-- On mul_tm shift to state 37
+-- On key_tm shift to state 43
+-- On atom_tm shift to state 40
+-- On app_tm shift to state 41
+-- On addsub_tm shift to state 44
+## Reductions:
+
+State 193:
+## Known stack suffix:
+## CONST IDENT EQ tm
+## LR(1) items:
+stmt -> CONST IDENT EQ tm . SEP [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+-- On SEP shift to state 194
+## Reductions:
+
+State 194:
+## Known stack suffix:
+## CONST IDENT EQ tm SEP
+## LR(1) items:
+stmt -> CONST IDENT EQ tm SEP . [ THEOREM PRINT EOF DEFINITION CONST ]
+## Transitions:
+## Reductions:
+-- On THEOREM PRINT EOF DEFINITION CONST
+--   reduce production stmt -> CONST IDENT EQ tm SEP
+
+State 195:
+## Known stack suffix:
+## stmt
+## LR(1) items:
+program -> stmt . program [ # ]
+## Transitions:
+-- On THEOREM shift to state 1
+-- On PRINT shift to state 157
+-- On EOF shift to state 160
+-- On DEFINITION shift to state 161
+-- On CONST shift to state 190
+-- On stmt shift to state 195
+-- On program shift to state 196
+## Reductions:
+
+State 196:
+## Known stack suffix:
+## stmt program
+## LR(1) items:
+program -> stmt program . [ # ]
+## Transitions:
+## Reductions:
+-- On #
+--   reduce production program -> stmt program
+
+State 197:
+## Known stack suffix:
+## program
+## LR(1) items:
+program' -> program . [ # ]
+## Transitions:
+## Reductions:
+-- On #
+--   accept program
+
