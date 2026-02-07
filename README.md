@@ -1,5 +1,5 @@
 # InstantCurry
-An friendly educational proof checker for COMP 302.
+A friendly educational proof checker for COMP 302.
 
 Allows for stating and proving inductive and arithmetic statements, with polymorphpic type checking and inference.
 
@@ -428,3 +428,4 @@ Build using `dune build`.
 Run against a file with `./run <file>`.
 Use `./run_tests` to run on all files in the `sample` and `proofs` directories.
 Definitions and theorems from `common.ic` are automatically loaded.
+
